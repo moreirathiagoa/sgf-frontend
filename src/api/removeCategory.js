@@ -1,10 +1,10 @@
 import axios from 'axios'
-import PROPRIETIES from '../properties'
+import proprieties from '../properties'
 
 export default (id) => {
     const response = axios({
         method: 'delete',
-        url: PROPRIETIES.URL+'category/delete/'+id,
+        url: proprieties.url+'category/delete/'+id,
     })
     .then((res) => {
         return res

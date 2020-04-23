@@ -134,7 +134,7 @@ class Admin extends React.Component {
             />
             <Switch>
               {this.getRoutes(routes)}
-              <Redirect from="*" to="/admin/dashboard"/>
+              <Redirect from="*" to="/admin/category"/>
             </Switch>
             {// we don't want the Footer to be rendered on map page
             this.props.location.pathname.indexOf("maps") !== -1 ? null : (
