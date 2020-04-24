@@ -110,7 +110,7 @@ class AdminNavbar extends React.Component {
                 </button>
               </div>
               <NavbarBrand href="#" onClick={e => e.preventDefault()}>
-                Sistema Gerencial Financeiro
+                Gestão Financeira
               </NavbarBrand>
             </div>
             <button
