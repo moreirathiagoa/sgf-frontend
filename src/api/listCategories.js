@@ -2,7 +2,6 @@ import axios from 'axios'
 import properties from '../properties'
 console.log(properties.url);
 
-
 const listCategories = () => {
     const response = axios({
         method: 'get',

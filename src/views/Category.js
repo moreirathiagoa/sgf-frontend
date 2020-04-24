@@ -27,7 +27,6 @@ import {
   CardHeader,
   CardBody,
   CardFooter,
-  CardText,
   Table,
   FormGroup,
   Form,
@@ -43,6 +42,7 @@ class UserProfile extends React.Component {
     this.state={
       categories: [],
       idToUpdate: undefined,
+      list: true,
       data: {
         name: '',
         isActive: true
@@ -53,6 +53,7 @@ class UserProfile extends React.Component {
     this.editInit = this.editInit.bind(this)
     this.remover = this.remover.bind(this)
     this.setAtive = this.setAtive.bind(this)
+    this.acaoBotaoNovo = this.acaoBotaoNovo.bind(this)
   }
 
   componentDidMount(){
@@ -77,6 +78,7 @@ class UserProfile extends React.Component {
 
   editInit(element){
     let state = this.state
+    state.list = false
     state.idToUpdate = element._id
     state.data.name = element.name
     state.data.isActive = element.isActive
@@ -97,17 +99,21 @@ class UserProfile extends React.Component {
   }
 
   remover(id){
-    removeCategory(id)
-    .then((res)=>{
-      //primary, success, danger, warning, info
-      if (res.data.code == 202)
-        this.notify("success", res.data.message)
-      else
-        this.notify("warning", res.data.message)
-    })
-    .catch((err)=>{
-      this.notify("danger", err.message)
-    })
+
+    if (window.confirm('Deseja realmente apagar essa Categoria?'))
+    {
+      removeCategory(id)
+        .then((res)=>{
+          //primary, success, danger, warning, info
+          if (res.data.code == 202)
+            this.notify("success", res.data.message)
+          else
+            this.notify("warning", res.data.message)
+        })
+        .catch((err)=>{
+          this.notify("danger", err.message)
+        })
+    }
   }
 
   submitForm(e){
@@ -152,10 +158,17 @@ class UserProfile extends React.Component {
 
   limpaDataState() {
     let state = this.state
+    state.list = true
     state.data.name = ''
     state.data.isActive = true
     state.idToUpdate = undefined
     this.setState(state)
+  }
+
+  acaoBotaoNovo(){
+    this.setState({list:!this.state.list})
+    if (!this.state.list)
+      this.limpaDataState()
   }
 
   notify = (type, message) => {
@@ -180,99 +193,115 @@ class UserProfile extends React.Component {
     return (
       <>
         <div className="content">
-          <h1>Categorias</h1>
+          <h1>Categorias{" "}
+            <Button 
+              className="btn-fill" 
+              size="sm"
+              onClick={()=>this.acaoBotaoNovo()}
+            >
+              <i className={this.state.list?"tim-icons icon-simple-add":"tim-icons icon-minimal-left"}></i>
+            </Button>
+          </h1>
           <div className="react-notification-alert-container">
             <NotificationAlert ref="notificationAlert" />
           </div>
-          <Row>
-            <Col md="12">
-              <Card>
-                <CardHeader>
-                  <h5 className="title">Categorias Cadastradas</h5>
-                </CardHeader>
-                <CardBody>
-                <Table className="tablesorter">
-                    <thead className="text-primary">
-                      <tr>
-                        <th>Nome</th>
-                        <th>Status</th>
-                        <th>Opções</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {this.state.categories.map(element => {
-                        return(
-                          <tr>
-                            <td>{ element.name }</td>
-                            <td>{ element.isActive?'Ativa':'Inativa' }</td>
-                            <td>
-                              <Button 
-                                className="btn-fill" 
-                                size="sm" 
-                                title="Dois cliques para remover"
-                                onDoubleClick={()=>this.remover(element._id)}
-                              >Remover</Button>
-                              <Button className="btn-fill" size="sm" onClick={()=>this.editInit(element)}>Editar</Button>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </Table>
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
-          <Row>
-            <Col md="6">
-              <Card>
-                <CardHeader>
-                  <h5 className="title">Criação de Categoria</h5>
-                </CardHeader>
-                <Form onSubmit={this.submitForm}>
+
+          {this.state.list?
+
+            <Row>
+              <Col md="12">
+                <Card>
+                  <CardHeader>
+                    <h5 className="title">Categorias Cadastradas</h5>
+
+                  </CardHeader>
                   <CardBody>
-                    <Row>
-                      <Col className="pr-md-1" md="8">
-                        <FormGroup>
-                          <label>Nome da Categoria</label>
-                          <Input
-                            placeholder="Categoria"
-                            type="text"
-                            value={this.state.data.name}
-                            onChange={this.setName}
-                          />
-                        </FormGroup>
-                      </Col>
-                    
-                      <Col className="pr-md-1" md="4">
-                        <FormGroup>
-                        <label>Status</label>
-                        <br/>
-                          <Button
-                            color="info"
-                            id="2"
-                            size="sm"
-                            weight="5px"
-                            tag="label"
-                            className={classNames("btn-simple", {
-                              active: this.state.data.isActive
-                            })}
-                            onClick={this.setAtive}
-                          >{this.state.data.isActive?"Ativa":"Inativa"}
-                          </Button>
-                        </FormGroup>
-                      </Col>
-                    </Row>
+                  <Table className="tablesorter">
+                      <thead className="text-primary">
+                        <tr>
+                          <th>Nome</th>
+                          <th>Status</th>
+                          <th>Opções</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {this.state.categories.map(element => {
+                          return(
+                            <tr key={ element._id }>
+                              <td>{ element.name }</td>
+                              <td>{ element.isActive?'Ativa':'Inativa' }</td>
+                              <td>
+                                <Button 
+                                  className="btn-fill" 
+                                  size="sm" 
+                                  title="Dois cliques para remover"
+                                  onClick={()=>this.remover(element._id)}
+                                >Apagar</Button>
+                                {" "}
+                                <Button className="btn-fill" size="sm" onClick={()=>this.editInit(element)}>Editar</Button>
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </Table>
                   </CardBody>
-                  <CardFooter>
-                    <Button className="btn-fill" color="primary" type="submit">
-                      Save
-                    </Button>
-                  </CardFooter>
-                </Form>
-              </Card>
-            </Col>
-          </Row>
+                </Card>
+              </Col>
+            </Row>
+          :
+
+            <Row>
+              <Col md="6">
+                <Card>
+                  <CardHeader>
+                    <h5 className="title">Criação de Categoria</h5>
+                  </CardHeader>
+                  <Form onSubmit={this.submitForm}>
+                    <CardBody>
+                      <Row>
+                        <Col className="pr-md-1" md="8">
+                          <FormGroup>
+                            <label>Nome da Categoria</label>
+                            <Input
+                              placeholder="Categoria"
+                              type="text"
+                              value={this.state.data.name}
+                              onChange={this.setName}
+                            />
+                          </FormGroup>
+                        </Col>
+                      
+                        <Col className="pr-md-1" md="4">
+                          <FormGroup>
+                          <label>Status</label>
+                          <br/>
+                            <Button
+                              color="info"
+                              id="2"
+                              size="sm"
+                              weight="5px"
+                              tag="label"
+                              className={classNames("btn-simple", {
+                                active: this.state.data.isActive
+                              })}
+                              onClick={this.setAtive}
+                            >{this.state.data.isActive?"Categoria Ativa":"Categoria Inativa"}
+                            </Button>
+                          </FormGroup>
+                        </Col>
+                      </Row>
+                    </CardBody>
+                    <CardFooter>
+                      <Button className="btn-fill" size="lg" type="submit">
+                        Confirmar
+                      </Button>
+                    </CardFooter>
+                  </Form>
+                </Card>
+              </Col>
+            </Row>
+          }
         </div>
       </>
     );
