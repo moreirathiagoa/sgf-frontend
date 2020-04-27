@@ -1,17 +1,26 @@
 import axios from 'axios'
 import properties from '../properties'
-console.log(properties.url);
 
 const listCategories = () => {
+    
+    const token = localStorage.getItem('token')
+    
     const response = axios({
         method: 'get',
         url: properties.url+'category/list',
+        headers:{
+            auth: token
+        }
     })
     .then((res) => {
         return res
     })
     .catch((err) => {
-        return err
+        //console.log(err.response.status);
+        
+        //res.redirect('admin/login');
+        
+        return err.response
     })
     return response
 }

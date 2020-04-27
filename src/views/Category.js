@@ -19,6 +19,7 @@ import React from "react";
 import { createCategory, listCategories, removeCategory, updateCategory } from '../api'
 import NotificationAlert from "react-notification-alert";
 import classNames from "classnames";
+import { Redirect } from "react-router-dom";
 
 // reactstrap components
 import {
@@ -40,6 +41,7 @@ class UserProfile extends React.Component {
   constructor(props){
     super(props)
     this.state={
+      redirect: false,
       categories: [],
       idToUpdate: undefined,
       list: true,
@@ -60,18 +62,24 @@ class UserProfile extends React.Component {
     this.list()
   }
 
-  componentDidUpdate(){
-    this.list()
-  }
-
   list = ()=>{
     listCategories()
-      .then((res)=>{
-        let state = this.state
-        state.categories = res.data.data
-        this.setState(state)
+      .then((res)=>{          
+          if (res.status == 401){
+            localStorage.removeItem('token')
+            let state = this.state
+            state.redirect = true
+            this.setState(state)
+          }
+          else {
+            let state = this.state
+            state.categories = res.data.data
+            this.setState(state)
+          }
       })
       .catch((err)=>{
+        console.log('>>',err);
+        
         this.notify("danger", err.message)
       })
   }
@@ -105,8 +113,10 @@ class UserProfile extends React.Component {
       removeCategory(id)
         .then((res)=>{
           //primary, success, danger, warning, info
-          if (res.data.code == 202)
+          if (res.data.code == 202){
             this.notify("success", res.data.message)
+            this.list()
+          }
           else
             this.notify("warning", res.data.message)
         })
@@ -128,8 +138,10 @@ class UserProfile extends React.Component {
     createCategory(this.state.data)
       .then((res)=>{
         //primary, success, danger, warning, info
-        if (res.data.code == 201 || res.data.code == 202)
+        if (res.data.code == 201 || res.data.code == 202){
           this.notify("success", res.data.message)
+          this.list()
+        }
         else
           this.notify("warning", res.data.message)
         
@@ -143,9 +155,12 @@ class UserProfile extends React.Component {
   atualizar(){
     updateCategory(this.state.data, this.state.idToUpdate)
       .then((res)=>{
+        
         //primary, success, danger, warning, info
-        if (res.data.code == 201 || res.data.code == 202)
+        if (res.data.code == 201 || res.data.code == 202){
           this.notify("success", res.data.message)
+          this.list()
+        }
         else
           this.notify("warning", res.data.message)
 
@@ -189,7 +204,9 @@ class UserProfile extends React.Component {
   };
   
   render() {
-    //console.log(this.state);
+    if (this.state.redirect) {
+      return <Redirect to={'/admin/login'} />
+    }
     return (
       <>
         <div className="content">

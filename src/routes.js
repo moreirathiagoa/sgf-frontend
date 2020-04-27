@@ -17,6 +17,7 @@
 */
 import Dashboard from "views/Dashboard.js";
 import Category from "views/Category.js";
+import Login from "views/Login.js";
 import Icons from "views/Icons.js";
 import Map from "views/Map.js";
 import Notifications from "views/Notifications.js";
@@ -26,6 +27,13 @@ import Typography from "views/Typography.js";
 import UserProfile from "views/UserProfile.js";
 
 var routes = [
+  {
+    path: "/login",
+    name: "Login",
+    icon: "tim-icons icon-bag-16",
+    component: Login,
+    layout: "/admin"
+  },
   {
     path: "/category",
     name: "Categorias",
