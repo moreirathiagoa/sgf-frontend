@@ -13,6 +13,7 @@ import {
 import { MoreOutlined } from '@ant-design/icons';
 import { createCategory, listCategories, removeCategory, updateCategory } from '../api'
 import { Redirect } from 'react-router-dom';
+import { formatDateFromDB } from '../utils'
 
 const { Panel } = Collapse;
 const { Title } = Typography;
@@ -219,6 +220,7 @@ class Categorias extends React.Component {
                                         <Descriptions title="Detalhes:">
                                             <Descriptions.Item label="Nome:">{element.name}</Descriptions.Item>
                                             <Descriptions.Item label="Status:">{element.isActive ? 'Ativa' : 'Inativa'}</Descriptions.Item>
+                                            <Descriptions.Item label="Data Criação:">{formatDateFromDB(element.createDate)}</Descriptions.Item>
                                         </Descriptions>
                                     </Panel>
                                 )

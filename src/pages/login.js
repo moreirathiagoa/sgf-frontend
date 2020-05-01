@@ -1,6 +1,5 @@
 import React from 'react';
 import { Form, Input, Button, Checkbox } from 'antd';
-import { MoreOutlined } from '@ant-design/icons';
 import { login } from '../api'
 import { Redirect } from "react-router-dom";
 
@@ -21,7 +20,7 @@ class Login extends React.Component {
             .then((res) => {
 
                 //primary, success, danger, warning, info
-                if (res.data.code == 200) {
+                if (res.data.code === 200) {
                     console.log('Lougou')
                     localStorage.setItem('token', res.data.data.token)
                     this.setState({logou:true})
