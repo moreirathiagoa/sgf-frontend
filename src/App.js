@@ -1,7 +1,7 @@
 import React from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, Redirect } from 'react-router-dom'
 import { Layout } from 'antd';
 import {
 	MenuUnfoldOutlined,
@@ -15,7 +15,8 @@ const { Header, Content } = Layout;
 class App extends React.Component {
 	state = {
 		collapsed: true,
-		titulo: 'Sistema de Gerenciamento Financeiro'
+		titulo: 'Sistema de Gerenciamento Financeiro',
+		logado: true
 	};
 
 	toggle = () => {
@@ -25,11 +26,21 @@ class App extends React.Component {
 		});
 	};
 	render() {
+
+		/* const token = localStorage.getItem('token')
+        if (token === '' || token === null) {
+			if (this.state.logado !== false)
+            	this.setState({logado: false})
+        } else {
+			if (this.state.logado !== true)
+            	this.setState({logado: true})
+		} */
+
 		return (
 			<div>
 				<BrowserRouter>
 					<Layout>
-						<MenuPrincipal collapsed={this.state.collapsed} menuKey={"1"} />
+						<MenuPrincipal collapsed={this.state.collapsed} logado={this.state.logado} />
 						<Layout className="site-layout">
 							<Header className="site-layout-background" style={{ padding: 0 }}>
 								{React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {

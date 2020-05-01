@@ -12,6 +12,7 @@ import {
 } from 'antd';
 import { MoreOutlined } from '@ant-design/icons';
 import { createCategory, listCategories, removeCategory, updateCategory } from '../api'
+import { Redirect } from 'react-router-dom';
 
 const { Panel } = Collapse;
 const { Title } = Typography;
@@ -197,6 +198,12 @@ class Categorias extends React.Component {
     };
 
     render() {
+
+        const token = localStorage.getItem('token')
+        if (token === '' || token === null){
+            return <Redirect to="/"/>
+        }
+
         return (
             <div>
                 {this.state.list?

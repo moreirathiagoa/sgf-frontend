@@ -9,8 +9,7 @@ const listCategories = () => {
         method: 'get',
         url: properties.url+'category/list',
         headers:{
-            //auth: token
-            auth: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6InRoaWFnbyIsImRhdGFfZ2VyYWNhbyI6IjIwMjAtMDUtMDFUMDQ6NTE6MjguMTg0WiIsImlhdCI6MTU4ODMwODY4OCwiZXhwIjoxNTg4MzEyMjg4fQ.k_-l0cmYwWjSIkdq-dRdLLJgzUHOSq7TWuvX4Vyqefs"
+            auth: token
         }
     })
     .then((res) => {
