@@ -8,8 +8,6 @@ import Login from './pages/login'
 class Router extends React.Component {
 
 	render(){
-		console.log(this.props.logado);
-		
         if (!this.props.logado){
             return <Login verificaLogin={this.props.verificaLogin} />
         }

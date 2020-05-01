@@ -20,6 +20,10 @@ class App extends React.Component {
 		logado: false
 	};
 
+	componentDidMount(){
+		this.verificaLogin()
+	}
+
 	verificaLogin = () =>{
 		const token = localStorage.getItem('token')
 		if (token){
