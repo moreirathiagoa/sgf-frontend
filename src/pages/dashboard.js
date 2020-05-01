@@ -1,15 +1,8 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
 
 class Dashboard extends React.Component {
 
     render() {
-
-        const token = localStorage.getItem('token')
-        if (token === '' || token === null) {
-            return <Redirect to="/" />
-        }
-
         return (
             <div>
                 <h1>Dashboard</h1>

@@ -12,7 +12,6 @@ import {
 } from 'antd';
 import { MoreOutlined } from '@ant-design/icons';
 import { createCategory, listCategories, removeCategory, updateCategory } from '../api'
-import { Redirect } from 'react-router-dom';
 import { formatDateFromDB } from '../utils'
 
 const { Panel } = Collapse;
@@ -27,7 +26,6 @@ class Categorias extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            redirect: false,
             categories: [],
             idToUpdate: undefined,
             list: true,
@@ -55,7 +53,7 @@ class Categorias extends React.Component {
                 if (res.status === 401) {
                     localStorage.removeItem('token')
                     let state = this.state
-                    state.redirect = true
+                    this.props.verificaLogin()
                     this.setState(state)
                 }
                 else {
@@ -199,12 +197,6 @@ class Categorias extends React.Component {
     };
 
     render() {
-
-        const token = localStorage.getItem('token')
-        if (token === '' || token === null){
-            return <Redirect to="/"/>
-        }
-
         return (
             <div>
                 {this.state.list?

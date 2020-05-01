@@ -4,13 +4,22 @@ import Dashboard from './pages/dashboard';
 import Categoria from './pages/categorias'
 import Login from './pages/login'
 
-const routers = ()=>{
-	return(
-		<Switch>
-			<Route exact path="/" component={ Login } />
-			<Route path="/dashboard" component={ Dashboard } />
-			<Route path="/categoria" component={ Categoria } />
-		</Switch>
-	)
+class Router extends React.Component {
+
+	render(){
+		
+        if (!this.props.logado){
+            return <Login verificaLogin={this.props.verificaLogin} />
+        }
+
+		return(
+			<Switch>
+				<Route exact path="/"><Login verificaLogin={this.props.verificaLogin} /></Route>
+				<Route path="/dashboard"><Dashboard verificaLogin={this.props.verificaLogin}/></Route>
+				<Route path="/categoria"><Categoria verificaLogin={this.props.verificaLogin}/></Route>
+			</Switch>
+		)
+		
+	}
 }
-export default routers
+export default Router

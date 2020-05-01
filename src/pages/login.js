@@ -12,21 +12,15 @@ const tailLayout = {
 };
 
 class Login extends React.Component {
-    state = {
-        logou: false
-    }
+
     onFinish = values => {
         login(values)
             .then((res) => {
 
-                //primary, success, danger, warning, info
                 if (res.data.code === 200) {
                     console.log('Lougou')
                     localStorage.setItem('token', res.data.data.token)
-                    this.setState({logou:true})
-
-                    //localStorage.removeItem('config')
-                    //const token = localStorage.getItem('config')
+                    this.props.verificaLogin()
                 }
                 else {
 
@@ -79,7 +73,7 @@ class Login extends React.Component {
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
                         Submit
-        </Button>
+                    </Button>
                 </Form.Item>
             </Form>
         )
