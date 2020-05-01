@@ -35,11 +35,10 @@ class Categorias extends React.Component {
                 isActive: true
             }
         }
-        this.setName = this.setName.bind(this)
+        this.handleChange = this.handleChange.bind(this)
         this.submitForm = this.submitForm.bind(this)
         this.editInit = this.editInit.bind(this)
         this.remover = this.remover.bind(this)
-        this.setAtive = this.setAtive.bind(this)
         this.acaoBotaoNovo = this.acaoBotaoNovo.bind(this)
     }
 
@@ -61,23 +60,17 @@ class Categorias extends React.Component {
                 }
             })
             .catch((err) => {
-                console.log('>>', err);
-
-
+                openNotification('error', 'Erro ao listar', 'Erro interno. Tente novamente mais tarde.')
             })
     }
 
     menu = (element) => (
         <Menu>
-            <Menu.Item onClick={()=> this.remover(element._id)}>
-                Apagar
-            </Menu.Item>
-            <Menu.Item onClick={()=> this.editInit(element)}>
-                Editar
-            </Menu.Item>
+            <Menu.Item onClick={() => this.remover(element._id)}>Apagar</Menu.Item>
+            <Menu.Item onClick={() => this.editInit(element)}>Editar</Menu.Item>
         </Menu>
     )
-    
+
     genExtra = (key) => (
         <Dropdown
             overlay={this.menu(key)}
@@ -99,16 +92,20 @@ class Categorias extends React.Component {
         this.setState(state)
     }
 
-    setName(e) {
-        let digitade = e.target.value
-        let state = this.state;
-        state.data.name = digitade
-        this.setState(state)
-    }
+    handleChange(event) {
+        let state = this.state
 
-    setAtive() {
-        let state = this.state;
-        state.data.isActive = !state.data.isActive
+        switch (event.target.name) {
+            case 'name':
+                state.data.name = event.target.value
+                break
+
+            case 'isActive':
+                state.data.isActive = !state.data.isActive
+                break
+
+            default:
+        }
         this.setState(state)
     }
 
@@ -118,22 +115,21 @@ class Categorias extends React.Component {
             removeCategory(id)
                 .then((res) => {
                     if (res.data.code === 202) {
-                        openNotification('success','Categoria removida','Categoria removida com sucesso.')
+                        openNotification('success', 'Categoria removida', 'Categoria removida com sucesso.')
                         this.list()
                     }
                     else {
-                        openNotification('error','Categoria não removida','A Categoria não pode ser removida.')
+                        openNotification('error', 'Categoria não removida', 'A Categoria não pode ser removida.')
                     }
 
                 })
                 .catch((err) => {
-                    openNotification('error','Categoria não removida','Erro interno. Tente novamente mais tarde.')
+                    openNotification('error', 'Categoria não removida', 'Erro interno. Tente novamente mais tarde.')
                 })
         }
     }
 
     submitForm(e) {
-        console.log('submit ok')
         if (this.state.idToUpdate)
             this.atualizar(e)
         else
@@ -144,17 +140,17 @@ class Categorias extends React.Component {
         createCategory(this.state.data)
             .then((res) => {
                 if (res.data.code === 201 || res.data.code === 202) {
-                    openNotification('success','Categoria cadastrada','Categoria cadastrada com sucesso.')
+                    openNotification('success', 'Categoria cadastrada', 'Categoria cadastrada com sucesso.')
                     this.list()
                     this.limpaDataState()
                 }
                 else {
-                    openNotification('error','Categoria não cadastrada','A Categoria não pode ser cadastrada.')
+                    openNotification('error', 'Categoria não cadastrada', 'A Categoria não pode ser cadastrada.')
                 }
-                
+
             })
             .catch((err) => {
-                openNotification('error','Categoria não cadastrada','Erro interno. Tente novamente mais tarde.')
+                openNotification('error', 'Categoria não cadastrada', 'Erro interno. Tente novamente mais tarde.')
             })
     }
 
@@ -162,16 +158,16 @@ class Categorias extends React.Component {
         updateCategory(this.state.data, this.state.idToUpdate)
             .then((res) => {
                 if (res.data.code === 201 || res.data.code === 202) {
-                    console.log('atualizou a categoria')
+                    openNotification('success', 'Categoria atualizada', 'Categoria atualizada com sucesso.')
                     this.list()
+                    this.limpaDataState()
                 }
                 else {
-                    console.log('erro ao atualizar a categoria')
+                    openNotification('error', 'Categoria não atualizada', 'A Categoria não pode ser atualizada.')
                 }
-                this.limpaDataState()
             })
             .catch((err) => {
-
+                openNotification('error', 'Categoria não cadastrada', 'Erro interno. Tente novamente mais tarde.')
             })
     }
 
@@ -193,9 +189,9 @@ class Categorias extends React.Component {
     render() {
         return (
             <div>
-                {this.state.list?
+                {this.state.list ?
                     <div>
-                        <Title level={4}>Lista de Categorias <PlusCircleOutlined onClick={()=>this.acaoBotaoNovo()} /></Title>
+                        <Title level={4}>Lista de Categorias <PlusCircleOutlined onClick={() => this.acaoBotaoNovo()} /></Title>
                         <Collapse
                             onChange={callback}
                             expandIconPosition="left"
@@ -213,9 +209,9 @@ class Categorias extends React.Component {
                             })}
                         </Collapse>
                     </div>
-                :
+                    :
                     <div>
-                        <Title level={4}><ArrowLeftOutlined onClick={()=>this.acaoBotaoNovo()} /> Dados da Categoria</Title>
+                        <Title level={4}><ArrowLeftOutlined onClick={() => this.acaoBotaoNovo()} /> Dados da Categoria</Title>
                         <Form
                             labelCol={{ span: 4, }}
                             wrapperCol={{ span: 14, }}
@@ -230,12 +226,15 @@ class Categorias extends React.Component {
                                 <Input
                                     placeholder="Categoria"
                                     type="text"
+                                    name="name"
                                     value={this.state.data.name}
-                                    onChange={this.setName}
+                                    onChange={this.handleChange}
                                 />
                             </Form.Item>
                             <Form.Item label="Categoria Ativa">
-                                <Switch checked={this.state.data.isActive} onClick={this.setAtive} />
+                                <span onClick={this.handleChange}>
+                                    <Switch name="isActive" checked={this.state.data.isActive} size="small" />
+                                </span>
                             </Form.Item>
                             <Form.Item label="Button">
                                 <Button className="btn-fill" size="lg" htmlType="submit">

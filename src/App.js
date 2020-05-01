@@ -17,8 +17,12 @@ class App extends React.Component {
 	state = {
 		collapsed: true,
 		titulo: 'Sistema de Gerenciamento Financeiro',
-		logado: true
+		logado: false
 	};
+
+	componentDidMount(){
+		this.verificaLogin()
+	}
 
 	verificaLogin = () =>{
 		const token = localStorage.getItem('token')
