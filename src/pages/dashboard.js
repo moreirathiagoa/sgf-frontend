@@ -6,6 +6,10 @@ import '../App.css'
 const { Title } = Typography;
 
 class Dashboard extends React.Component {
+    
+    componentDidMount() {
+        this.props.mudaTitulo("Dashboard")
+    }
 
     render() {
         return (
