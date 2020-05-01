@@ -47,7 +47,7 @@ class App extends React.Component {
 					<Layout>
 						<MenuPrincipal collapsed={this.state.collapsed} logado={this.state.logado} alterado={this.toggle}/>
 						<Layout className="site-layout">
-							<Header className="site-layout-background" style={{ padding: 0 }}>
+							<Header className="site-layout-background" style={{ padding: 0, margin: '1px 1px 0 1px' }}>
 								{React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
 									className: 'trigger',
 									onClick: this.toggle,
@@ -57,7 +57,7 @@ class App extends React.Component {
 							<Content
 								className="site-layout-background"
 								style={{
-									margin: '24px 16px',
+									margin: '1px 1px',
 									padding: 24,
 									minHeight: 280,
 								}}
