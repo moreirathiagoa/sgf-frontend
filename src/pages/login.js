@@ -21,6 +21,7 @@ class Login extends React.Component {
                     openNotification('success','Login efetuado','Seu login foi registrado com sucesso.')
                     localStorage.setItem('token', res.data.data.token)
                     this.props.verificaLogin()
+                    this.render()
                 }
                 else {
                     openNotification('error','Login não efetuado','Usuário ou senha inválio.')
@@ -37,9 +38,14 @@ class Login extends React.Component {
 
     render() {
 
-        const token = localStorage.getItem('token')
-        if (token !== null && token !== ''){
-            return <Redirect to="/dashboard" />;
+        if (this.props.mode){
+            localStorage.removeItem('token')
+            this.props.verificaLogin()
+            return <Redirect to="/"/>
+        }
+
+        if (this.props.logado){
+            return <Redirect to="/dashboard"/>
         }
 
         return (

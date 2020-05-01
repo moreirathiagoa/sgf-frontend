@@ -19,7 +19,7 @@ class MenuPrincipal extends React.Component {
 				{this.props.logado &&
 					<Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} onClick={this.props.alterado}>
 						<Menu.Item key="1">
-							<Link to="/">
+							<Link to="/dashboard">
 								<UserOutlined />
 								<span>
 									Dashboard
@@ -27,9 +27,15 @@ class MenuPrincipal extends React.Component {
 							</Link>
 						</Menu.Item>
 						<Menu.Item key="2">
-							<Link to="/categoria">
+							<Link to="/category">
 								<VideoCameraOutlined />
 								<span>Categorias</span>
+							</Link>
+						</Menu.Item>
+						<Menu.Item key="3">
+							<Link to="/logout">
+								<VideoCameraOutlined />
+								<span>Logout</span>
 							</Link>
 						</Menu.Item>
 					</Menu>
