@@ -1,4 +1,5 @@
 import React from 'react';
+import '../App.css'
 import {
     Form,
     Input,
@@ -10,7 +11,7 @@ import {
     Descriptions,
     Typography
 } from 'antd';
-import { ArrowLeftOutlined, MoreOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { createCategory, listCategories, removeCategory, updateCategory } from '../api'
 import { formatDateFromDB, openNotification } from '../utils'
 
@@ -79,7 +80,7 @@ class Categorias extends React.Component {
                 event.stopPropagation();
             }}
         >
-            <MoreOutlined />
+            <MenuOutlined />
         </Dropdown >
     );
 
@@ -227,17 +228,18 @@ class Categorias extends React.Component {
                                     placeholder="Categoria"
                                     type="text"
                                     name="name"
+                                    size="md"
                                     value={this.state.data.name}
                                     onChange={this.handleChange}
                                 />
                             </Form.Item>
                             <Form.Item label="Categoria Ativa">
                                 <span onClick={this.handleChange}>
-                                    <Switch name="isActive" checked={this.state.data.isActive} size="small" />
+                                    <Switch name="isActive" checked={this.state.data.isActive} size="md" />
                                 </span>
                             </Form.Item>
-                            <Form.Item label="Button">
-                                <Button className="btn-fill" size="lg" htmlType="submit">
+                            <Form.Item label="">
+                                <Button className="btn-fill" size="lg" type="primary" htmlType="submit">
                                     Confirmar
                                 </Button>
                             </Form.Item>

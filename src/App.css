@@ -4,18 +4,69 @@
 	padding: 0 24px;
 	cursor: pointer;
 	transition: color 0.3s;
+	color: white;
+}
+
+body{
+	background: #000;
+}
+.ant-menu.ant-menu-dark{
+	background: #010304;
+}
+
+.ant-menu-item-selected{
+	background: #001529 !important;
 }
 
 .trigger:hover {
 	color: #1890ff;
+	color: white;
+}
+
+.ant-switch {
+	background: #3a3939;
+}
+
+.ant-switch-checked {
+	background: #1890ff;
 }
 
 .logo {
 	height: 32px;
-	background: rgba(255, 255, 255, 0.2);
-	margin: 16px;
+	color: #303879;
+	margin: 0 0 15px 0;
+	text-align: center;
+	font-size: 30px;
+	font-weight: bolder;
 }
 
 .site-layout .site-layout-background {
-	background: #fff;
+	background: #100e0e;
+	color: white;
+}
+
+h4.ant-typography{
+	color: #ccc;
+}
+
+.ant-layout-sider-children{
+	background: #100e0e;
+}
+
+
+.ant-collapse-item{
+	background: #3e3c3c;
+}
+
+.ant-collapse-header{
+	color: white !important;
+	
+}
+
+.ant-form-item-label{
+	color: white;
+}
+
+label{
+	color: white !important;
 }
