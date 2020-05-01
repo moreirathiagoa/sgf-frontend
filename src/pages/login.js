@@ -13,6 +13,13 @@ const tailLayout = {
 };
 
 class Login extends React.Component {
+    
+    componentDidMount(){
+        if (this.props.mode){
+            localStorage.removeItem('token')
+            this.props.verificaLogin()
+        }
+    }
 
     onFinish = values => {
         login(values)
@@ -39,8 +46,6 @@ class Login extends React.Component {
     render() {
 
         if (this.props.mode){
-            localStorage.removeItem('token')
-            this.props.verificaLogin()
             return <Redirect to="/"/>
         }
 
