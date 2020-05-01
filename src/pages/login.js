@@ -1,8 +1,8 @@
 import React from 'react';
 import { Form, Input, Button, Checkbox } from 'antd';
-import { MoreOutlined } from '@ant-design/icons';
 import { login } from '../api'
 import { Redirect } from "react-router-dom";
+import { openNotification } from '../utils'
 
 const layout = {
     labelCol: { span: 8 },
@@ -13,33 +13,26 @@ const tailLayout = {
 };
 
 class Login extends React.Component {
-    state = {
-        logou: false
-    }
+
     onFinish = values => {
         login(values)
             .then((res) => {
-
-                //primary, success, danger, warning, info
-                if (res.data.code == 200) {
-                    console.log('Lougou')
+                if (res.data.code === 200) {
+                    openNotification('success','Login efetuado','Seu login foi registrado com sucesso.')
                     localStorage.setItem('token', res.data.data.token)
-                    this.setState({logou:true})
-
-                    //localStorage.removeItem('config')
-                    //const token = localStorage.getItem('config')
+                    this.props.verificaLogin()
                 }
                 else {
-
+                    openNotification('error','Login não efetuado','Usuário ou senha inválio.')
                 }
             })
             .catch((err) => {
-
+                openNotification('error','Login não efetuado','Erro interno. Tente novamente mais tarde.')
             })
     };
 
     onFinishFailed = errorInfo => {
-        console.log('Failed:', errorInfo);
+        openNotification('warning','Login não efetuado','Preencha os dados corretamente.')
     };
 
     render() {
@@ -80,7 +73,7 @@ class Login extends React.Component {
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
                         Submit
-        </Button>
+                    </Button>
                 </Form.Item>
             </Form>
         )

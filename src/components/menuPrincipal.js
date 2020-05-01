@@ -5,17 +5,19 @@ import { Link } from 'react-router-dom'
 import {
 	UserOutlined,
 	VideoCameraOutlined,
-	UploadOutlined,
 } from '@ant-design/icons';
 const { Sider } = Layout;
 
 class MenuPrincipal extends React.Component {
+
+	
+
 	render() {
 		return (
 			<Sider trigger={null} collapsible collapsed={this.props.collapsed} collapsedWidth={0}>
 				<div className="logo" >SGF Logo</div>
 				{this.props.logado &&
-					<Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+					<Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} onClick={this.props.alterado}>
 						<Menu.Item key="1">
 							<Link to="/">
 								<UserOutlined />
@@ -29,10 +31,6 @@ class MenuPrincipal extends React.Component {
 								<VideoCameraOutlined />
 								<span>Categorias</span>
 							</Link>
-						</Menu.Item>
-						<Menu.Item key="3">
-							<UploadOutlined />
-							<span>nav 3</span>
 						</Menu.Item>
 					</Menu>
 				}

@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 import Routes from './routes'
 import MenuPrincipal from './components/menuPrincipal';
+import { openNotification } from './utils'
 
 const { Header, Content } = Layout;
 
@@ -19,6 +20,16 @@ class App extends React.Component {
 		logado: true
 	};
 
+	verificaLogin = () =>{
+		const token = localStorage.getItem('token')
+		if (token){
+			this.setState({logado: true})
+		} else {
+			this.setState({logado: false})
+			openNotification('error','Você foi deslogado','Realize login novamente.')
+		}
+	}
+
 	toggle = () => {
 		this.setState({
 			collapsed: !this.state.collapsed,
@@ -26,21 +37,11 @@ class App extends React.Component {
 		});
 	};
 	render() {
-
-		/* const token = localStorage.getItem('token')
-        if (token === '' || token === null) {
-			if (this.state.logado !== false)
-            	this.setState({logado: false})
-        } else {
-			if (this.state.logado !== true)
-            	this.setState({logado: true})
-		} */
-
 		return (
 			<div>
 				<BrowserRouter>
 					<Layout>
-						<MenuPrincipal collapsed={this.state.collapsed} logado={this.state.logado} />
+						<MenuPrincipal collapsed={this.state.collapsed} logado={this.state.logado} alterado={this.toggle}/>
 						<Layout className="site-layout">
 							<Header className="site-layout-background" style={{ padding: 0 }}>
 								{React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
@@ -57,7 +58,7 @@ class App extends React.Component {
 									minHeight: 280,
 								}}
 							>
-								<Routes />
+								<Routes logado={this.state.logado} verificaLogin={this.verificaLogin}/>
 							</Content>
 						</Layout>
 					</Layout>
