@@ -44,6 +44,7 @@ class Categorias extends React.Component {
     }
 
     componentDidMount() {
+        this.props.mudaTitulo("Categoria")
         this.list()
     }
 

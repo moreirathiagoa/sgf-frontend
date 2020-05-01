@@ -15,6 +15,7 @@ const tailLayout = {
 class Login extends React.Component {
     
     componentDidMount(){
+        this.props.mudaTitulo("Login")
         if (this.props.mode){
             localStorage.removeItem('token')
             this.props.verificaLogin()

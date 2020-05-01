@@ -9,16 +9,16 @@ class Router extends React.Component {
 
 	render(){
         if (!this.props.logado){
-            return <Login verificaLogin={this.props.verificaLogin} />
-        }
+            return <Login mudaTitulo={this.props.mudaTitulo} verificaLogin={this.props.verificaLogin} />
+		}
 
 		return(
 			<Switch>
-				<Route exact path="/"><Login logado={this.props.logado} verificaLogin={this.props.verificaLogin} /></Route>
-				<Route path="/dashboard"><Dashboard verificaLogin={this.props.verificaLogin}/></Route>
-				<Route path="/category"><Categoria verificaLogin={this.props.verificaLogin}/></Route>
-				<Route path="/logout"><Login mode={"logout"} verificaLogin={this.props.verificaLogin} /></Route>
-				<Route><NotFound/></Route>
+				<Route exact path="/"><Login mudaTitulo={this.props.mudaTitulo} logado={this.props.logado} verificaLogin={this.props.verificaLogin} /></Route>
+				<Route path="/dashboard"><Dashboard mudaTitulo={this.props.mudaTitulo} verificaLogin={this.props.verificaLogin}/></Route>
+				<Route path="/category"><Categoria mudaTitulo={this.props.mudaTitulo} verificaLogin={this.props.verificaLogin}/></Route>
+				<Route path="/logout"><Login mudaTitulo={this.props.mudaTitulo} mode={"logout"} verificaLogin={this.props.verificaLogin} /></Route>
+				<Route><NotFound mudaTitulo={this.props.mudaTitulo}/></Route>
 			</Switch>
 		)
 		

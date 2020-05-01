@@ -37,9 +37,15 @@ class App extends React.Component {
 	toggle = () => {
 		this.setState({
 			collapsed: !this.state.collapsed,
-			titulo: this.state.collapsed?'SGF':'Sistema de Gerenciamento Financeiro'
+			//titulo: this.state.collapsed?'SGF':'Sistema de Gerenciamento Financeiro'
 		});
 	};
+
+	mudaTitulo = (pagina) =>{
+		if (this.state.titulo !== pagina)
+			this.setState({titulo: pagina})
+	}
+
 	render() {
 		return (
 			<div>
@@ -62,7 +68,7 @@ class App extends React.Component {
 									minHeight: 280,
 								}}
 							>
-								<Routes logado={this.state.logado} verificaLogin={this.verificaLogin}/>
+								<Routes mudaTitulo={this.mudaTitulo} logado={this.state.logado} verificaLogin={this.verificaLogin}/>
 							</Content>
 						</Layout>
 					</Layout>
