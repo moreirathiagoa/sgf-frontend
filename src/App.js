@@ -15,39 +15,43 @@ const { Header, Content } = Layout;
 class App extends React.Component {
 	state = {
 		collapsed: true,
+		titulo: 'Sistema de Gerenciamento Financeiro'
 	};
 
 	toggle = () => {
 		this.setState({
 			collapsed: !this.state.collapsed,
+			titulo: this.state.collapsed?'SGF':'Sistema de Gerenciamento Financeiro'
 		});
 	};
-
 	render() {
 		return (
-			<BrowserRouter>
-				<Layout>
-					<MenuPrincipal collapsed={this.state.collapsed}/>
-					<Layout className="site-layout">
-						<Header className="site-layout-background" style={{ padding: 0 }}>
-							{React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-								className: 'trigger',
-								onClick: this.toggle,
-							})}
-						</Header>
-						<Content
-							className="site-layout-background"
-							style={{
-								margin: '24px 16px',
-								padding: 24,
-								minHeight: 280,
-							}}
-						>
-							<Routes/>
-						</Content>
+			<div>
+				<BrowserRouter>
+					<Layout>
+						<MenuPrincipal collapsed={this.state.collapsed} menuKey={"1"} />
+						<Layout className="site-layout">
+							<Header className="site-layout-background" style={{ padding: 0 }}>
+								{React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+									className: 'trigger',
+									onClick: this.toggle,
+								})}
+								{this.state.titulo}
+							</Header>
+							<Content
+								className="site-layout-background"
+								style={{
+									margin: '24px 16px',
+									padding: 24,
+									minHeight: 280,
+								}}
+							>
+								<Routes />
+							</Content>
+						</Layout>
 					</Layout>
-				</Layout>
-			</BrowserRouter>
+				</BrowserRouter>
+			</div>
 		);
 	}
 }

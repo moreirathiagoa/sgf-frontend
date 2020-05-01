@@ -6,8 +6,8 @@ import Categoria from './pages/categorias'
 const routers = ()=>{
 	return(
 		<Switch>
-			<Route exact path="/" component={ Dashboard }/>
-			<Route path="/categoria" component={ Categoria }/>
+			<Route exact path="/" component={ Dashboard } menuKey="1"/>
+			<Route path="/categoria" component={ Categoria } menuKey="2"/>
 		</Switch>
 	)
 }
