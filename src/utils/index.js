@@ -1,4 +1,5 @@
 import { parseISO, format } from 'date-fns';
+import { notification } from 'antd';
 
 function formatDateTimeFromDB(date) {
     const parsedDate = parseISO(date)
@@ -18,7 +19,16 @@ function formatDateFromDB(date) {
     return formattedDate
 }
 
+function openNotification(type, message, description) {
+    notification[type]({
+        message: message,
+        description: description,
+    });
+};
+
+
 export {
     formatDateTimeFromDB,
-    formatDateFromDB
+    formatDateFromDB,
+    openNotification
 }

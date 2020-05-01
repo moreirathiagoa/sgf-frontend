@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 import Routes from './routes'
 import MenuPrincipal from './components/menuPrincipal';
+import { openNotification } from './utils'
 
 const { Header, Content } = Layout;
 
@@ -22,11 +23,10 @@ class App extends React.Component {
 	verificaLogin = () =>{
 		const token = localStorage.getItem('token')
 		if (token){
-			console.log('foi login');
 			this.setState({logado: true})
 		} else {
 			this.setState({logado: false})
-			console.log('foi logout');
+			openNotification('error','Você foi deslogado','Realize login novamente.')
 		}
 	}
 

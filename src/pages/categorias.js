@@ -10,9 +10,9 @@ import {
     Descriptions,
     Typography
 } from 'antd';
-import { MoreOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, MoreOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { createCategory, listCategories, removeCategory, updateCategory } from '../api'
-import { formatDateFromDB } from '../utils'
+import { formatDateFromDB, openNotification } from '../utils'
 
 const { Panel } = Collapse;
 const { Title } = Typography;
@@ -52,9 +52,7 @@ class Categorias extends React.Component {
             .then((res) => {
                 if (res.status === 401) {
                     localStorage.removeItem('token')
-                    let state = this.state
                     this.props.verificaLogin()
-                    this.setState(state)
                 }
                 else {
                     let state = this.state
@@ -119,18 +117,17 @@ class Categorias extends React.Component {
         if (window.confirm('Deseja realmente apagar essa Categoria?')) {
             removeCategory(id)
                 .then((res) => {
-                    //primary, success, danger, warning, info
                     if (res.data.code === 202) {
-
+                        openNotification('success','Categoria removida','Categoria removida com sucesso.')
                         this.list()
                     }
                     else {
-
+                        openNotification('error','Categoria não removida','A Categoria não pode ser removida.')
                     }
 
                 })
                 .catch((err) => {
-
+                    openNotification('error','Categoria não removida','Erro interno. Tente novamente mais tarde.')
                 })
         }
     }
@@ -147,16 +144,17 @@ class Categorias extends React.Component {
         createCategory(this.state.data)
             .then((res) => {
                 if (res.data.code === 201 || res.data.code === 202) {
-                    console.log('criou a categoria')
+                    openNotification('success','Categoria cadastrada','Categoria cadastrada com sucesso.')
                     this.list()
+                    this.limpaDataState()
                 }
                 else {
-                    console.log('erro ao criar a categoria')
+                    openNotification('error','Categoria não cadastrada','A Categoria não pode ser cadastrada.')
                 }
-                this.limpaDataState()
+                
             })
             .catch((err) => {
-
+                openNotification('error','Categoria não cadastrada','Erro interno. Tente novamente mais tarde.')
             })
     }
 
@@ -192,16 +190,12 @@ class Categorias extends React.Component {
             this.limpaDataState()
     }
 
-    onPositionChange = expandIconPosition => {
-        this.setState({ expandIconPosition });
-    };
-
     render() {
         return (
             <div>
                 {this.state.list?
                     <div>
-                        <Title level={4}>Lista de Categorias</Title>
+                        <Title level={4}>Lista de Categorias <PlusCircleOutlined onClick={()=>this.acaoBotaoNovo()} /></Title>
                         <Collapse
                             onChange={callback}
                             expandIconPosition="left"
@@ -221,7 +215,7 @@ class Categorias extends React.Component {
                     </div>
                 :
                     <div>
-                        <Title level={4}>Dados da Categoria</Title>
+                        <Title level={4}><ArrowLeftOutlined onClick={()=>this.acaoBotaoNovo()} /> Dados da Categoria</Title>
                         <Form
                             labelCol={{ span: 4, }}
                             wrapperCol={{ span: 14, }}
