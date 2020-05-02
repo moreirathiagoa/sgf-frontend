@@ -9,6 +9,7 @@ import {
 	WalletOutlined,
 	FileSearchOutlined,
 	LogoutOutlined,
+	MenuUnfoldOutlined,
 } from '@ant-design/icons';
 const { Sider } = Layout;
 
@@ -16,9 +17,9 @@ class MenuPrincipal extends React.Component {
 	render() {
 		return (
 			<Sider trigger={null} collapsible collapsed={this.props.collapsed} collapsedWidth={0} style={{
-				margin: '1px 0 1px 1px',
-			}}>
-				<div className="logo" >SGF</div>
+				margin: '1px 1px 1px 1px', position: 'fixed', 'z-index': '2'
+				}}>
+				<div className="logo" onClick={this.props.toggle}>SGF</div>
 				{this.props.logado &&
 					<Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} onClick={this.props.alterado}>
 						<Menu.Item key="1">

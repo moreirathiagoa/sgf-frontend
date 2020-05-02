@@ -52,10 +52,10 @@ class App extends React.Component {
 			<div>
 				<BrowserRouter>
 					<Layout>
-						<MenuPrincipal collapsed={this.state.collapsed} logado={this.state.logado} alterado={this.toggle}/>
+						<MenuPrincipal toggle={this.toggle} collapsed={this.state.collapsed} logado={this.state.logado} alterado={this.toggle}/>
 						<Layout className="site-layout">
-							<Header className="site-layout-background" style={{ padding: 0, margin: '1px 1px 0 1px' }}>
-								{React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+							<Header className="site-layout-background" style={{ padding: 0, margin: '0 1px 0 1px', position: 'fixed', width: '99%', 'z-index': '1' }}>
+								{React.createElement(MenuFoldOutlined, {
 									className: 'trigger',
 									onClick: this.toggle,
 								})}
@@ -65,7 +65,7 @@ class App extends React.Component {
 								className="site-layout-background"
 								style={{
 									margin: '1px 1px',
-									padding: 24,
+									padding: '100px 24px 24px 24px',
 									minHeight: 280,
 								}}
 							>
