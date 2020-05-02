@@ -29,8 +29,9 @@ class App extends React.Component {
 		if (token){
 			this.setState({logado: true})
 		} else {
+			if (this.state.logado)
+				openNotification('error','Você foi deslogado','Realize login novamente.')
 			this.setState({logado: false})
-			openNotification('error','Você foi deslogado','Realize login novamente.')
 		}
 	}
 
