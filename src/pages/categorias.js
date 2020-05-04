@@ -193,7 +193,7 @@ class Categorias extends React.Component {
             <div>
                 {this.state.list ?
                     <div>
-                        <Title level={4}>Lista de Categorias <PlusCircleOutlined onClick={() => this.acaoBotaoNovo()} /></Title>
+                        <Title level={3}>Lista de Categorias <PlusCircleOutlined onClick={() => this.acaoBotaoNovo()} /></Title>
                         <Collapse
                             onChange={callback}
                             expandIconPosition="left"
@@ -202,9 +202,9 @@ class Categorias extends React.Component {
                                 return (
                                     <Panel header={element.name} key={element.name} extra={this.genExtra(element)}>
                                         <Descriptions title="Detalhes:">
-                                            <Descriptions.Item label="Nome:">{element.name}</Descriptions.Item>
-                                            <Descriptions.Item label="Status:">{element.isActive ? 'Ativa' : 'Inativa'}</Descriptions.Item>
-                                            <Descriptions.Item label="Data Criação:">{formatDateFromDB(element.createDate)}</Descriptions.Item>
+                                            <Descriptions.Item label="Nome">{element.name}</Descriptions.Item>
+                                            <Descriptions.Item label="Status">{element.isActive ? 'Ativa' : 'Inativa'}</Descriptions.Item>
+                                            <Descriptions.Item label="Data Criação">{formatDateFromDB(element.createDate)}</Descriptions.Item>
                                         </Descriptions>
                                     </Panel>
                                 )
@@ -213,7 +213,7 @@ class Categorias extends React.Component {
                     </div>
                     :
                     <div>
-                        <Title level={4}><ArrowLeftOutlined onClick={() => this.acaoBotaoNovo()} /> Dados da Categoria</Title>
+                        <Title level={3}><ArrowLeftOutlined onClick={() => this.acaoBotaoNovo()} /> Dados da Categoria</Title>
                         <Form
                             labelCol={{ span: 4, }}
                             wrapperCol={{ span: 14, }}

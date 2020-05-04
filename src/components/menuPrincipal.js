@@ -17,7 +17,7 @@ class MenuPrincipal extends React.Component {
 	render() {
 		return (
 			<Sider trigger={null} collapsible collapsed={this.props.collapsed} collapsedWidth={0} style={{
-				margin: '1px 1px 1px 1px', position: 'fixed', 'z-index': '2'
+				margin: '0 0 0 0', position: 'fixed', 'z-index': '2'
 				}}>
 				<div className="logo" onClick={this.props.toggle}>SGF</div>
 				{this.props.logado &&

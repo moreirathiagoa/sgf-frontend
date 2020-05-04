@@ -54,7 +54,7 @@ class App extends React.Component {
 					<Layout>
 						<MenuPrincipal toggle={this.toggle} collapsed={this.state.collapsed} logado={this.state.logado} alterado={this.toggle}/>
 						<Layout className="site-layout">
-							<Header className="site-layout-background" style={{ padding: 0, margin: '0 1px 0 1px', position: 'fixed', width: '99%', 'z-index': '1' }}>
+							<Header className="site-layout-background" style={{ padding: 0, margin: '0 0 0 0', position: 'fixed', width: '99%', 'z-index': '1' }}>
 								{React.createElement(MenuFoldOutlined, {
 									className: 'trigger',
 									onClick: this.toggle,
@@ -64,9 +64,9 @@ class App extends React.Component {
 							<Content
 								className="site-layout-background"
 								style={{
-									margin: '1px 1px',
+									margin: '0 0',
 									padding: '100px 24px 24px 24px',
-									minHeight: 280,
+									minHeight: 775,
 								}}
 							>
 								<Routes mudaTitulo={this.mudaTitulo} logado={this.state.logado} verificaLogin={this.verificaLogin}/>
