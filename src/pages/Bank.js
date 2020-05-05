@@ -19,6 +19,7 @@ import { formatDateFromDB, openNotification } from '../utils'
 const { Panel } = Collapse;
 const { Title } = Typography;
 const { Option } = Select;
+const formatMoeda = { style: 'currency', currency: 'BRL' }
 
 function handleChange(value) {
     console.log(`selected ${value}`);
@@ -43,7 +44,6 @@ class Categorias extends React.Component {
                 bankType: '',
                 systemBalance: 0,
                 manualBalance: 0,
-                //enum: ['Conta Corrente', 'Conta Cartão', 'Cartão de Crédito', 'Poupança'],
             }
         }
         this.handleChange = this.handleChange.bind(this)
@@ -54,7 +54,7 @@ class Categorias extends React.Component {
     }
 
     componentDidMount() {
-        this.props.mudaTitulo("Categoria")
+        this.props.mudaTitulo("Bancos")
         this.list()
     }
 
@@ -107,7 +107,7 @@ class Categorias extends React.Component {
         this.setState(state)
     }
 
-    handleChange(event, value) {
+    handleChange(event) {
         let state = this.state
 
         switch (event.target.name) {
@@ -130,20 +130,20 @@ class Categorias extends React.Component {
 
     remover(id) {
 
-        if (window.confirm('Deseja realmente apagar essa Categoria?')) {
+        if (window.confirm('Deseja realmente apagar esse Banco?')) {
             removeBank(id)
                 .then((res) => {
                     if (res.data.code === 202) {
-                        openNotification('success', 'Categoria removida', 'Categoria removida com sucesso.')
+                        openNotification('success', 'Banco removido', 'Banco removido com sucesso.')
                         this.list()
                     }
                     else {
-                        openNotification('error', 'Categoria não removida', 'A Categoria não pode ser removida.')
+                        openNotification('error', 'Banco não removido', 'O Banco não pode ser removido.')
                     }
 
                 })
                 .catch((err) => {
-                    openNotification('error', 'Categoria não removida', 'Erro interno. Tente novamente mais tarde.')
+                    openNotification('error', 'Banco não removido', 'Erro interno. Tente novamente mais tarde.')
                 })
         }
     }
@@ -159,17 +159,17 @@ class Categorias extends React.Component {
         createBank(this.state.data)
             .then((res) => {
                 if (res.data.code === 201 || res.data.code === 202) {
-                    openNotification('success', 'Categoria cadastrada', 'Categoria cadastrada com sucesso.')
+                    openNotification('success', 'Banco cadastrado', 'Banco cadastrado com sucesso.')
                     this.list()
                     this.limpaDataState()
                 }
                 else {
-                    openNotification('error', 'Categoria não cadastrada', 'A Categoria não pode ser cadastrada.')
+                    openNotification('error', 'Banco não cadastrado', 'O Banco não pode ser cadastrada.')
                 }
 
             })
             .catch((err) => {
-                openNotification('error', 'Categoria não cadastrada', 'Erro interno. Tente novamente mais tarde.')
+                openNotification('error', 'Banco não cadastrado', 'Erro interno. Tente novamente mais tarde.')
             })
     }
 
@@ -177,16 +177,16 @@ class Categorias extends React.Component {
         updateBank(this.state.data, this.state.idToUpdate)
             .then((res) => {
                 if (res.data.code === 201 || res.data.code === 202) {
-                    openNotification('success', 'Categoria atualizada', 'Categoria atualizada com sucesso.')
+                    openNotification('success', 'Banco atualizado', 'Banco atualizado com sucesso.')
                     this.list()
                     this.limpaDataState()
                 }
                 else {
-                    openNotification('error', 'Categoria não atualizada', 'A Categoria não pode ser atualizada.')
+                    openNotification('error', 'Banco não atualizado', 'O Banco não pode ser atualizado.')
                 }
             })
             .catch((err) => {
-                openNotification('error', 'Categoria não cadastrada', 'Erro interno. Tente novamente mais tarde.')
+                openNotification('error', 'Banco não cadastrado', 'Erro interno. Tente novamente mais tarde.')
             })
     }
 
@@ -210,7 +210,7 @@ class Categorias extends React.Component {
             <div>
                 {this.state.list ?
                     <div>
-                        <Title level={3}>Lista de Categorias <PlusCircleOutlined onClick={() => this.acaoBotaoNovo()} /></Title>
+                        <Title level={3}>Lista de Bancos <PlusCircleOutlined onClick={() => this.acaoBotaoNovo()} /></Title>
                         <Collapse
                             onChange={callback}
                             expandIconPosition="left"
@@ -220,10 +220,10 @@ class Categorias extends React.Component {
                                     <Panel header={element.name} key={element.name} extra={this.genExtra(element)}>
                                         <Descriptions title="Detalhes:">
                                             <Descriptions.Item label="Nome">{element.name}</Descriptions.Item>
-                                            <Descriptions.Item label="Status">{element.isActive ? 'Ativa' : 'Inativa'}</Descriptions.Item>
+                                            <Descriptions.Item label="Status">{element.isActive ? 'Ativo' : 'Inativo'}</Descriptions.Item>
                                             <Descriptions.Item label="Tipo">{element.bankType}</Descriptions.Item>
-                                            <Descriptions.Item label="Saldo Sistema">{element.systemBalance}</Descriptions.Item>
-                                            <Descriptions.Item label="Saldo Manual">{element.manualBalance}</Descriptions.Item>
+                                            <Descriptions.Item label="Saldo Sistema">{element.systemBalance.toLocaleString('pt-BR', formatMoeda)}</Descriptions.Item>
+                                            <Descriptions.Item label="Saldo Manual">{element.manualBalance.toLocaleString('pt-BR', formatMoeda)}</Descriptions.Item>
                                             <Descriptions.Item label="Data Criação">{formatDateFromDB(element.createDate)}</Descriptions.Item>
                                         </Descriptions>
                                     </Panel>
@@ -233,7 +233,7 @@ class Categorias extends React.Component {
                     </div>
                     :
                     <div>
-                        <Title level={3}><ArrowLeftOutlined onClick={() => this.acaoBotaoNovo()} /> Dados da Categoria</Title>
+                        <Title level={3}><ArrowLeftOutlined onClick={() => this.acaoBotaoNovo()} /> Dados do Banco</Title>
                         <Form
                             labelCol={{ span: 4, }}
                             wrapperCol={{ span: 14, }}
@@ -244,9 +244,9 @@ class Categorias extends React.Component {
                             onFinish={this.submitForm}
                             onFinishFailed={() => { console.log('falhou') }}
                         >
-                            <Form.Item label="Nome da Categoria">
+                            <Form.Item label="Nome de Banco">
                                 <Input
-                                    placeholder="Categoria"
+                                    placeholder="Banco"
                                     type="text"
                                     name="name"
                                     size="md"
@@ -274,7 +274,7 @@ class Categorias extends React.Component {
                             </Form.Item>
 
 
-                            <Form.Item label="Categoria Ativa">
+                            <Form.Item label="Banco Ativo">
                                 <span onClick={this.handleChange}>
                                     <Switch name="isActive" checked={this.state.data.isActive} size="md" />
                                 </span>
