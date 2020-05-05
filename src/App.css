@@ -8,7 +8,7 @@
 }
 
 body{
-	background: #fff;
+	background: #112338;
 }
 .ant-menu.ant-menu-dark{
 	background: #000129;
@@ -34,7 +34,7 @@ body{
 .logo {
 	height: 32px;
 	color: #ccc;
-	margin: 0 0 15px 0;
+	margin-bottom: 15px;
 	text-align: center;
 	font-size: 30px;
 	font-weight: bolder;

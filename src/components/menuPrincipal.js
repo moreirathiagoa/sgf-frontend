@@ -15,8 +15,13 @@ const { Sider } = Layout;
 class MenuPrincipal extends React.Component {
 	render() {
 		return (
-			<Sider trigger={null} collapsible collapsed={this.props.collapsed} collapsedWidth={0} style={{
-				margin: '0 0 0 0', position: 'fixed', 'zIndex': '2'
+			<Sider trigger={null} 
+				collapsible 
+				collapsed={this.props.collapsed} 
+				collapsedWidth={0} 
+				style={{
+					position: 'fixed', 
+					'zIndex': '2'
 				}}>
 				<div className="logo" onClick={this.props.toggle}>SGF</div>
 				{this.props.logado &&

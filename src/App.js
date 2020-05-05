@@ -2,7 +2,7 @@ import React from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
 import { BrowserRouter } from 'react-router-dom'
-import { Layout } from 'antd';
+import { Layout, Spin } from 'antd';
 import {
 	MenuFoldOutlined,
 } from '@ant-design/icons';
@@ -16,21 +16,22 @@ class App extends React.Component {
 	state = {
 		collapsed: true,
 		titulo: 'Sistema de Gerenciamento Financeiro',
-		logado: false
+		logado: false,
+		loading: false
 	};
 
-	componentDidMount(){
+	componentDidMount() {
 		this.verificaLogin()
 	}
 
-	verificaLogin = () =>{
+	verificaLogin = () => {
 		const token = localStorage.getItem('token')
-		if (token){
-			this.setState({logado: true})
+		if (token) {
+			this.setState({ logado: true })
 		} else {
 			if (this.state.logado)
-				openNotification('error','Você foi deslogado','Realize login novamente.')
-			this.setState({logado: false})
+				openNotification('error', 'Você foi deslogado', 'Realize login novamente.')
+			this.setState({ logado: false })
 		}
 	}
 
@@ -41,9 +42,14 @@ class App extends React.Component {
 		});
 	};
 
-	mudaTitulo = (pagina) =>{
+	mudaTitulo = (pagina) => {
 		if (this.state.titulo !== pagina)
-			this.setState({titulo: pagina})
+			this.setState({ titulo: pagina })
+	}
+
+	setLoading = (loading) => {
+		if (this.state.loading !== loading)
+			this.setState({ loading: loading })
 	}
 
 	render() {
@@ -51,24 +57,34 @@ class App extends React.Component {
 			<div>
 				<BrowserRouter>
 					<Layout>
-						<MenuPrincipal toggle={this.toggle} collapsed={this.state.collapsed} logado={this.state.logado} alterado={this.toggle}/>
+						<MenuPrincipal
+							toggle={this.toggle}
+							collapsed={this.state.collapsed}
+							logado={this.state.logado}
+							alterado={this.toggle}
+						/>
 						<Layout className="site-layout">
-							<Header className="site-layout-background" style={{ padding: 0, margin: '0 0 0 0', position: 'fixed', width: '99%', 'zIndex': '1' }}>
-								{React.createElement(MenuFoldOutlined, {
-									className: 'trigger',
-									onClick: this.toggle,
-								})}
+							<Header
+								className="site-layout-background"
+								style={{
+									padding: 0,
+									position: 'fixed',
+									width: '100%',
+									'zIndex': '1'
+								}}>
+								{ React.createElement(MenuFoldOutlined, { className: 'trigger', onClick: this.toggle, }) }
 								{this.state.titulo}
 							</Header>
 							<Content
 								className="site-layout-background"
 								style={{
-									margin: '0 0',
 									padding: '100px 24px 24px 24px',
 									minHeight: 775,
 								}}
 							>
-								<Routes mudaTitulo={this.mudaTitulo} logado={this.state.logado} verificaLogin={this.verificaLogin}/>
+								<Spin spinning={this.state.loading} size="large">
+									<Routes loading={this.setLoading} mudaTitulo={this.mudaTitulo} logado={this.state.logado} verificaLogin={this.verificaLogin} />
+								</Spin>
 							</Content>
 						</Layout>
 					</Layout>

@@ -23,6 +23,7 @@ class Login extends React.Component {
     }
 
     onFinish = values => {
+        this.props.loading(true)
         login(values)
             .then((res) => {
                 if (res.data.code === 200) {
@@ -34,9 +35,11 @@ class Login extends React.Component {
                 else {
                     openNotification('error','Login não efetuado','Usuário ou senha inválio.')
                 }
+                this.props.loading(false)
             })
             .catch((err) => {
                 openNotification('error','Login não efetuado','Erro interno. Tente novamente mais tarde.')
+                this.props.loading(false)
             })
     };
 

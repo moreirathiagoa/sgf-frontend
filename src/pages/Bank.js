@@ -10,7 +10,7 @@ import {
     Dropdown,
     Descriptions,
     Typography,
-    Select
+    Select,
 } from 'antd';
 import { ArrowLeftOutlined, MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { listBanks, createBank, removeBank, updateBank } from '../api'
@@ -20,10 +20,6 @@ const { Panel } = Collapse;
 const { Title } = Typography;
 const { Option } = Select;
 const formatMoeda = { style: 'currency', currency: 'BRL' }
-
-function handleChange(value) {
-    console.log(`selected ${value}`);
-}
 
 function callback(key) {
     //console.log(key);
@@ -59,9 +55,9 @@ class Categorias extends React.Component {
     }
 
     list = () => {
+        this.props.loading(true)
         listBanks()
             .then((res) => {
-                console.log(res);
 
                 if (res.status === 401) {
                     localStorage.removeItem('token')
@@ -72,9 +68,11 @@ class Categorias extends React.Component {
                     state.categories = res.data.data
                     this.setState(state)
                 }
+                this.props.loading(false)
             })
             .catch((err) => {
                 openNotification('error', 'Erro ao listar', 'Erro interno. Tente novamente mais tarde.')
+                this.props.loading(false)
             })
     }
 

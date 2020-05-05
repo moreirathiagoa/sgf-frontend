@@ -49,6 +49,7 @@ class Categorias extends React.Component {
     }
 
     list = () => {
+        this.props.loading(true)
         listCategories()
             .then((res) => {
                 if (res.status === 401) {
@@ -60,9 +61,11 @@ class Categorias extends React.Component {
                     state.categories = res.data.data
                     this.setState(state)
                 }
+                this.props.loading(false)
             })
             .catch((err) => {
                 openNotification('error', 'Erro ao listar', 'Erro interno. Tente novamente mais tarde.')
+                this.props.loading(false)
             })
     }
 
