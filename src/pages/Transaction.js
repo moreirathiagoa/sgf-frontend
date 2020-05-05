@@ -12,15 +12,23 @@ import {
     Typography,
     Select,
     Radio,
+    Row,
+    Col,
+    DatePicker
 } from 'antd';
 import { ArrowLeftOutlined, MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { createTransaction, updateTransaction, listBanks, listCategories } from '../api'
 import { formatDateFromDB, openNotification } from '../utils'
+import { Route } from 'react-router-dom';
 
 const { Panel } = Collapse;
 const { Title } = Typography;
 const { Option } = Select;
 const formatMoeda = { style: 'currency', currency: 'BRL' }
+
+function onChange(date, dateString) {
+    console.log(date, dateString);
+}
 
 class Transaction extends React.Component {
 
@@ -28,8 +36,9 @@ class Transaction extends React.Component {
         super(props)
         this.state = {
             idToUpdate: undefined,
+            screenType: 'contaCorrente',
             data: {
-                isCompesed: null,
+                isCompesed: true,
                 efectedDate: null,
                 description: null,
                 value: null,
@@ -38,6 +47,8 @@ class Transaction extends React.Component {
                 bank_id: null,
                 category_id: null,
                 fature_id: null,
+                isSimples: false,
+                isCredit: false
             },
             banks: [],
             categories: []
@@ -93,6 +104,11 @@ class Transaction extends React.Component {
         let state = this.state
 
         switch (event.target.name) {
+
+            case 'screenType':
+                state.screenType = event.target.value
+                break
+
             case 'isCompesed':
                 state.data.isCompesed = !state.data.isCompesed
                 break
@@ -108,7 +124,7 @@ class Transaction extends React.Component {
             case 'value':
                 state.data.value = event.target.value
                 break
-            
+
             case 'finalRecurrence':
                 state.data.finalRecurrence = event.target.value
                 break
@@ -123,6 +139,14 @@ class Transaction extends React.Component {
 
             case 'fature_id':
                 state.data.fature_id = event.target.value
+                break
+
+            case 'isSimples':
+                state.data.isSimples = !state.data.isSimples
+                break
+
+            case 'isCredit':
+                state.data.isCredit = !state.data.isCredit
                 break
 
             default:
@@ -193,9 +217,9 @@ class Transaction extends React.Component {
                     onFinishFailed={() => { console.log('falhou') }}
                 >
                     <Form.Item label="Tipo de Transação">
-                        <Radio.Group onChange={this.handleChange} defaultValue="contaCorrente" buttonStyle="solid" size="md">
+                        <Radio.Group name="screenType" onChange={this.handleChange} defaultValue="contaCorrente" buttonStyle="solid" size="md">
                             <Radio.Button value="contaCorrente">Conta</Radio.Button>
-                            <Radio.Button value="cartãoCredito">Crédito</Radio.Button>
+                            <Radio.Button value="cartaoCredito">Crédito</Radio.Button>
                             <Radio.Button value="planejamento">Plano</Radio.Button>
                             <Radio.Button value="planejamento" disabled>Investimento</Radio.Button>
                         </Radio.Group>
@@ -239,32 +263,53 @@ class Transaction extends React.Component {
                         </Select>
                     </Form.Item>
 
-                    <Form.Item label="Compensado">
-                        <span onClick={this.handleChange}>
-                            <Switch name="isCompesed" checked={this.state.data.isCompesed} size="md" />
-                        </span>
-                    </Form.Item>
-
                     <Form.Item label="Data da Transação">
-                        <Input
-                            placeholder=""
-                            type="text"
-                            name="efectedDate"
-                            size="md"
-                            value={this.state.data.efectedDate}
-                            onChange={this.handleChange}
-                        />
+                        <Row>
+                            <Col span={12}>
+                                <DatePicker onChange={onChange} />
+                                <Input
+                                    placeholder=""
+                                    type="text"
+                                    name="efectedDate"
+                                    size="md"
+                                    value={this.state.data.efectedDate}
+                                    onChange={this.handleChange}
+                                    style={{ width: 150 }}
+                                />
+                            </Col>
+                            <Col span={10}>
+                                {this.state.screenType === 'contaCorrente' &&
+                                    <>
+                                        <span style={{ color: '#ccc' }}>Compensado: </span>
+                                        <span onClick={this.handleChange}>
+                                            <Switch name="isCompesed" checked={this.state.data.isCompesed} size="md" />
+                                        </span>
+                                    </>
+                                }
+                            </Col>
+                        </Row>
                     </Form.Item>
 
                     <Form.Item label="Valor da Transação">
-                        <Input
-                            placeholder=""
-                            type="text"
-                            name="value"
-                            size="md"
-                            value={this.state.data.value}
-                            onChange={this.handleChange}
-                        />
+                        <Row>
+                            <Col span={8}>
+                                <Input
+                                    placeholder=""
+                                    type="text"
+                                    name="value"
+                                    size="md"
+                                    value={this.state.data.value}
+                                    onChange={this.handleChange}
+                                    style={{ width: 100 }}
+                                />
+                            </Col>
+                            <Col span={10}>
+                                <span style={{ color: '#ccc' }}>Crédito: </span>
+                                <span onClick={this.handleChange}>
+                                    <Switch name="isCredit" checked={this.state.data.isCredit} size="md" />
+                                </span>
+                            </Col>
+                        </Row>
                     </Form.Item>
 
                     <Form.Item label="Descrição">
@@ -275,38 +320,62 @@ class Transaction extends React.Component {
                             size="md"
                             value={this.state.data.description}
                             onChange={this.handleChange}
+                            style={{ width: 350 }}
                         />
                     </Form.Item>
-
-                    <Form.Item label="Fatura">
-                        <Select
-                            name="fature_id"
-                            defaultValue="Selecione"
-                            size="md"
-                            style={{ width: 200 }}
-                            onSelect={(value) => {
-                                const event = { target: { name: 'fature_id', value: value } }
-                                this.handleChange(event)
-                            }}
-                        >
-                            <Option value="1">05/2020</Option>
-                            <Option value="2">06/2020</Option>
-                            <Option value="3">07/2020</Option>
-                        </Select>
+                    {this.state.screenType === 'cartaoCredito' &&
+                        <Form.Item label="Fatura">
+                            <Select
+                                name="fature_id"
+                                defaultValue="Selecione"
+                                size="md"
+                                style={{ width: 200 }}
+                                onSelect={(value) => {
+                                    const event = { target: { name: 'fature_id', value: value } }
+                                    this.handleChange(event)
+                                }}
+                            >
+                                <Option value="1">05/2020</Option>
+                                <Option value="2">06/2020</Option>
+                                <Option value="3">07/2020</Option>
+                            </Select>
+                        </Form.Item>
+                    }
+                    <Form.Item label="Recorrência">
+                        <Row>
+                            {this.state.idToUpdate &&
+                                <Col span={6}>
+                                    <Input
+                                        placeholder="Atual"
+                                        type="text"
+                                        name="finalRecurrence"
+                                        size="md"
+                                        value={this.state.data.currentRecurrence}
+                                        onChange={this.handleChange}
+                                        style={{ width: 60 }}
+                                    />
+                                </Col>
+                            }
+                            <Col span={6}>
+                                <Input
+                                    placeholder="Final"
+                                    type="text"
+                                    name="finalRecurrence"
+                                    size="md"
+                                    value={this.state.data.finalRecurrence}
+                                    onChange={this.handleChange}
+                                    style={{ width: 60 }}
+                                />
+                            </Col>
+                            <Col span={8}>
+                                <span onClick={this.handleChange}>
+                                    <span style={{ color: '#ccc' }}>Simples:</span> <Switch name="isSimples" checked={this.state.data.isSimples} size="md" />
+                                </span>
+                            </Col>
+                        </Row>
                     </Form.Item>
 
-                    <Form.Item label="Recorrente">
-                        <Input
-                            placeholder=""
-                            type="text"
-                            name="finalRecurrence"
-                            size="md"
-                            value={this.state.data.finalRecurrence}
-                            onChange={this.handleChange}
-                        />
-                    </Form.Item>
-
-                    <Form.Item label="">
+                    <Form.Item label="Ação">
                         <Button className="btn-fill" size="lg" type="primary" htmlType="submit">
                             Confirmar
                         </Button>

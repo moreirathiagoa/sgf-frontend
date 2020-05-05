@@ -21,7 +21,7 @@ class MenuPrincipal extends React.Component {
 				collapsedWidth={0} 
 				style={{
 					position: 'fixed', 
-					'zIndex': '2'
+					'zIndex': '3'
 				}}>
 				<div className="logo" onClick={this.props.toggle}>SGF</div>
 				{this.props.logado &&

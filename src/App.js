@@ -70,7 +70,7 @@ class App extends React.Component {
 									padding: 0,
 									position: 'fixed',
 									width: '100%',
-									'zIndex': '1'
+									'zIndex': '2'
 								}}>
 								{ React.createElement(MenuFoldOutlined, { className: 'trigger', onClick: this.toggle, }) }
 								{this.state.titulo}
