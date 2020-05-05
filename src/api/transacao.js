@@ -6,12 +6,12 @@ function getToken(){
     token = localStorage.getItem('token')
 }
 
-const listBanks = () => {
+const listTransaction = () => {
     if (!token) getToken()
     
     const response = axios({
         method: 'get',
-        url: properties.url+'bank/list',
+        url: properties.url+'transaction/list',
         headers:{
             auth: token
         }
@@ -25,13 +25,13 @@ const listBanks = () => {
     return response
 }
 
-const createBank = (bank) => {
+const createTransaction = (transaction) => {
     if (!token) getToken()
     
     const response = axios({
         method: 'post',
-        url: properties.url+'bank/create',
-        data: bank,
+        url: properties.url+'transaction/create',
+        data: transaction,
         headers:{
             auth: token
         }
@@ -45,12 +45,12 @@ const createBank = (bank) => {
     return response
 }
 
-const removeBank = (id) => {
+const removeTransaction = (id) => {
     if (!token) getToken()
     
     const response = axios({
         method: 'delete',
-        url: properties.url+'bank/delete/'+id,
+        url: properties.url+'transaction/delete/'+id,
         headers:{
             auth: token
         }
@@ -64,13 +64,13 @@ const removeBank = (id) => {
     return response 
 }
 
-const updateBank = (bank, idBank) => {
+const updateTransaction = (transaction, idCategory) => {
     if (!token) getToken()
     
     const response = axios({
         method: 'put',
-        url: properties.url+'bank/update/'+idBank,
-        data: bank,
+        url: properties.url+'transaction/update/'+idCategory,
+        data: transaction,
         headers:{
             auth: token
         }
@@ -85,8 +85,8 @@ const updateBank = (bank, idBank) => {
 }
 
 export {
-    listBanks,
-    createBank,
-    removeBank,
-    updateBank
+    listTransaction,
+    createTransaction,
+    removeTransaction,
+    updateTransaction
 }
