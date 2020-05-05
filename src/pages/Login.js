@@ -39,6 +39,8 @@ class Login extends React.Component {
             })
             .catch((err) => {
                 openNotification('error','Login não efetuado','Erro interno. Tente novamente mais tarde.')
+                localStorage.removeItem('token')
+                this.props.verificaLogin()
                 this.props.loading(false)
             })
     };
