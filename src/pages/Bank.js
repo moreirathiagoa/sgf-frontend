@@ -25,7 +25,7 @@ function callback(key) {
     //console.log(key);
 }
 
-class Categorias extends React.Component {
+class Banks extends React.Component {
 
     constructor(props) {
         super(props)
@@ -271,7 +271,6 @@ class Categorias extends React.Component {
                                 </Select>
                             </Form.Item>
 
-
                             <Form.Item label="Banco Ativo">
                                 <span onClick={this.handleChange}>
                                     <Switch name="isActive" checked={this.state.data.isActive} size="md" />
@@ -290,4 +289,4 @@ class Categorias extends React.Component {
     }
 }
 
-export default Categorias
+export default Banks
