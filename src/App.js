@@ -1,10 +1,9 @@
 import React from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
-import { BrowserRouter, Redirect } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import { Layout } from 'antd';
 import {
-	MenuUnfoldOutlined,
 	MenuFoldOutlined,
 } from '@ant-design/icons';
 import Routes from './routes'
@@ -54,7 +53,7 @@ class App extends React.Component {
 					<Layout>
 						<MenuPrincipal toggle={this.toggle} collapsed={this.state.collapsed} logado={this.state.logado} alterado={this.toggle}/>
 						<Layout className="site-layout">
-							<Header className="site-layout-background" style={{ padding: 0, margin: '0 0 0 0', position: 'fixed', width: '99%', 'z-index': '1' }}>
+							<Header className="site-layout-background" style={{ padding: 0, margin: '0 0 0 0', position: 'fixed', width: '99%', 'zIndex': '1' }}>
 								{React.createElement(MenuFoldOutlined, {
 									className: 'trigger',
 									onClick: this.toggle,
