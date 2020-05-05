@@ -13,7 +13,7 @@ import {
     Select,
 } from 'antd';
 import { ArrowLeftOutlined, MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
-import { listBanks, createBank, removeBank, updateBank } from '../api'
+import { listTransaction, createTransaction, removeTransaction, updateTransaction } from '../api'
 import { formatDateFromDB, openNotification } from '../utils'
 
 const { Panel } = Collapse;
@@ -21,14 +21,12 @@ const { Title } = Typography;
 const { Option } = Select;
 const formatMoeda = { style: 'currency', currency: 'BRL' }
 
-class Categorias extends React.Component {
+class Transaction extends React.Component {
 
     constructor(props) {
         super(props)
         this.state = {
-            categories: [],
             idToUpdate: undefined,
-            expandIconPosition: 'left',
             data: {
                 name: '',
                 isActive: true,
@@ -42,7 +40,7 @@ class Categorias extends React.Component {
     }
 
     componentDidMount() {
-        this.props.mudaTitulo("Bancos")
+        this.props.mudaTitulo("Transação")
     }
 
     handleChange(event) {
@@ -74,35 +72,35 @@ class Categorias extends React.Component {
     }
 
     cadastrar() {
-        createBank(this.state.data)
+        createTransaction(this.state.data)
             .then((res) => {
                 if (res.data.code === 201 || res.data.code === 202) {
-                    openNotification('success', 'Banco cadastrado', 'Banco cadastrado com sucesso.')
+                    openNotification('success', 'Transação cadastrada', 'Transação cadastrada com sucesso.')
                     this.limpaDataState()
                 }
                 else {
-                    openNotification('error', 'Banco não cadastrado', 'O Banco não pode ser cadastrada.')
+                    openNotification('error', 'Transação não cadastrada', 'A Transação não pode ser cadastrada')
                 }
 
             })
             .catch((err) => {
-                openNotification('error', 'Banco não cadastrado', 'Erro interno. Tente novamente mais tarde.')
+                openNotification('error', 'Transação não cadastrada', 'Erro interno. Tente novamente mais tarde.')
             })
     }
 
     atualizar() {
-        updateBank(this.state.data, this.state.idToUpdate)
+        updateTransaction(this.state.data, this.state.idToUpdate)
             .then((res) => {
                 if (res.data.code === 201 || res.data.code === 202) {
-                    openNotification('success', 'Banco atualizado', 'Banco atualizado com sucesso.')
+                    openNotification('success', 'Transação atualizada', 'Transação atualizada com sucesso.')
                     this.limpaDataState()
                 }
                 else {
-                    openNotification('error', 'Banco não atualizado', 'O Banco não pode ser atualizado.')
+                    openNotification('error', 'Transação não atualizada', 'A Transação não pode ser atualizada.')
                 }
             })
             .catch((err) => {
-                openNotification('error', 'Banco não cadastrado', 'Erro interno. Tente novamente mais tarde.')
+                openNotification('error', 'Transação não cadastrada', 'Erro interno. Tente novamente mais tarde.')
             })
     }
 
@@ -118,7 +116,7 @@ class Categorias extends React.Component {
     render() {
         return (
             <div>
-                <Title level={3}>Dados do Banco</Title>
+                <Title level={3}>Dados da Transação</Title>
                 <Form
                     labelCol={{ span: 4, }}
                     wrapperCol={{ span: 14, }}
@@ -174,4 +172,4 @@ class Categorias extends React.Component {
     }
 }
 
-export default Categorias
+export default Transaction

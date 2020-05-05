@@ -30,7 +30,6 @@ class Categorias extends React.Component {
             categories: [],
             idToUpdate: undefined,
             list: true,
-            expandIconPosition: 'left',
             data: {
                 name: '',
                 isActive: true

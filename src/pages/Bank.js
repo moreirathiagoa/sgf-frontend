@@ -30,10 +30,9 @@ class Banks extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            categories: [],
+            banks: [],
             idToUpdate: undefined,
             list: true,
-            expandIconPosition: 'left',
             data: {
                 name: '',
                 isActive: true,
@@ -65,7 +64,7 @@ class Banks extends React.Component {
                 }
                 else {
                     let state = this.state
-                    state.categories = res.data.data
+                    state.banks = res.data.data
                     this.setState(state)
                 }
                 this.props.loading(false)
@@ -162,7 +161,7 @@ class Banks extends React.Component {
                     this.limpaDataState()
                 }
                 else {
-                    openNotification('error', 'Banco não cadastrado', 'O Banco não pode ser cadastrada.')
+                    openNotification('error', 'Banco não cadastrado', 'O Banco não pode ser cadastrado.')
                 }
 
             })
@@ -213,7 +212,7 @@ class Banks extends React.Component {
                             onChange={callback}
                             expandIconPosition="left"
                         >
-                            {this.state.categories.map(element => {
+                            {this.state.banks.map(element => {
                                 return (
                                     <Panel header={element.name} key={element.name} extra={this.genExtra(element)}>
                                         <Descriptions title="Detalhes:">
