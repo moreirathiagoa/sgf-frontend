@@ -14,7 +14,8 @@ import {
 } from 'antd';
 import { ArrowLeftOutlined, MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { listBanks, createBank, removeBank, updateBank } from '../api'
-import { formatDateFromDB, openNotification } from '../utils'
+import { openNotification } from '../utils'
+import moment from 'moment'
 
 const { Panel } = Collapse;
 const { Title } = Typography;
@@ -57,7 +58,6 @@ class Banks extends React.Component {
         this.props.loading(true)
         listBanks()
             .then((res) => {
-
                 if (res.status === 401) {
                     localStorage.removeItem('token')
                     this.props.verificaLogin()
@@ -214,14 +214,14 @@ class Banks extends React.Component {
                         >
                             {this.state.banks.map(element => {
                                 return (
-                                    <Panel header={element.name} key={element.name} extra={this.genExtra(element)}>
+                                    <Panel header={element.name} key={element.name} extra={this.genExtra(element)} style={{'font-size': '16px'}}>
                                         <Descriptions title="Detalhes:">
                                             <Descriptions.Item label="Nome">{element.name}</Descriptions.Item>
                                             <Descriptions.Item label="Status">{element.isActive ? 'Ativo' : 'Inativo'}</Descriptions.Item>
                                             <Descriptions.Item label="Tipo">{element.bankType}</Descriptions.Item>
                                             <Descriptions.Item label="Saldo Sistema">{element.systemBalance.toLocaleString('pt-BR', formatMoeda)}</Descriptions.Item>
                                             <Descriptions.Item label="Saldo Manual">{element.manualBalance.toLocaleString('pt-BR', formatMoeda)}</Descriptions.Item>
-                                            <Descriptions.Item label="Data Criação">{formatDateFromDB(element.createDate)}</Descriptions.Item>
+                                            <Descriptions.Item label="Data Criação">{moment(element.createDate).format("DD/MM/YYYY")}</Descriptions.Item>
                                         </Descriptions>
                                     </Panel>
                                 )

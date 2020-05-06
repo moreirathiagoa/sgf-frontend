@@ -6,29 +6,19 @@ import {
     Button,
     Switch,
     Collapse,
-    Menu,
-    Dropdown,
-    Descriptions,
     Typography,
     Select,
     Radio,
     Row,
     Col,
-    DatePicker
+    DatePicker,
 } from 'antd';
-import { ArrowLeftOutlined, MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { createTransaction, updateTransaction, listBanks, listCategories } from '../api'
-import { formatDateFromDB, openNotification } from '../utils'
-import { Route } from 'react-router-dom';
+import { openNotification } from '../utils'
+import moment from 'moment'
 
-const { Panel } = Collapse;
-const { Title } = Typography;
 const { Option } = Select;
-const formatMoeda = { style: 'currency', currency: 'BRL' }
-
-function onChange(date, dateString) {
-    console.log(date, dateString);
-}
+const formatDate = 'DD/MM/YYYY'
 
 class Transaction extends React.Component {
 
@@ -39,9 +29,9 @@ class Transaction extends React.Component {
             screenType: 'contaCorrente',
             data: {
                 isCompesed: true,
-                efectedDate: null,
+                efectedDate: moment(moment(), formatDate),
                 description: null,
-                value: null,
+                value: '',
                 currentRecurrence: null,
                 finalRecurrence: null,
                 bank_id: null,
@@ -266,15 +256,16 @@ class Transaction extends React.Component {
                     <Form.Item label="Data da Transação">
                         <Row>
                             <Col span={12}>
-                                <DatePicker onChange={onChange} />
-                                <Input
-                                    placeholder=""
-                                    type="text"
+
+                                <DatePicker
+                                    format={formatDate}
                                     name="efectedDate"
                                     size="md"
-                                    value={this.state.data.efectedDate}
-                                    onChange={this.handleChange}
-                                    style={{ width: 150 }}
+                                    defaultValue={moment(this.state.data.efectedDate, "DD/MM/YYYY")}
+                                    onChange={(date, dateString) => {
+                                        const event = { target: { name: 'efectedDate', value: dateString } }
+                                        this.handleChange(event)
+                                    }}
                                 />
                             </Col>
                             <Col span={10}>
@@ -295,7 +286,7 @@ class Transaction extends React.Component {
                             <Col span={8}>
                                 <Input
                                     placeholder=""
-                                    type="text"
+                                    type="number"
                                     name="value"
                                     size="md"
                                     value={this.state.data.value}
@@ -347,7 +338,7 @@ class Transaction extends React.Component {
                                 <Col span={6}>
                                     <Input
                                         placeholder="Atual"
-                                        type="text"
+                                        type="number"
                                         name="finalRecurrence"
                                         size="md"
                                         value={this.state.data.currentRecurrence}
@@ -359,7 +350,7 @@ class Transaction extends React.Component {
                             <Col span={6}>
                                 <Input
                                     placeholder="Final"
-                                    type="text"
+                                    type="number"
                                     name="finalRecurrence"
                                     size="md"
                                     value={this.state.data.finalRecurrence}

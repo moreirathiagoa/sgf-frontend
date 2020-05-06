@@ -3,7 +3,14 @@
 	line-height: 64px;
 	padding: 0 24px;
 	cursor: pointer;
-	transition: color 0.3s;
+	color: #ccc;
+}
+
+.trigger-title {
+	font-size: 18px;
+	line-height: 64px;
+	padding: 0 24px 0 38px;
+	cursor: pointer;
 	color: #ccc;
 }
 
@@ -16,11 +23,6 @@ body{
 
 .ant-menu-item-selected{
 	background: #001529 !important;
-}
-
-.trigger:hover {
-	color: #1890ff;
-	color: #ccc;
 }
 
 .ant-switch {

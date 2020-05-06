@@ -1,13 +1,8 @@
 import axios from 'axios'
 import properties from '../properties'
-let token
-
-function getToken(){
-    token = localStorage.getItem('token')
-}
 
 const listBanks = () => {
-    if (!token) getToken()
+    const token = localStorage.getItem('token')
     
     const response = axios({
         method: 'get',
@@ -26,7 +21,7 @@ const listBanks = () => {
 }
 
 const createBank = (bank) => {
-    if (!token) getToken()
+    const token = localStorage.getItem('token')
     
     const response = axios({
         method: 'post',
@@ -46,7 +41,7 @@ const createBank = (bank) => {
 }
 
 const removeBank = (id) => {
-    if (!token) getToken()
+    const token = localStorage.getItem('token')
     
     const response = axios({
         method: 'delete',
@@ -65,7 +60,7 @@ const removeBank = (id) => {
 }
 
 const updateBank = (bank, idBank) => {
-    if (!token) getToken()
+    const token = localStorage.getItem('token')
     
     const response = axios({
         method: 'put',

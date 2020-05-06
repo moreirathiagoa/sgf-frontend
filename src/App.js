@@ -3,14 +3,12 @@ import 'antd/dist/antd.css';
 import './App.css';
 import { BrowserRouter } from 'react-router-dom'
 import { Layout, Spin } from 'antd';
-import {
-	MenuFoldOutlined,
-} from '@ant-design/icons';
 import Routes from './routes'
 import MenuPrincipal from './components/menuPrincipal';
+import HeaderPrincipal from './components/HeaderPrincipal';
 import { openNotification } from './utils'
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 class App extends React.Component {
 	state = {
@@ -38,7 +36,6 @@ class App extends React.Component {
 	toggle = () => {
 		this.setState({
 			collapsed: !this.state.collapsed,
-			//titulo: this.state.collapsed?'SGF':'Sistema de Gerenciamento Financeiro'
 		});
 	};
 
@@ -64,17 +61,11 @@ class App extends React.Component {
 							alterado={this.toggle}
 						/>
 						<Layout className="site-layout">
-							<Header
-								className="site-layout-background"
-								style={{
-									padding: 0,
-									position: 'fixed',
-									width: '100%',
-									'zIndex': '2'
-								}}>
-								{ React.createElement(MenuFoldOutlined, { className: 'trigger', onClick: this.toggle, }) }
-								{this.state.titulo}
-							</Header>
+							<HeaderPrincipal
+								toggle={this.toggle}
+								logado={this.state.logado}
+								titulo={this.state.titulo}
+							/>
 							<Content
 								className="site-layout-background"
 								style={{
@@ -83,7 +74,12 @@ class App extends React.Component {
 								}}
 							>
 								<Spin spinning={this.state.loading} size="large">
-									<Routes loading={this.setLoading} mudaTitulo={this.mudaTitulo} logado={this.state.logado} verificaLogin={this.verificaLogin} />
+									<Routes 
+										loading={this.setLoading} 
+										mudaTitulo={this.mudaTitulo} 
+										logado={this.state.logado} 
+										verificaLogin={this.verificaLogin} 
+									/>
 								</Spin>
 							</Content>
 						</Layout>

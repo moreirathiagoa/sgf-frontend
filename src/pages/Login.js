@@ -15,7 +15,8 @@ const tailLayout = {
 class Login extends React.Component {
     
     componentDidMount(){
-        this.props.mudaTitulo("Login")
+        this.props.mudaTitulo("")
+
         if (this.props.mode){
             localStorage.removeItem('token')
             this.props.verificaLogin()
@@ -83,8 +84,8 @@ class Login extends React.Component {
                     <Input.Password />
                 </Form.Item>
 
-                <Form.Item {...tailLayout} name="remember" valuePropName="checked">
-                    <Checkbox>Remember me</Checkbox>
+                <Form.Item {...tailLayout} name="remember" valuePropName="">
+                    <Checkbox>Permanecer Logado</Checkbox>
                 </Form.Item>
 
                 <Form.Item {...tailLayout}>

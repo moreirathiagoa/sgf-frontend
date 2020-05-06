@@ -11,37 +11,66 @@ class Router extends React.Component {
 
 	render(){
         if (!this.props.logado){
-            return <Login loading={this.props.loading} mudaTitulo={this.props.mudaTitulo} verificaLogin={this.props.verificaLogin} />
+			return (
+				<Login 
+					loading={this.props.loading} 
+					mudaTitulo={this.props.mudaTitulo} 
+					verificaLogin={this.props.verificaLogin} 
+				/>
+			)
 		}
 
 		return(
 			<Switch>
 				<Route exact path="/">
-					<Login loading={this.props.loading} mudaTitulo={this.props.mudaTitulo} logado={this.props.logado} verificaLogin={this.props.verificaLogin} />
+					<Login 
+						loading={this.props.loading} 
+						mudaTitulo={this.props.mudaTitulo} 
+						verificaLogin={this.props.verificaLogin} 
+						logado={this.props.logado} 
+					/>
 				</Route>
-
 				<Route path="/dashboard">
-					<Dashboard loading={this.props.loading} mudaTitulo={this.props.mudaTitulo} verificaLogin={this.props.verificaLogin}/>
+					<Dashboard 
+						loading={this.props.loading} 
+						mudaTitulo={this.props.mudaTitulo} 
+						verificaLogin={this.props.verificaLogin}
+					/>
 				</Route>
-
 				<Route path="/transaction">
-					<Transaction loading={this.props.loading} mudaTitulo={this.props.mudaTitulo} verificaLogin={this.props.verificaLogin}/>
+					<Transaction 
+						loading={this.props.loading} 
+						mudaTitulo={this.props.mudaTitulo} 
+						verificaLogin={this.props.verificaLogin}
+					/>
 				</Route>
-
 				<Route path="/category">
-					<Categoria loading={this.props.loading} mudaTitulo={this.props.mudaTitulo} verificaLogin={this.props.verificaLogin}/>
+					<Categoria 
+						loading={this.props.loading} 
+						mudaTitulo={this.props.mudaTitulo} 
+						verificaLogin={this.props.verificaLogin}
+					/>
 				</Route>
-
 				<Route path="/banks">
-					<Bank loading={this.props.loading} mudaTitulo={this.props.mudaTitulo} verificaLogin={this.props.verificaLogin}/>
+					<Bank 
+						loading={this.props.loading} 
+						mudaTitulo={this.props.mudaTitulo} 
+						verificaLogin={this.props.verificaLogin}
+					/>
 				</Route>
-
 				<Route path="/logout">
-					<Login loading={this.props.loading} mudaTitulo={this.props.mudaTitulo} mode={"logout"} verificaLogin={this.props.verificaLogin} />
+					<Login 
+						loading={this.props.loading} 
+						mudaTitulo={this.props.mudaTitulo} 
+						verificaLogin={this.props.verificaLogin} 
+						mode={"logout"}  
+					/>
 				</Route>
-
 				<Route>
-					<NotFound loading={this.props.loading} mudaTitulo={this.props.mudaTitulo}/>
+					<NotFound 
+						loading={this.props.loading} 
+						mudaTitulo={this.props.mudaTitulo}
+					/>
 				</Route>
 			</Switch>
 		)

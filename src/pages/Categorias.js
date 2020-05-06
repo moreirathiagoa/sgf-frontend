@@ -83,7 +83,7 @@ class Categorias extends React.Component {
                 event.stopPropagation();
             }}
         >
-            <MenuOutlined />
+            <MenuOutlined/>
         </Dropdown >
     );
 
@@ -202,7 +202,7 @@ class Categorias extends React.Component {
                         >
                             {this.state.categories.map(element => {
                                 return (
-                                    <Panel header={element.name} key={element.name} extra={this.genExtra(element)}>
+                                    <Panel header={element.name} key={element.name} extra={this.genExtra(element)} style={{'font-size': '16px'}}>
                                         <Descriptions title="Detalhes:">
                                             <Descriptions.Item label="Nome">{element.name}</Descriptions.Item>
                                             <Descriptions.Item label="Status">{element.isActive ? 'Ativa' : 'Inativa'}</Descriptions.Item>
