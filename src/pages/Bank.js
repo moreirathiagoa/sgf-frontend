@@ -255,7 +255,7 @@ class Banks extends React.Component {
                             <Form.Item label="Tipo de Banco">
                                 <Select
                                     name="bankType"
-                                    defaultValue="Conta Corrente"
+                                    defaultValue="Selecione"
                                     size="md"
                                     style={{ width: 200 }}
                                     onSelect={(value) => {
