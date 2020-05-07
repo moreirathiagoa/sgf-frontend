@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, Input, Button, Checkbox } from 'antd';
-import { login } from '../api'
+import { login, startServer } from '../api'
 import { Redirect } from "react-router-dom";
 import { openNotification } from '../utils'
 
@@ -13,51 +13,87 @@ const tailLayout = {
 };
 
 class Login extends React.Component {
-    
-    componentDidMount(){
+
+    componentDidMount() {
+
+        this.verifyServer()
+
         this.props.mudaTitulo("")
 
-        if (this.props.mode){
+        if (this.props.mode) {
             localStorage.removeItem('token')
             this.props.verificaLogin()
         }
     }
 
-    onFinish = values => {
-        this.props.loading(true)
-        login(values)
+    verifyServer = () => {
+        const online = startServer()
             .then((res) => {
-                if (res.data.code === 200) {
-                    openNotification('success','Login efetuado','Seu login foi registrado com sucesso.')
-                    localStorage.setItem('token', res.data.data.token)
-                    this.props.verificaLogin()
-                    this.render()
+                if (res) {
+                    console.log('Server Online')
+                    return true
                 }
                 else {
-                    openNotification('error','Login não efetuado','Usuário ou senha inválio.')
+                    console.log('Server Offline')
+                    return false
                 }
-                this.props.loading(false)
+
             })
             .catch((err) => {
-                openNotification('error','Login não efetuado','Erro interno. Tente novamente mais tarde.')
-                localStorage.removeItem('token')
-                this.props.verificaLogin()
-                this.props.loading(false)
+                console.log('Server Offline')
+                return false
+            })
+        return online
+    }
+
+    onFinish = values => {
+        this.props.loading(true)
+        this.verifyServer()
+            .then((res) => {
+                if (!res) {
+                    this.props.loading(false)
+                    openNotification('error', 'Login não efetuado', 'O servidor está offline. Tente novamente em alguns segundos.')
+                    return
+                }
+                login(values)
+                    .then((res) => {
+                        if (res.data.code === 200) {
+                            openNotification('success', 'Login efetuado', 'Seu login foi registrado com sucesso.')
+                            localStorage.setItem('token', res.data.data.token)
+                            this.props.verificaLogin()
+                            this.render()
+                        }
+                        else {
+                            openNotification('error', 'Login não efetuado', 'Usuário ou senha inválio.')
+                        }
+                        this.props.loading(false)
+                    })
+                    .catch((err) => {
+                        openNotification('error', 'Login não efetuado', 'Erro interno. Tente novamente mais tarde.')
+                        localStorage.removeItem('token')
+                        this.props.verificaLogin()
+                        this.props.loading(false)
+                    })
+
+            })
+            .catch((err) => {
+                openNotification('error', 'Login não efetuado', 'O servidor está offline. Tente novamente em alguns segundos.')
+                return
             })
     };
 
     onFinishFailed = errorInfo => {
-        openNotification('warning','Login não efetuado','Preencha os dados corretamente.')
+        openNotification('warning', 'Login não efetuado', 'Preencha os dados corretamente.')
     };
 
     render() {
 
-        if (this.props.mode){
-            return <Redirect to="/"/>
+        if (this.props.mode) {
+            return <Redirect to="/" />
         }
 
-        if (this.props.logado){
-            return <Redirect to="/dashboard"/>
+        if (this.props.logado) {
+            return <Redirect to="/dashboard" />
         }
 
         return (
@@ -97,5 +133,4 @@ class Login extends React.Component {
         )
     }
 }
-
 export default Login
