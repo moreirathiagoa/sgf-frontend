@@ -214,7 +214,7 @@ class Banks extends React.Component {
                         >
                             {this.state.banks.map(element => {
                                 return (
-                                    <Panel header={element.name} key={element.name} extra={this.genExtra(element)} style={{'font-size': '16px'}}>
+                                    <Panel header={element.name} key={element.name} extra={this.genExtra(element)} style={{'fontSize': '16px'}}>
                                         <Descriptions title="Detalhes:">
                                             <Descriptions.Item label="Nome">{element.name}</Descriptions.Item>
                                             <Descriptions.Item label="Status">{element.isActive ? 'Ativo' : 'Inativo'}</Descriptions.Item>

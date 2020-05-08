@@ -8,6 +8,7 @@ switch (env) {
     case 'prod':
         url = "https://sgf-backend.herokuapp.com/"
         break
+    default:
 }
 console.log('Iniciado em ambiente ' + env.toLocaleUpperCase())
 

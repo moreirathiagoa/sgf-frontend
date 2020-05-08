@@ -1,7 +1,6 @@
 import React from 'react';
-import { Statistic, Row, Col, Button, Typography, Descriptions } from 'antd';
+import { Statistic, Row, Col } from 'antd';
 import { BarChart, Bar, XAxis, YAxis } from 'recharts';
-import { openNotification } from '../utils'
 import '../App.css'
 
 const data = [{ name: 'Page A', uv: 400, pv: 2400, amt: 2400 }, { name: 'Page B', uv: 300, pv: 3000, amt: 600 }]
@@ -28,8 +27,6 @@ const renderCustomAxisTick = ({ x, y, payload }) => {
 const renderCustomBarLabel = ({ payload, x, y, width, height, value }) => {
     return <text x={x + width / 2} y={y} fill="#666" textAnchor="middle" dy={-6}>{`value: ${value}`}</text>;
 };
-
-const { Title } = Typography;
 
 class Dashboard extends React.Component {
 
