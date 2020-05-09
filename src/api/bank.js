@@ -3,79 +3,79 @@ import properties from '../properties'
 
 const listBanks = () => {
     const token = localStorage.getItem('token')
-    
+
     const response = axios({
         method: 'get',
-        url: properties.url+'bank/list',
-        headers:{
+        url: properties.url + 'bank/list',
+        headers: {
             auth: token
         }
     })
-    .then((res) => {
-        return res
-    })
-    .catch((err) => {
-        return err.response
-    })
+        .then((res) => {
+            return res
+        })
+        .catch((err) => {
+            return err.response
+        })
     return response
 }
 
 const createBank = (bank) => {
     const token = localStorage.getItem('token')
-    
+
     const response = axios({
         method: 'post',
-        url: properties.url+'bank/create',
+        url: properties.url + 'bank/create',
         data: bank,
-        headers:{
+        headers: {
             auth: token
         }
     })
-    .then((res) => {
-        return res
-    })
-    .catch((err) => {
-        return err.response
-    })
+        .then((res) => {
+            return res
+        })
+        .catch((err) => {
+            return err.response
+        })
     return response
 }
 
 const removeBank = (id) => {
     const token = localStorage.getItem('token')
-    
+
     const response = axios({
         method: 'delete',
-        url: properties.url+'bank/delete/'+id,
-        headers:{
+        url: properties.url + 'bank/delete/' + id,
+        headers: {
             auth: token
         }
     })
-    .then((res) => {
-        return res
-    })
-    .catch((err) => {
-        return err.response
-    })
-    return response 
+        .then((res) => {
+            return res
+        })
+        .catch((err) => {
+            return err.response
+        })
+    return response
 }
 
 const updateBank = (bank, idBank) => {
     const token = localStorage.getItem('token')
-    
+
     const response = axios({
         method: 'put',
-        url: properties.url+'bank/update/'+idBank,
+        url: properties.url + 'bank/update/' + idBank,
         data: bank,
-        headers:{
+        headers: {
             auth: token
         }
     })
-    .then((res) => {
-        return res
-    })
-    .catch((err) => {
-        return err.response
-    })
+        .then((res) => {
+            return res
+        })
+        .catch((err) => {
+            return err.response
+        })
     return response
 }
 

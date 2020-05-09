@@ -28,16 +28,16 @@ class MenuPrincipal extends React.Component {
 					<>
 						<Row>
 							<Col className="trigger" span={6}>
-								<MenuFoldOutlined onClick={this.props.toggle}/>
+								<MenuFoldOutlined onClick={this.props.toggle} />
 							</Col>
 							<Col className="trigger-title" span={4}>
 								<span>SGF</span>
 							</Col>
 						</Row>
-						<Menu 
-							theme="dark" 
-							mode="inline" 
-							defaultSelectedKeys={['1']} 
+						<Menu
+							theme="dark"
+							mode="inline"
+							defaultSelectedKeys={['1']}
 							onClick={this.props.alterado}
 						>
 							<Menu.Item key="1">

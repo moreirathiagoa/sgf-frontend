@@ -6,12 +6,12 @@ const startServer = () => {
         method: 'get',
         url: properties.url
     })
-    .then((res) => {
-        return true
-    })
-    .catch((err) => {
-        return false
-    })
+        .then((res) => {
+            return true
+        })
+        .catch((err) => {
+            return false
+        })
     return response
 }
 

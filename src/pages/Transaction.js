@@ -244,7 +244,7 @@ class Transaction extends React.Component {
 
     limpaDataState() {
         let state = this.state
-        if (state.saveExit === true){
+        if (state.saveExit === true) {
             state.exit = true
         }
         this.setState(state)
@@ -255,7 +255,7 @@ class Transaction extends React.Component {
         if (this.state.exit === true) {
             return <Redirect to="/" />
         }
-        
+
 
         return (
             <div>

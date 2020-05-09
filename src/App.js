@@ -74,11 +74,11 @@ class App extends React.Component {
 								}}
 							>
 								<Spin spinning={this.state.loading} size="large">
-									<Routes 
-										loading={this.setLoading} 
-										mudaTitulo={this.mudaTitulo} 
-										logado={this.state.logado} 
-										verificaLogin={this.verificaLogin} 
+									<Routes
+										loading={this.setLoading}
+										mudaTitulo={this.mudaTitulo}
+										logado={this.state.logado}
+										verificaLogin={this.verificaLogin}
 									/>
 								</Spin>
 							</Content>

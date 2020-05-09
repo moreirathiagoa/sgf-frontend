@@ -56,7 +56,7 @@ class Dashboard extends React.Component {
                         <Statistic title="Saldo Liquido" value="R$ 200,00" />
                     </Col>
                 </Row>
-                <br/>
+                <br />
                 <Row>
                     <BarChart width={350} height={250} data={data}>
                         <XAxis dataKey="name" tick={renderCustomAxisTick} />

@@ -4,14 +4,14 @@ import properties from '../properties'
 export default (user) => {
     const response = axios({
         method: 'post',
-        url: properties.url+'login',
+        url: properties.url + 'login',
         data: user
     })
-    .then((res) => {
-        return res
-    })
-    .catch((err) => {
-        return err.response
-    })
+        .then((res) => {
+            return res
+        })
+        .catch((err) => {
+            return err.response
+        })
     return response
 }
