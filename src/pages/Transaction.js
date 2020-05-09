@@ -1,5 +1,6 @@
 import React from 'react';
 import '../App.css'
+import { Redirect } from "react-router-dom";
 import {
     Form,
     Input,
@@ -14,6 +15,7 @@ import {
 import { createTransaction, updateTransaction, listBanks, listCategories } from '../api'
 import { openNotification } from '../utils'
 import moment from 'moment'
+import { isExists } from 'date-fns';
 
 const { Option } = Select;
 const formatDate = 'DD/MM/YYYY'
@@ -26,15 +28,22 @@ class Transaction extends React.Component {
             idToUpdate: undefined,
             screenType: null,
             data: this.getInitialData(),
+            allBanks: [],
             banks: [],
             categories: [],
-            fatures: []
+            fatures: [],
+            saveExit: null,
+            exit: false,
         }
+
         this.handleChange = this.handleChange.bind(this)
         this.submitForm = this.submitForm.bind(this)
 
         this.getListBanks()
         this.getListCategories()
+    }
+    componentDidUpdate(){
+        console.log(this.state.data.efectedDate)
     }
 
     componentDidMount() {
@@ -59,17 +68,11 @@ class Transaction extends React.Component {
 
     getInitialData() {
         return {
-            isCompesed: null,
-            efectedDate: moment(moment(), formatDate),
-            description: null,
-            value: '',
-            currentRecurrence: null,
-            finalRecurrence: null,
-            bank_id: null,
-            category_id: null,
-            fature: null,
+            efectedDate: moment(moment()).format(formatDate),
+            bank_id: 'Selecione',
+            category_id: 'Selecione',
             isSimples: false,
-            isCredit: false
+            isCredit: false,
         }
     }
 
@@ -82,7 +85,7 @@ class Transaction extends React.Component {
                 }
                 else {
                     let state = this.state
-                    state.banks = res.data.data
+                    state.allBanks = res.data.data
                     this.setState(state)
                 }
             })
@@ -116,8 +119,36 @@ class Transaction extends React.Component {
             case 'screenType':
                 state.screenType = event.target.value
                 state.data = this.getInitialData()
-                if (event.target.value === 'contaCorrente')
-                    state.data.isCompesed = true
+                this.state.banks = []
+                switch (event.target.value) {
+                    case 'contaCorrente':
+                        state.data.isCompesed = true
+                        state.allBanks.map((bank) => {
+                            if (bank.bankType === 'Conta Corrente' || bank.bankType === 'Conta Cartão') {
+                                state.banks.push(bank)
+                            }
+                        })
+                        break;
+
+                    case 'cartaoCredito':
+                        state.allBanks.map((bank) => {
+                            if (bank.bankType === 'Cartão de Crédito') {
+                                state.banks.push(bank)
+                            }
+                        })
+                        break;
+
+                    case 'planejamento':
+                        state.allBanks.map((bank) => {
+                            if (bank.bankType === 'Conta Corrente' || bank.bankType === 'Conta Cartão') {
+                                state.banks.push(bank)
+                            }
+                        })
+                        break;
+
+                    default:
+                        break;
+                }
                 break
             case 'isCompesed':
                 state.data.isCompesed = !state.data.isCompesed
@@ -147,8 +178,8 @@ class Transaction extends React.Component {
                 state.data.category_id = event.target.value
                 break
 
-            case 'fature_id':
-                state.data.fature_id = event.target.value
+            case 'fature':
+                state.data.fature = event.target.value
                 break
 
             case 'isSimples':
@@ -157,6 +188,12 @@ class Transaction extends React.Component {
 
             case 'isCredit':
                 state.data.isCredit = !state.data.isCredit
+                break
+            case 'salvarSair':
+                state.saveExit = true
+                break
+            case 'salvar':
+                state.saveExit = false
                 break
 
             default:
@@ -179,11 +216,12 @@ class Transaction extends React.Component {
                     this.limpaDataState()
                 }
                 else {
-                    openNotification('error', 'Transação não cadastrada', 'A Transação não pode ser cadastrada')
+                    openNotification('error', 'Transação não cadastrada', res.data.message)
                 }
-
+                console.log('res',res)
             })
             .catch((err) => {
+                console.log('err',err)
                 openNotification('error', 'Transação não cadastrada', 'Erro interno. Tente novamente mais tarde.')
             })
     }
@@ -206,14 +244,19 @@ class Transaction extends React.Component {
 
     limpaDataState() {
         let state = this.state
-        state.list = true
-        state.data.name = ''
-        state.data.isActive = true
-        state.idToUpdate = undefined
+        if (state.saveExit === true){
+            this.state.exit = true
+        }
         this.setState(state)
     }
 
     render() {
+
+        if (this.state.exit === true) {
+            return <Redirect to="/" />
+        }
+        
+
         return (
             <div>
                 <Form
@@ -244,7 +287,7 @@ class Transaction extends React.Component {
                             <Form.Item label="Banco">
                                 <Select
                                     name="bank_id"
-                                    defaultValue="Selecione"
+                                    value={this.state.data.bank_id}
                                     size="md"
                                     style={{ width: 200 }}
                                     onSelect={(value) => {
@@ -272,7 +315,7 @@ class Transaction extends React.Component {
                             <Form.Item label="Categoria">
                                 <Select
                                     name="category_id"
-                                    defaultValue="Selecione"
+                                    value={this.state.data.category_id}
                                     size="md"
                                     style={{ width: 200 }}
                                     onSelect={(value) => {
@@ -300,14 +343,14 @@ class Transaction extends React.Component {
 
                             <Form.Item label="Data da Transação">
                                 <Row>
-                                    <Col span={12}>
+                                    <Col span={8}>
 
                                         <DatePicker
                                             format={formatDate}
                                             name="efectedDate"
                                             size="md"
                                             defaultValue={
-                                                moment(this.state.data.efectedDate, "DD/MM/YYYY")
+                                                moment(this.state.data.efectedDate, formatDate)
                                             }
                                             onChange={(date, dateString) => {
                                                 const event = {
@@ -323,14 +366,14 @@ class Transaction extends React.Component {
                                     <Col span={10}>
                                         {this.state.screenType === 'contaCorrente' &&
                                             <>
-                                                <span style={{ color: '#ccc' }}>Compensado: </span>
-                                                <span onClick={this.handleChange}>
+                                                <span style={{ 'padding': '0 10px' }} onClick={this.handleChange}>
                                                     <Switch
                                                         name="isCompesed"
                                                         checked={this.state.data.isCompesed}
                                                         size="md"
                                                     />
                                                 </span>
+                                                <span style={{ color: '#ccc' }}>{this.state.data.isCompesed ? "Compensado" : "Programado"}</span>
                                             </>
                                         }
                                     </Col>
@@ -351,14 +394,14 @@ class Transaction extends React.Component {
                                         />
                                     </Col>
                                     <Col span={10}>
-                                        <span style={{ color: '#ccc' }}>Crédito: </span>
-                                        <span onClick={this.handleChange}>
+                                        <span style={{ 'padding': '0 10px' }} onClick={this.handleChange}>
                                             <Switch
                                                 name="isCredit"
                                                 checked={this.state.data.isCredit}
                                                 size="md"
                                             />
                                         </span>
+                                        <span style={{ color: '#ccc' }}>{this.state.data.isCredit ? "Crédto" : "Débito"}</span>
                                     </Col>
                                 </Row>
                             </Form.Item>
@@ -377,14 +420,14 @@ class Transaction extends React.Component {
                             {this.state.screenType === 'cartaoCredito' &&
                                 <Form.Item label="Fatura">
                                     <Select
-                                        name="fature_id"
+                                        name="fature"
                                         defaultValue="Selecione"
                                         size="md"
                                         style={{ width: 200 }}
                                         onSelect={(value) => {
                                             const event = {
                                                 target: {
-                                                    name: 'fature_id',
+                                                    name: 'fature',
                                                     value: value
                                                 }
                                             }
@@ -419,7 +462,7 @@ class Transaction extends React.Component {
                                             />
                                         </Col>
                                     }
-                                    <Col span={6}>
+                                    <Col span={8}>
                                         <Input
                                             placeholder="Final"
                                             type="number"
@@ -430,32 +473,48 @@ class Transaction extends React.Component {
                                             style={{ width: 60 }}
                                         />
                                     </Col>
-                                    <Col span={8}>
-                                        <span onClick={this.handleChange}>
-                                            <span
-                                                style={{ color: '#ccc' }}
-                                            >
-                                                Simples:
-                                            </span>
+                                    <Col span={10}>
+                                        <span style={{ 'padding': '0 10px' }} onClick={this.handleChange}>
                                             <Switch
                                                 name="isSimples"
                                                 checked={this.state.data.isSimples}
                                                 size="md"
                                             />
                                         </span>
+                                        <span style={{ color: '#ccc' }}>{this.state.data.isSimples ? "Simples" : "Completa"}</span>
                                     </Col>
                                 </Row>
                             </Form.Item>
 
                             <Form.Item label="Ação">
-                                <Button
-                                    className="btn-fill"
-                                    size="lg"
-                                    type="primary"
-                                    htmlType="submit"
-                                >
-                                    Confirmar
-                            </Button>
+                                <Row>
+                                    <Col span={8}>
+                                        <Button
+                                            className="btn-fill"
+                                            size="lg"
+                                            htmlType="submit"
+                                            name="salvar"
+                                            onClick={this.handleChange}
+                                        >
+                                            Salvar
+                                </Button>
+                                    </Col>
+                                    <Col span={8}>
+                                        <Button
+                                            className="btn-fill"
+                                            size="lg"
+                                            type="primary"
+                                            htmlType="submit"
+                                            name="salvarSair"
+                                            onClick={this.handleChange}
+                                        >
+                                            Salvar e Sair
+                                </Button>
+                                    </Col>
+                                </Row>
+
+
+
                             </Form.Item>
                         </>
                     }
