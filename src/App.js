@@ -4,7 +4,7 @@ import './App.css';
 import { BrowserRouter } from 'react-router-dom'
 import { Layout, Spin } from 'antd';
 import Routes from './routes'
-import MenuPrincipal from './components/menuPrincipal';
+import MenuPrincipal from './components/MenuPrincipal';
 import HeaderPrincipal from './components/HeaderPrincipal';
 import { openNotification } from './utils'
 

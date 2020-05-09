@@ -67,7 +67,7 @@ class MenuPrincipal extends React.Component {
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="5">
-								<Link to="/extrato-cartao">
+								<Link to="/extrato-plano">
 									<FileSearchOutlined />
 									<span>Extrato Planejamento</span>
 								</Link>

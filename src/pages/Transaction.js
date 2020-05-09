@@ -15,7 +15,6 @@ import {
 import { createTransaction, updateTransaction, listBanks, listCategories } from '../api'
 import { openNotification } from '../utils'
 import moment from 'moment'
-import { isExists } from 'date-fns';
 
 const { Option } = Select;
 const formatDate = 'DD/MM/YYYY'
@@ -41,9 +40,6 @@ class Transaction extends React.Component {
 
         this.getListBanks()
         this.getListCategories()
-    }
-    componentDidUpdate(){
-        console.log(this.state.data.efectedDate)
     }
 
     componentDidMount() {
@@ -119,7 +115,7 @@ class Transaction extends React.Component {
             case 'screenType':
                 state.screenType = event.target.value
                 state.data = this.getInitialData()
-                this.state.banks = []
+                state.banks = []
                 switch (event.target.value) {
                     case 'contaCorrente':
                         state.data.isCompesed = true
@@ -127,6 +123,7 @@ class Transaction extends React.Component {
                             if (bank.bankType === 'Conta Corrente' || bank.bankType === 'Conta Cartão') {
                                 state.banks.push(bank)
                             }
+                            return null
                         })
                         break;
 
@@ -135,6 +132,7 @@ class Transaction extends React.Component {
                             if (bank.bankType === 'Cartão de Crédito') {
                                 state.banks.push(bank)
                             }
+                            return null
                         })
                         break;
 
@@ -143,6 +141,7 @@ class Transaction extends React.Component {
                             if (bank.bankType === 'Conta Corrente' || bank.bankType === 'Conta Cartão') {
                                 state.banks.push(bank)
                             }
+                            return null
                         })
                         break;
 
@@ -150,6 +149,7 @@ class Transaction extends React.Component {
                         break;
                 }
                 break
+
             case 'isCompesed':
                 state.data.isCompesed = !state.data.isCompesed
                 break
@@ -189,9 +189,11 @@ class Transaction extends React.Component {
             case 'isCredit':
                 state.data.isCredit = !state.data.isCredit
                 break
+
             case 'salvarSair':
                 state.saveExit = true
                 break
+
             case 'salvar':
                 state.saveExit = false
                 break
@@ -218,10 +220,8 @@ class Transaction extends React.Component {
                 else {
                     openNotification('error', 'Transação não cadastrada', res.data.message)
                 }
-                console.log('res',res)
             })
             .catch((err) => {
-                console.log('err',err)
                 openNotification('error', 'Transação não cadastrada', 'Erro interno. Tente novamente mais tarde.')
             })
     }
@@ -245,7 +245,7 @@ class Transaction extends React.Component {
     limpaDataState() {
         let state = this.state
         if (state.saveExit === true){
-            this.state.exit = true
+            state.exit = true
         }
         this.setState(state)
     }
