@@ -1,6 +1,6 @@
 import React from 'react';
 import '../App.css'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 import {
     Input,
     Checkbox,
@@ -39,6 +39,7 @@ class Banks extends React.Component {
             banks: [],
             categories: [],
             filtro: false,
+            idToEdit: null,
         }
         this.handleChange = this.handleChange.bind(this)
         this.submitForm = this.submitForm.bind(this)
@@ -53,7 +54,7 @@ class Banks extends React.Component {
 
     list = () => {
         this.props.loading(true)
-        listTransaction()
+        listTransaction('contaCorrente')
             .then((res) => {
                 if (res.status === 401) {
                     localStorage.removeItem('token')
@@ -108,25 +109,6 @@ class Banks extends React.Component {
             })
     }
 
-    menu = (element) => (
-        <Menu>
-            <Menu.Item onClick={() => this.remover(element._id)}>Apagar</Menu.Item>
-            <Menu.Item onClick={() => this.editInit(element)}>Editar</Menu.Item>
-        </Menu>
-    )
-
-    genExtra = (key) => (
-        <Dropdown
-            overlay={this.menu(key)}
-            placement="bottomRight"
-            onClick={event => {
-                event.stopPropagation();
-            }}
-        >
-            <MenuOutlined />
-        </Dropdown >
-    );
-
     handleChange(event) {
         let state = this.state
 
@@ -153,30 +135,45 @@ class Banks extends React.Component {
 
     remover(id) {
 
-        if (window.confirm('Deseja realmente apagar esse Banco?')) {
+        if (window.confirm('Deseja realmente apagar essa Transação?')) {
             removeTransaction(id)
                 .then((res) => {
                     if (res.data.code === 202) {
-                        openNotification('success', 'Banco removido', 'Banco removido com sucesso.')
+                        openNotification('success', 'Transação removida', 'Transação removida com sucesso.')
                         this.list()
                     }
                     else {
-                        openNotification('error', 'Banco não removido', 'O Banco não pode ser removido.')
+                        openNotification('error', 'Transação não removida', 'A Transação não pode ser removida.')
                     }
 
                 })
                 .catch((err) => {
-                    openNotification('error', 'Banco não removido', 'Erro interno. Tente novamente mais tarde.')
+                    openNotification('error', 'Transação não removida', 'Erro interno. Tente novamente mais tarde.')
                 })
         }
+    }
+
+    editInit(idTransaction) {
+        this.setState({ idToEdit: idTransaction })
     }
 
     submitForm(e) {
 
     }
 
+    menu = (element) => (
+        <Menu>
+            <Menu.Item onClick={() => this.remover(element._id)}>Apagar</Menu.Item>
+            <Menu.Item onClick={() => this.editInit(element._id)}>Editar</Menu.Item>
+        </Menu>
+    )
 
     render() {
+
+        if (this.state.idToEdit) {
+            return <Redirect to={"/transaction/" + this.state.idToEdit} />
+        }
+
         return (
             <div>
                 <div>
@@ -358,7 +355,15 @@ class Banks extends React.Component {
                                                     </Col>
                                                     <Col span={3}>
                                                         <span style={{ float: 'right' }}>
-                                                            {action(element)}
+                                                            <Dropdown
+                                                                overlay={this.menu(element)}
+                                                                placement="bottomRight"
+                                                                onClick={event => {
+                                                                    event.stopPropagation();
+                                                                }}
+                                                            >
+                                                                <MenuOutlined />
+                                                            </Dropdown >
                                                         </span>
                                                     </Col>
                                                 </Row>

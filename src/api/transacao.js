@@ -1,12 +1,31 @@
 import axios from 'axios'
 import properties from '../properties'
 
-const listTransaction = () => {
+const listTransaction = (typeTransaction) => {
     const token = localStorage.getItem('token')
 
     const response = axios({
         method: 'get',
-        url: properties.url + 'transaction/list',
+        url: properties.url + 'transaction/list/'+typeTransaction,
+        headers: {
+            auth: token
+        }
+    })
+        .then((res) => {
+            return res
+        })
+        .catch((err) => {
+            return err.response
+        })
+    return response
+}
+
+const getTransaction = (idTransaction) => {
+    const token = localStorage.getItem('token')
+
+    const response = axios({
+        method: 'get',
+        url: properties.url + 'transaction/' + idTransaction,
         headers: {
             auth: token
         }
@@ -81,6 +100,7 @@ const updateTransaction = (transaction, idCategory) => {
 
 export {
     listTransaction,
+    getTransaction,
     createTransaction,
     removeTransaction,
     updateTransaction

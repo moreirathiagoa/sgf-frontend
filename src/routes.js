@@ -38,7 +38,7 @@ class Router extends React.Component {
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path="/transaction">
+				<Route path="/transaction/:idTransaction?">
 					<Transaction
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}

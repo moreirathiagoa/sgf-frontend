@@ -12,7 +12,7 @@ import {
     Col,
     DatePicker,
 } from 'antd';
-import { createTransaction, updateTransaction, listBanks, listCategories } from '../api'
+import { createTransaction, updateTransaction, listBanks, listCategories, getTransaction } from '../api'
 import { openNotification } from '../utils'
 import moment from 'moment'
 
@@ -22,9 +22,13 @@ const formatDate = 'DD/MM/YYYY'
 class Transaction extends React.Component {
 
     constructor(props) {
+
+        const param = window.location.pathname;
+        const idTransaction = param.split('/')[2]
+
         super(props)
         this.state = {
-            idToUpdate: undefined,
+            idToUpdate: idTransaction,
             screenType: null,
             data: this.getInitialData(),
             allBanks: [],
@@ -37,12 +41,15 @@ class Transaction extends React.Component {
 
         this.handleChange = this.handleChange.bind(this)
         this.submitForm = this.submitForm.bind(this)
-
-        this.getListBanks()
-        this.getListCategories()
     }
 
+    componentWillUpdate() {
+
+
+        console.log(this.state.data.efectedDate)
+    }
     componentDidMount() {
+
         this.props.mudaTitulo("Transação")
         let now = new Date()
 
@@ -60,6 +67,34 @@ class Transaction extends React.Component {
             now.setDate(now.getDate() + 30)
         }
         this.setState(state)
+
+        this.getListBanks()
+        this.getListCategories()
+        if (this.state.idToUpdate) {
+            this.getTransactionToUpdate(this.state.idToUpdate)
+        }
+    }
+
+    getTransactionToUpdate(idTransaction) {
+        getTransaction(idTransaction)
+            .then((res) => {
+                if (res.status === 401) {
+                    localStorage.removeItem('token')
+                    this.props.verificaLogin()
+                }
+                else {
+                    console.log(res.data.data)
+                    let state = this.state
+                    state.data = res.data.data
+                    const newDate = moment(res.data.data.efectedDate).format("DD/MM/YYYY")
+                    state.data.efectedDate = newDate
+                    state.banks = state.allBanks
+                    this.setState(state)
+                }
+            })
+            .catch((err) => {
+                openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Bancos.')
+            })
     }
 
     getInitialData() {
@@ -69,6 +104,7 @@ class Transaction extends React.Component {
             category_id: 'Selecione',
             isSimples: false,
             isCredit: false,
+            typeTransaction: null,
         }
     }
 
@@ -86,7 +122,7 @@ class Transaction extends React.Component {
                 }
             })
             .catch((err) => {
-                openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Bancos.')
+                openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Transações.')
             })
     }
 
@@ -112,9 +148,9 @@ class Transaction extends React.Component {
         let state = this.state
 
         switch (event.target.name) {
-            case 'screenType':
-                state.screenType = event.target.value
+            case 'typeTransaction':
                 state.data = this.getInitialData()
+                state.data.typeTransaction = event.target.value
                 state.banks = []
                 switch (event.target.value) {
                     case 'contaCorrente':
@@ -164,6 +200,10 @@ class Transaction extends React.Component {
 
             case 'value':
                 state.data.value = event.target.value
+                break
+
+            case 'currentRecurrence':
+                state.data.currentRecurrence = event.target.value
                 break
 
             case 'finalRecurrence':
@@ -251,11 +291,22 @@ class Transaction extends React.Component {
     }
 
     render() {
-
         if (this.state.exit === true) {
-            return <Redirect to="/" />
+            if (this.state.idToUpdate) {
+                switch (this.state.data.typeTransaction) {
+                    case 'contaCorrente':
+                        return <Redirect to="/extrato-conta" />
+                    case 'cartaoCredito':
+                        return <Redirect to="/extrato-cartao" />
+                    case 'plnejamento':
+                        return <Redirect to="/extrato-plano" />
+                    default:
+                }
+            }
+            else {
+                return <Redirect to="/dashboard" />
+            }
         }
-
 
         return (
             <div>
@@ -271,7 +322,7 @@ class Transaction extends React.Component {
                 >
                     <Form.Item label="Tipo de Transação">
                         <Radio.Group
-                            name="screenType"
+                            name="typeTransaction"
                             onChange={this.handleChange}
                             buttonStyle="solid"
                             size="md"
@@ -282,7 +333,7 @@ class Transaction extends React.Component {
                         </Radio.Group>
                     </Form.Item>
 
-                    {this.state.screenType &&
+                    {this.state.data.typeTransaction &&
                         <>
                             <Form.Item label="Banco">
                                 <Select
@@ -364,7 +415,7 @@ class Transaction extends React.Component {
                                         />
                                     </Col>
                                     <Col span={10}>
-                                        {this.state.screenType === 'contaCorrente' &&
+                                        {this.state.data.typeTransaction === 'contaCorrente' &&
                                             <>
                                                 <span style={{ 'padding': '0 10px' }} onClick={this.handleChange}>
                                                     <Switch
@@ -417,7 +468,7 @@ class Transaction extends React.Component {
                                     style={{ width: 350 }}
                                 />
                             </Form.Item>
-                            {this.state.screenType === 'cartaoCredito' &&
+                            {this.state.data.typeTransaction === 'cartaoCredito' &&
                                 <Form.Item label="Fatura">
                                     <Select
                                         name="fature"
@@ -454,7 +505,7 @@ class Transaction extends React.Component {
                                             <Input
                                                 placeholder="Atual"
                                                 type="number"
-                                                name="finalRecurrence"
+                                                name="currentRecurrence"
                                                 size="md"
                                                 value={this.state.data.currentRecurrence}
                                                 onChange={this.handleChange}
@@ -488,17 +539,19 @@ class Transaction extends React.Component {
 
                             <Form.Item label="Ação">
                                 <Row>
-                                    <Col span={8}>
-                                        <Button
-                                            className="btn-fill"
-                                            size="lg"
-                                            htmlType="submit"
-                                            name="salvar"
-                                            onClick={this.handleChange}
-                                        >
-                                            Salvar
-                                </Button>
-                                    </Col>
+                                    {!this.state.idToUpdate &&
+                                        <Col span={8}>
+                                            <Button
+                                                className="btn-fill"
+                                                size="lg"
+                                                htmlType="submit"
+                                                name="salvar"
+                                                onClick={this.handleChange}
+                                            >
+                                                Salvar
+                                            </Button>
+                                        </Col>
+                                    }
                                     <Col span={8}>
                                         <Button
                                             className="btn-fill"
@@ -512,9 +565,6 @@ class Transaction extends React.Component {
                                 </Button>
                                     </Col>
                                 </Row>
-
-
-
                             </Form.Item>
                         </>
                     }
