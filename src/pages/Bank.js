@@ -14,8 +14,7 @@ import {
 } from 'antd';
 import { ArrowLeftOutlined, MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { listBanks, createBank, removeBank, updateBank } from '../api'
-import { openNotification } from '../utils'
-import moment from 'moment'
+import { openNotification, formatDateToUser } from '../utils'
 
 const { Panel } = Collapse;
 const { Title } = Typography;
@@ -221,7 +220,7 @@ class Banks extends React.Component {
                                             <Descriptions.Item label="Tipo">{element.bankType}</Descriptions.Item>
                                             <Descriptions.Item label="Saldo Sistema">{element.systemBalance.toLocaleString('pt-BR', formatMoeda)}</Descriptions.Item>
                                             <Descriptions.Item label="Saldo Manual">{element.manualBalance.toLocaleString('pt-BR', formatMoeda)}</Descriptions.Item>
-                                            <Descriptions.Item label="Data Criação">{moment(element.createDate).format("DD/MM/YYYY")}</Descriptions.Item>
+                                            <Descriptions.Item label="Data Criação">{formatDateToUser(element.createDate)}</Descriptions.Item>
                                         </Descriptions>
                                     </Panel>
                                 )

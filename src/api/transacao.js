@@ -1,5 +1,6 @@
 import axios from 'axios'
 import properties from '../properties'
+import { formatDateToMoment } from '../utils'
 
 const listTransaction = (typeTransaction) => {
     const token = localStorage.getItem('token')
@@ -42,6 +43,8 @@ const getTransaction = (idTransaction) => {
 const createTransaction = (transaction) => {
     const token = localStorage.getItem('token')
 
+    transaction.efectedDate = formatDateToMoment(transaction.efectedDate)
+
     const response = axios({
         method: 'post',
         url: properties.url + 'transaction/create',
@@ -80,6 +83,8 @@ const removeTransaction = (id) => {
 
 const updateTransaction = (transaction, idCategory) => {
     const token = localStorage.getItem('token')
+
+    transaction.efectedDate = formatDateToMoment(transaction.efectedDate)
 
     const response = axios({
         method: 'put',

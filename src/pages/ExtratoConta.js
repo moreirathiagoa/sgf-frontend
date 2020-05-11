@@ -15,8 +15,7 @@ import {
 } from 'antd';
 import { MenuOutlined, PlusCircleOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
 import { listBanks, listTransaction, removeTransaction, listCategories } from '../api'
-import { openNotification } from '../utils'
-import moment from 'moment'
+import { openNotification, formatDateToUser } from '../utils'
 
 const { Panel } = Collapse;
 const { Title } = Typography;
@@ -340,7 +339,7 @@ class Banks extends React.Component {
                                                 <Row>
                                                     <Col span={4}>
                                                         <span>
-                                                            {moment(element.efectedDate).format("DD/MM/YYYY")}
+                                                            {formatDateToUser(element.efectedDate)}
                                                         </span>
                                                     </Col>
                                                     <Col span={11}>
@@ -374,8 +373,8 @@ class Banks extends React.Component {
                                         <Panel header={resume(element, this.genExtra)} key={element._id}>
                                             <Descriptions >
                                                 <Descriptions.Item label="Categoria">{element.category_id.name}</Descriptions.Item>
-                                                <Descriptions.Item label="Data Criação">{moment(element.createDate).format("DD/MM/YYYY")}</Descriptions.Item>
-                                                <Descriptions.Item label="Data Efetivação">{moment(element.efectedDate).format("DD/MM/YYYY")}</Descriptions.Item>
+                                                <Descriptions.Item label="Data Criação">{formatDateToUser(element.createDate)}</Descriptions.Item>
+                                                <Descriptions.Item label="Data Efetivação">{formatDateToUser(element.efectedDate)}</Descriptions.Item>
                                                 <Descriptions.Item label="Status">{element.isCompesed ? "Compensado" : "Não compensado"}</Descriptions.Item>
                                                 {element.currentRecurrence &&
                                                     <Descriptions.Item label="Recorrência">{element.currentRecurrence + "/" + element.finalRecurrence}</Descriptions.Item>

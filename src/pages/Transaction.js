@@ -13,11 +13,9 @@ import {
     DatePicker,
 } from 'antd';
 import { createTransaction, updateTransaction, listBanks, listCategories, getTransaction } from '../api'
-import { openNotification } from '../utils'
-import moment from 'moment'
+import { openNotification, actualDateToUser, formatDateToMoment } from '../utils'
 
 const { Option } = Select;
-const formatDate = 'DD/MM/YYYY'
 
 class Transaction extends React.Component {
 
@@ -38,16 +36,22 @@ class Transaction extends React.Component {
             saveExit: null,
             exit: false,
         }
-
+        console.log(this.state.data.efectedDate)
         this.handleChange = this.handleChange.bind(this)
         this.submitForm = this.submitForm.bind(this)
     }
 
-    componentWillUpdate() {
-
-
-        console.log(this.state.data.efectedDate)
+    getInitialData() {
+        return {
+            efectedDate: actualDateToUser(),
+            bank_id: 'Selecione',
+            category_id: 'Selecione',
+            isSimples: false,
+            isCredit: false,
+            typeTransaction: null,
+        }
     }
+
     componentDidMount() {
 
         this.props.mudaTitulo("Transação")
@@ -86,8 +90,8 @@ class Transaction extends React.Component {
                     console.log(res.data.data)
                     let state = this.state
                     state.data = res.data.data
-                    const newDate = moment(res.data.data.efectedDate).format("DD/MM/YYYY")
-                    state.data.efectedDate = newDate
+                    //const newDate = moment(res.data.data.efectedDate).format("DD/MM/YYYY")
+                    //state.data.efectedDate = newDate
                     state.banks = state.allBanks
                     this.setState(state)
                 }
@@ -95,17 +99,6 @@ class Transaction extends React.Component {
             .catch((err) => {
                 openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Bancos.')
             })
-    }
-
-    getInitialData() {
-        return {
-            efectedDate: moment(moment()).format(formatDate),
-            bank_id: 'Selecione',
-            category_id: 'Selecione',
-            isSimples: false,
-            isCredit: false,
-            typeTransaction: null,
-        }
     }
 
     getListBanks() {
@@ -397,11 +390,11 @@ class Transaction extends React.Component {
                                     <Col span={8}>
 
                                         <DatePicker
-                                            format={formatDate}
+                                            format={"DD/MM/YYYY"}
                                             name="efectedDate"
                                             size="md"
                                             defaultValue={
-                                                moment(this.state.data.efectedDate, formatDate)
+                                                formatDateToMoment(this.state.data.efectedDate)
                                             }
                                             onChange={(date, dateString) => {
                                                 const event = {

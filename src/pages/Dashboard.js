@@ -35,7 +35,6 @@ class Dashboard extends React.Component {
     }
 
     render() {
-
         return (
             <div>
                 <Row gutter={16}>
