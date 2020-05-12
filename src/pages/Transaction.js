@@ -13,7 +13,7 @@ import {
     DatePicker,
 } from 'antd';
 import { createTransaction, updateTransaction, listBanks, listCategories, getTransaction } from '../api'
-import { openNotification, actualDateToUser, formatDateToMoment } from '../utils'
+import { openNotification, actualDateToUser, formatDateToMoment, formatDateToUser } from '../utils'
 
 const { Option } = Select;
 
@@ -87,12 +87,12 @@ class Transaction extends React.Component {
                     this.props.verificaLogin()
                 }
                 else {
-                    console.log(res.data.data)
                     let state = this.state
                     state.data = res.data.data
-                    //const newDate = moment(res.data.data.efectedDate).format("DD/MM/YYYY")
-                    //state.data.efectedDate = newDate
+
+                    state.data.efectedDate = formatDateToUser(res.data.data.efectedDate)
                     state.banks = state.allBanks
+
                     this.setState(state)
                 }
             })
@@ -313,18 +313,20 @@ class Transaction extends React.Component {
                     onFinish={this.submitForm}
                     onFinishFailed={() => { console.log('falhou') }}
                 >
-                    <Form.Item label="Tipo de Transação">
-                        <Radio.Group
-                            name="typeTransaction"
-                            onChange={this.handleChange}
-                            buttonStyle="solid"
-                            size="md"
-                        >
-                            <Radio.Button value="contaCorrente">Conta Corrente</Radio.Button>
-                            <Radio.Button value="cartaoCredito">Crédito Crédito</Radio.Button>
-                            <Radio.Button value="planejamento">Plano</Radio.Button>
-                        </Radio.Group>
-                    </Form.Item>
+                    {!this.state.idToUpdate &&
+                        <Form.Item label="Tipo de Transação">
+                            <Radio.Group
+                                name="typeTransaction"
+                                onChange={this.handleChange}
+                                buttonStyle="solid"
+                                size="md"
+                            >
+                                <Radio.Button value="contaCorrente">Conta Corrente</Radio.Button>
+                                <Radio.Button value="cartaoCredito">Crédito Crédito</Radio.Button>
+                                <Radio.Button value="planejamento">Plano</Radio.Button>
+                            </Radio.Group>
+                        </Form.Item>
+                    }
 
                     {this.state.data.typeTransaction &&
                         <>
