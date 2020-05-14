@@ -47,7 +47,6 @@ class Transaction extends React.Component {
             bank_id: 'Selecione',
             category_id: 'Selecione',
             isSimples: false,
-            isCredit: false,
             typeTransaction: null,
         }
     }
@@ -219,10 +218,6 @@ class Transaction extends React.Component {
                 state.data.isSimples = !state.data.isSimples
                 break
 
-            case 'isCredit':
-                state.data.isCredit = !state.data.isCredit
-                break
-
             case 'salvarSair':
                 state.saveExit = true
                 break
@@ -291,7 +286,7 @@ class Transaction extends React.Component {
                         return <Redirect to="/extrato-conta" />
                     case 'cartaoCredito':
                         return <Redirect to="/extrato-cartao" />
-                    case 'plnejamento':
+                    case 'planejamento':
                         return <Redirect to="/extrato-plano" />
                     default:
                 }
@@ -427,29 +422,15 @@ class Transaction extends React.Component {
                             </Form.Item>
 
                             <Form.Item label="Valor da Transação">
-                                <Row>
-                                    <Col span={8}>
-                                        <Input
-                                            placeholder=""
-                                            type="number"
-                                            name="value"
-                                            size="md"
-                                            value={this.state.data.value}
-                                            onChange={this.handleChange}
-                                            style={{ width: 100 }}
-                                        />
-                                    </Col>
-                                    <Col span={10}>
-                                        <span style={{ 'padding': '0 10px' }} onClick={this.handleChange}>
-                                            <Switch
-                                                name="isCredit"
-                                                checked={this.state.data.isCredit}
-                                                size="md"
-                                            />
-                                        </span>
-                                        <span style={{ color: '#ccc' }}>{this.state.data.isCredit ? "Crédto" : "Débito"}</span>
-                                    </Col>
-                                </Row>
+                                <Input
+                                    placeholder=""
+                                    type="number"
+                                    name="value"
+                                    size="md"
+                                    value={this.state.data.value}
+                                    onChange={this.handleChange}
+                                    style={{ width: 100 }}
+                                />
                             </Form.Item>
 
                             <Form.Item label="Descrição">
