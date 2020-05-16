@@ -7,7 +7,6 @@ import {
     Button,
     Switch,
     Select,
-    Radio,
     Row,
     Col,
     DatePicker,
@@ -48,11 +47,14 @@ class Transaction extends React.Component {
         this.submitForm = this.submitForm.bind(this)
     }
 
-    componentWillReceiveProps() {
+    UNSAFE_componentWillReceiveProps() {
         const param = window.location.pathname;
         const typeTransaction = param.split('/')[2]
-        console.log('componentWillReceiveProps')
-        this.setState({ data: { typeTransaction: typeTransaction } })
+        let state = this.state
+        if (typeTransaction === 'contaCorrente')
+            state.data.isCompesed = true
+        state.data.typeTransaction = typeTransaction
+        this.setState(state)
         this.getListBanks(typeTransaction)
     }
 
@@ -144,48 +146,6 @@ class Transaction extends React.Component {
         let state = this.state
 
         switch (event.target.name) {
-            case 'typeTransaction':
-                state.data = {
-                    efectedDate: actualDateToUser(),
-                    bank_id: 'Selecione',
-                    category_id: 'Selecione',
-                    isSimples: false,
-                }
-                state.data.typeTransaction = event.target.value
-                state.banks = []
-                switch (event.target.value) {
-                    case 'contaCorrente':
-                        state.data.isCompesed = true
-                        state.allBanks.map((bank) => {
-                            if (bank.bankType === 'Conta Corrente' || bank.bankType === 'Conta Cartão') {
-                                state.banks.push(bank)
-                            }
-                            return null
-                        })
-                        break;
-
-                    case 'cartaoCredito':
-                        state.allBanks.map((bank) => {
-                            if (bank.bankType === 'Cartão de Crédito') {
-                                state.banks.push(bank)
-                            }
-                            return null
-                        })
-                        break;
-
-                    case 'planejamento':
-                        state.allBanks.map((bank) => {
-                            if (bank.bankType === 'Conta Corrente' || bank.bankType === 'Conta Cartão') {
-                                state.banks.push(bank)
-                            }
-                            return null
-                        })
-                        break;
-
-                    default:
-                        break;
-                }
-                break
 
             case 'isCompesed':
                 state.data.isCompesed = !state.data.isCompesed
@@ -317,242 +277,223 @@ class Transaction extends React.Component {
                     onFinish={this.submitForm}
                     onFinishFailed={() => { console.log('falhou') }}
                 >
-                    {/* !this.state.idToUpdate &&
-                        <Form.Item label="Tipo de Transação">
-                            <Radio.Group
-                                name="typeTransaction"
-                                onChange={this.handleChange}
-                                buttonStyle="solid"
-                                size="md"
-                            >
-                                <Radio.Button value="contaCorrente">Conta Corrente</Radio.Button>
-                                <Radio.Button value="cartaoCredito">Crédito Crédito</Radio.Button>
-                                <Radio.Button value="planejamento">Plano</Radio.Button>
-                            </Radio.Group>
-                        </Form.Item>
-                     */}
-
-                    {this.state.data.typeTransaction &&
-                        <>
-                            <Form.Item label="Banco">
-                                <Select
-                                    name="bank_id"
-                                    value={this.state.data.bank_id}
-                                    size="md"
-                                    style={{ width: 200 }}
-                                    onSelect={(value) => {
-                                        const event = {
-                                            target: {
-                                                name: 'bank_id',
-                                                value: value
-                                            }
-                                        }
-                                        this.handleChange(event)
-                                    }}
-                                >
-                                    {this.state.banks.map(element => {
-                                        return (
-                                            <Option key={element._id}
-                                                value={element._id}
-                                            >
-                                                {element.name}
-                                            </Option>
-                                        )
-                                    })}
-                                </Select>
-                            </Form.Item>
-
-                            <Form.Item label="Categoria">
-                                <Select
-                                    name="category_id"
-                                    value={this.state.data.category_id}
-                                    size="md"
-                                    style={{ width: 200 }}
-                                    onSelect={(value) => {
-                                        const event = {
-                                            target: {
-                                                name: 'category_id',
-                                                value: value
-                                            }
-                                        }
-                                        this.handleChange(event)
-                                    }}
-                                >
-                                    {this.state.categories.map(element => {
-                                        return (
-                                            <Option
-                                                key={element._id}
-                                                value={element._id}
-                                            >
-                                                {element.name}
-                                            </Option>
-                                        )
-                                    })}
-                                </Select>
-                            </Form.Item>
-
-                            <Form.Item label="Data da Transação">
-                                <Row>
-                                    <Col span={8}>
-
-                                        <DatePicker
-                                            format={"DD/MM/YYYY"}
-                                            name="efectedDate"
-                                            size="md"
-                                            defaultValue={
-                                                formatDateToMoment(this.state.data.efectedDate)
-                                            }
-                                            onChange={(date, dateString) => {
-                                                const event = {
-                                                    target: {
-                                                        name: 'efectedDate',
-                                                        value: dateString
-                                                    }
-                                                }
-                                                this.handleChange(event)
-                                            }}
-                                        />
-                                    </Col>
-                                    <Col span={10}>
-                                        {this.state.data.typeTransaction === 'contaCorrente' &&
-                                            <>
-                                                <span style={{ 'padding': '0 10px' }} onClick={this.handleChange}>
-                                                    <Switch
-                                                        name="isCompesed"
-                                                        checked={this.state.data.isCompesed}
-                                                        size="md"
-                                                    />
-                                                </span>
-                                                <span style={{ color: '#ccc' }}>{this.state.data.isCompesed ? "Compensado" : "Programado"}</span>
-                                            </>
-                                        }
-                                    </Col>
-                                </Row>
-                            </Form.Item>
-
-                            <Form.Item label="Valor da Transação">
-                                <Input
-                                    placeholder=""
-                                    type="number"
-                                    name="value"
-                                    size="md"
-                                    value={this.state.data.value}
-                                    onChange={this.handleChange}
-                                    style={{ width: 100 }}
-                                />
-                            </Form.Item>
-
-                            <Form.Item label="Descrição">
-                                <Input
-                                    placeholder=""
-                                    type="text"
-                                    name="description"
-                                    size="md"
-                                    value={this.state.data.description}
-                                    onChange={this.handleChange}
-                                    style={{ width: 350 }}
-                                />
-                            </Form.Item>
-                            {this.state.data.typeTransaction === 'cartaoCredito' &&
-                                <Form.Item label="Fatura">
-                                    <Select
-                                        name="fature"
-                                        defaultValue="Selecione"
-                                        size="md"
-                                        style={{ width: 200 }}
-                                        onSelect={(value) => {
-                                            const event = {
-                                                target: {
-                                                    name: 'fature',
-                                                    value: value
-                                                }
-                                            }
-                                            this.handleChange(event)
-                                        }}
-                                    >
-                                        {this.state.fatures.map(element => {
-                                            return (
-                                                <Option
-                                                    key={element}
-                                                    value={element}
-                                                >
-                                                    {element}
-                                                </Option>
-                                            )
-                                        })}
-                                    </Select>
-                                </Form.Item>
-                            }
-                            <Form.Item label="Recorrência">
-                                <Row>
-                                    {this.state.idToUpdate &&
-                                        <Col span={6}>
-                                            <Input
-                                                placeholder="Atual"
-                                                type="number"
-                                                name="currentRecurrence"
-                                                size="md"
-                                                value={this.state.data.currentRecurrence}
-                                                onChange={this.handleChange}
-                                                style={{ width: 60 }}
-                                            />
-                                        </Col>
+                    <Form.Item label="Banco">
+                        <Select
+                            name="bank_id"
+                            value={this.state.data.bank_id}
+                            size="md"
+                            style={{ width: 200 }}
+                            onSelect={(value) => {
+                                const event = {
+                                    target: {
+                                        name: 'bank_id',
+                                        value: value
                                     }
-                                    <Col span={8}>
-                                        <Input
-                                            placeholder="Final"
-                                            type="number"
-                                            name="finalRecurrence"
-                                            size="md"
-                                            value={this.state.data.finalRecurrence}
-                                            onChange={this.handleChange}
-                                            style={{ width: 60 }}
-                                        />
-                                    </Col>
-                                    <Col span={10}>
+                                }
+                                this.handleChange(event)
+                            }}
+                        >
+                            {this.state.banks.map(element => {
+                                return (
+                                    <Option key={element._id}
+                                        value={element._id}
+                                    >
+                                        {element.name}
+                                    </Option>
+                                )
+                            })}
+                        </Select>
+                    </Form.Item>
+
+                    <Form.Item label="Categoria">
+                        <Select
+                            name="category_id"
+                            value={this.state.data.category_id}
+                            size="md"
+                            style={{ width: 200 }}
+                            onSelect={(value) => {
+                                const event = {
+                                    target: {
+                                        name: 'category_id',
+                                        value: value
+                                    }
+                                }
+                                this.handleChange(event)
+                            }}
+                        >
+                            {this.state.categories.map(element => {
+                                return (
+                                    <Option
+                                        key={element._id}
+                                        value={element._id}
+                                    >
+                                        {element.name}
+                                    </Option>
+                                )
+                            })}
+                        </Select>
+                    </Form.Item>
+
+                    <Form.Item label="Data da Transação">
+                        <Row>
+                            <Col span={8}>
+
+                                <DatePicker
+                                    format={"DD/MM/YYYY"}
+                                    name="efectedDate"
+                                    size="md"
+                                    defaultValue={
+                                        formatDateToMoment(this.state.data.efectedDate)
+                                    }
+                                    onChange={(date, dateString) => {
+                                        const event = {
+                                            target: {
+                                                name: 'efectedDate',
+                                                value: dateString
+                                            }
+                                        }
+                                        this.handleChange(event)
+                                    }}
+                                />
+                            </Col>
+                            <Col span={10}>
+                                {this.state.data.typeTransaction === 'contaCorrente' &&
+                                    <>
                                         <span style={{ 'padding': '0 10px' }} onClick={this.handleChange}>
                                             <Switch
-                                                name="isSimples"
-                                                checked={this.state.data.isSimples}
+                                                name="isCompesed"
+                                                checked={this.state.data.isCompesed}
                                                 size="md"
                                             />
                                         </span>
-                                        <span style={{ color: '#ccc' }}>{this.state.data.isSimples ? "Simples" : "Completa"}</span>
-                                    </Col>
-                                </Row>
-                            </Form.Item>
+                                        <span style={{ color: '#ccc' }}>{this.state.data.isCompesed ? "Compensado" : "Programado"}</span>
+                                    </>
+                                }
+                            </Col>
+                        </Row>
+                    </Form.Item>
 
-                            <Form.Item label="Ação">
-                                <Row>
-                                    {!this.state.idToUpdate &&
-                                        <Col span={8}>
-                                            <Button
-                                                className="btn-fill"
-                                                size="lg"
-                                                htmlType="submit"
-                                                name="salvar"
-                                                onClick={this.handleChange}
-                                            >
-                                                Salvar
-                                            </Button>
-                                        </Col>
+                    <Form.Item label="Valor da Transação">
+                        <Input
+                            placeholder=""
+                            type="number"
+                            name="value"
+                            size="md"
+                            value={this.state.data.value}
+                            onChange={this.handleChange}
+                            style={{ width: 100 }}
+                        />
+                    </Form.Item>
+
+                    <Form.Item label="Descrição">
+                        <Input
+                            placeholder=""
+                            type="text"
+                            name="description"
+                            size="md"
+                            value={this.state.data.description}
+                            onChange={this.handleChange}
+                            style={{ width: 350 }}
+                        />
+                    </Form.Item>
+                    {this.state.data.typeTransaction === 'cartaoCredito' &&
+                        <Form.Item label="Fatura">
+                            <Select
+                                name="fature"
+                                defaultValue="Selecione"
+                                size="md"
+                                style={{ width: 200 }}
+                                onSelect={(value) => {
+                                    const event = {
+                                        target: {
+                                            name: 'fature',
+                                            value: value
+                                        }
                                     }
-                                    <Col span={8}>
-                                        <Button
-                                            className="btn-fill"
-                                            size="lg"
-                                            type="primary"
-                                            htmlType="submit"
-                                            name="salvarSair"
-                                            onClick={this.handleChange}
+                                    this.handleChange(event)
+                                }}
+                            >
+                                {this.state.fatures.map(element => {
+                                    return (
+                                        <Option
+                                            key={element}
+                                            value={element}
                                         >
-                                            Salvar e Sair
-                                </Button>
-                                    </Col>
-                                </Row>
-                            </Form.Item>
-                        </>
+                                            {element}
+                                        </Option>
+                                    )
+                                })}
+                            </Select>
+                        </Form.Item>
                     }
+                    <Form.Item label="Recorrência">
+                        <Row>
+                            {this.state.idToUpdate &&
+                                <Col span={6}>
+                                    <Input
+                                        placeholder="Atual"
+                                        type="number"
+                                        name="currentRecurrence"
+                                        size="md"
+                                        value={this.state.data.currentRecurrence}
+                                        onChange={this.handleChange}
+                                        style={{ width: 60 }}
+                                    />
+                                </Col>
+                            }
+                            <Col span={8}>
+                                <Input
+                                    placeholder="Final"
+                                    type="number"
+                                    name="finalRecurrence"
+                                    size="md"
+                                    value={this.state.data.finalRecurrence}
+                                    onChange={this.handleChange}
+                                    style={{ width: 60 }}
+                                />
+                            </Col>
+                            <Col span={10}>
+                                <span style={{ 'padding': '0 10px' }} onClick={this.handleChange}>
+                                    <Switch
+                                        name="isSimples"
+                                        checked={this.state.data.isSimples}
+                                        size="md"
+                                    />
+                                </span>
+                                <span style={{ color: '#ccc' }}>{this.state.data.isSimples ? "Simples" : "Completa"}</span>
+                            </Col>
+                        </Row>
+                    </Form.Item>
+
+                    <Form.Item label="Ação">
+                        <Row>
+                            {!this.state.idToUpdate &&
+                                <Col span={8}>
+                                    <Button
+                                        className="btn-fill"
+                                        size="lg"
+                                        htmlType="submit"
+                                        name="salvar"
+                                        onClick={this.handleChange}
+                                    >
+                                        Salvar
+                                            </Button>
+                                </Col>
+                            }
+                            <Col span={8}>
+                                <Button
+                                    className="btn-fill"
+                                    size="lg"
+                                    type="primary"
+                                    htmlType="submit"
+                                    name="salvarSair"
+                                    onClick={this.handleChange}
+                                >
+                                    Salvar e Sair
+                                </Button>
+                            </Col>
+                        </Row>
+                    </Form.Item>
                 </Form>
             </div>
         )
