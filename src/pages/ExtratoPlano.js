@@ -3,7 +3,6 @@ import '../App.css'
 import { Link, Redirect } from 'react-router-dom'
 import {
     Input,
-    Checkbox,
     Collapse,
     Menu,
     Dropdown,
@@ -53,7 +52,7 @@ class ExtratoConta extends React.Component {
 
     list = () => {
         this.props.loading(true)
-        listTransaction('contaCorrente')
+        listTransaction('planejamento')
             .then((res) => {
                 if (res.status === 401) {
                     localStorage.removeItem('token')
@@ -170,7 +169,7 @@ class ExtratoConta extends React.Component {
     render() {
 
         if (this.state.idToEdit) {
-            return <Redirect to={"/transaction/contaCorrente/" + this.state.idToEdit} />
+            return <Redirect to={"/transaction/planejamento/" + this.state.idToEdit} />
         }
 
         return (
@@ -229,10 +228,6 @@ class ExtratoConta extends React.Component {
                                         <Option value="11">Nov</Option>
                                         <Option value="12">Dex</Option>
                                     </Select>
-                                </Col>
-                                <Col span={8}>
-                                    <span style={{ 'marginRight': '30px' }}>Tipo:</span>
-                                    <Checkbox>Futuros</Checkbox>
                                 </Col>
                             </Row>
 
@@ -317,7 +312,7 @@ class ExtratoConta extends React.Component {
                     <Row>
                         <Title level={4}>
                             Transações
-                            <Link style={{ 'paddingLeft': '10px' }} to="/transaction/contaCorrente">
+                            <Link style={{ 'paddingLeft': '10px' }} to="/transaction/planejamento">
                                 <PlusCircleOutlined />
                             </Link>
                         </Title>

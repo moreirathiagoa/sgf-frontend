@@ -49,42 +49,54 @@ class MenuPrincipal extends React.Component {
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="2">
-								<Link to="/transaction">
+								<Link to="/transaction/contaCorrente">
 									<WalletOutlined />
-									<span>Nova Transação</span>
+									<span>Nova Compra Débito</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="3">
-								<Link to="/extrato-conta">
-									<FileSearchOutlined />
-									<span>Extrato Conta</span>
+								<Link to="/transaction/cartaoCredito">
+									<WalletOutlined />
+									<span>Nova Compra Crédito</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="4">
-								<Link to="/extrato-cartao">
-									<FileSearchOutlined />
-									<span>Extrato Cartão</span>
+								<Link to="/transaction/planejamento">
+									<WalletOutlined />
+									<span>Novo Planejamento</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="5">
+								<Link to="/extrato-conta">
+									<FileSearchOutlined />
+									<span>Extrato Conta Corrente</span>
+								</Link>
+							</Menu.Item>
+							<Menu.Item key="6">
+								<Link to="/extrato-cartao">
+									<FileSearchOutlined />
+									<span>Faturas Cartão Crédito</span>
+								</Link>
+							</Menu.Item>
+							<Menu.Item key="7">
 								<Link to="/extrato-plano">
 									<FileSearchOutlined />
 									<span>Extrato Planejamento</span>
 								</Link>
 							</Menu.Item>
-							<Menu.Item key="6">
+							<Menu.Item key="8">
 								<Link to="/banks">
 									<BankOutlined />
 									<span>Bancos</span>
 								</Link>
 							</Menu.Item>
-							<Menu.Item key="7">
+							<Menu.Item key="9">
 								<Link to="/category">
 									<ProfileOutlined />
 									<span>Categorias</span>
 								</Link>
 							</Menu.Item>
-							<Menu.Item key="8">
+							<Menu.Item key="10">
 								<Link to="/logout">
 									<LogoutOutlined />
 									<span>Logout</span>

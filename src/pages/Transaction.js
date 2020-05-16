@@ -22,13 +22,20 @@ class Transaction extends React.Component {
     constructor(props) {
 
         const param = window.location.pathname;
-        const idTransaction = param.split('/')[2]
+        const typeTransaction = param.split('/')[2]
+        const idTransaction = param.split('/')[3]
 
         super(props)
         this.state = {
             idToUpdate: idTransaction,
             screenType: null,
-            data: this.getInitialData(),
+            data: {
+                efectedDate: actualDateToUser(),
+                bank_id: 'Selecione',
+                category_id: 'Selecione',
+                isSimples: false,
+                typeTransaction: typeTransaction,
+            },
             allBanks: [],
             banks: [],
             categories: [],
@@ -41,19 +48,17 @@ class Transaction extends React.Component {
         this.submitForm = this.submitForm.bind(this)
     }
 
-    getInitialData() {
-        return {
-            efectedDate: actualDateToUser(),
-            bank_id: 'Selecione',
-            category_id: 'Selecione',
-            isSimples: false,
-            typeTransaction: null,
-        }
+    componentWillReceiveProps() {
+        const param = window.location.pathname;
+        const typeTransaction = param.split('/')[2]
+        console.log('componentWillReceiveProps')
+        this.setState({ data: { typeTransaction: typeTransaction } })
+        this.getListBanks(typeTransaction)
     }
 
     componentDidMount() {
 
-        this.props.mudaTitulo("Transação")
+        this.props.mudaTitulo("Nova Transação")
         let now = new Date()
 
         let state = this.state
@@ -71,7 +76,6 @@ class Transaction extends React.Component {
         }
         this.setState(state)
 
-        this.getListBanks()
         this.getListCategories()
         if (this.state.idToUpdate) {
             this.getTransactionToUpdate(this.state.idToUpdate)
@@ -100,8 +104,8 @@ class Transaction extends React.Component {
             })
     }
 
-    getListBanks() {
-        listBanks()
+    getListBanks(typeTransaction) {
+        listBanks(typeTransaction)
             .then((res) => {
                 if (res.status === 401) {
                     localStorage.removeItem('token')
@@ -109,7 +113,7 @@ class Transaction extends React.Component {
                 }
                 else {
                     let state = this.state
-                    state.allBanks = res.data.data
+                    state.banks = res.data.data
                     this.setState(state)
                 }
             })
@@ -141,7 +145,12 @@ class Transaction extends React.Component {
 
         switch (event.target.name) {
             case 'typeTransaction':
-                state.data = this.getInitialData()
+                state.data = {
+                    efectedDate: actualDateToUser(),
+                    bank_id: 'Selecione',
+                    category_id: 'Selecione',
+                    isSimples: false,
+                }
                 state.data.typeTransaction = event.target.value
                 state.banks = []
                 switch (event.target.value) {
@@ -308,7 +317,7 @@ class Transaction extends React.Component {
                     onFinish={this.submitForm}
                     onFinishFailed={() => { console.log('falhou') }}
                 >
-                    {!this.state.idToUpdate &&
+                    {/* !this.state.idToUpdate &&
                         <Form.Item label="Tipo de Transação">
                             <Radio.Group
                                 name="typeTransaction"
@@ -321,7 +330,7 @@ class Transaction extends React.Component {
                                 <Radio.Button value="planejamento">Plano</Radio.Button>
                             </Radio.Group>
                         </Form.Item>
-                    }
+                     */}
 
                     {this.state.data.typeTransaction &&
                         <>

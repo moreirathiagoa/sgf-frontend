@@ -3,7 +3,6 @@ import '../App.css'
 import { Link, Redirect } from 'react-router-dom'
 import {
     Input,
-    Checkbox,
     Collapse,
     Menu,
     Dropdown,
@@ -14,7 +13,7 @@ import {
     Col
 } from 'antd';
 import { MenuOutlined, PlusCircleOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
-import { listBanks, listTransaction, removeTransaction, listCategories } from '../api'
+import { listBanks, listTransaction, removeTransaction, listCategories, listFatures } from '../api'
 import { openNotification, formatDateToUser } from '../utils'
 
 const { Panel } = Collapse;
@@ -26,7 +25,7 @@ function callback(key) {
     //console.log(key);
 }
 
-class ExtratoConta extends React.Component {
+class Banks extends React.Component {
 
     constructor(props) {
         super(props)
@@ -37,12 +36,14 @@ class ExtratoConta extends React.Component {
             description: null,
             banks: [],
             categories: [],
+            fatures: [],
             filtro: false,
             idToEdit: null,
         }
         this.handleChange = this.handleChange.bind(this)
         this.submitForm = this.submitForm.bind(this)
         this.getListBanks()
+        this.getListFatures()
         this.getListCategories()
     }
 
@@ -53,7 +54,7 @@ class ExtratoConta extends React.Component {
 
     list = () => {
         this.props.loading(true)
-        listTransaction('contaCorrente')
+        listTransaction('cartaoCredito')
             .then((res) => {
                 if (res.status === 401) {
                     localStorage.removeItem('token')
@@ -82,6 +83,24 @@ class ExtratoConta extends React.Component {
                 else {
                     let state = this.state
                     state.banks = res.data.data
+                    this.setState(state)
+                }
+            })
+            .catch((err) => {
+                openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Bancos.')
+            })
+    }
+
+    getListFatures() {
+        listFatures(this.state.bank_id)
+            .then((res) => {
+                if (res.status === 401) {
+                    localStorage.removeItem('token')
+                    this.props.verificaLogin()
+                }
+                else {
+                    let state = this.state
+                    state.fatures = res.data.data
                     this.setState(state)
                 }
             })
@@ -170,7 +189,7 @@ class ExtratoConta extends React.Component {
     render() {
 
         if (this.state.idToEdit) {
-            return <Redirect to={"/transaction/contaCorrente/" + this.state.idToEdit} />
+            return <Redirect to={"/transaction/cartaoCredito/" + this.state.idToEdit} />
         }
 
         return (
@@ -187,56 +206,6 @@ class ExtratoConta extends React.Component {
 
                     {this.state.filtro &&
                         <>
-                            <Row>
-                                <Col span={8}>
-                                    <span style={{ 'marginRight': '30px' }}>Ano:</span>
-                                    <Select
-                                        name="year"
-                                        defaultValue="Selecione"
-                                        size="md"
-                                        style={{ width: 80 }}
-                                        onSelect={(value) => {
-                                            const event = { target: { name: 'year', value: value } }
-                                            this.handleChange(event)
-                                        }}
-                                    >
-                                        <Option value="2019">2019</Option>
-                                        <Option value="2020">2020</Option>
-                                    </Select>
-                                </Col>
-                                <Col span={8}>
-                                    <span style={{ 'marginRight': '30px' }}>Nês:</span>
-                                    <Select
-                                        name="month"
-                                        defaultValue="Selecione"
-                                        size="md"
-                                        style={{ width: 80 }}
-                                        onSelect={(value) => {
-                                            const event = { target: { name: 'month', value: value } }
-                                            this.handleChange(event)
-                                        }}
-                                    >
-                                        <Option value="1">Jan</Option>
-                                        <Option value="2">Fev</Option>
-                                        <Option value="3">Mar</Option>
-                                        <Option value="4">Abr</Option>
-                                        <Option value="5">Mai</Option>
-                                        <Option value="6">Jun</Option>
-                                        <Option value="7">Jul</Option>
-                                        <Option value="8">Ago</Option>
-                                        <Option value="9">Set</Option>
-                                        <Option value="10">Out</Option>
-                                        <Option value="11">Nov</Option>
-                                        <Option value="12">Dex</Option>
-                                    </Select>
-                                </Col>
-                                <Col span={8}>
-                                    <span style={{ 'marginRight': '30px' }}>Tipo:</span>
-                                    <Checkbox>Futuros</Checkbox>
-                                </Col>
-                            </Row>
-
-                            <br />
                             <Row>
                                 <Col span={12}>
                                     <span style={{ 'marginRight': '30px' }}>Banco:</span>
@@ -265,6 +234,50 @@ class ExtratoConta extends React.Component {
                                             )
                                         })}
                                     </Select>
+                                </Col>
+                                <Col span={12}>
+                                    <span style={{ 'marginRight': '30px' }}>Fatura:</span>
+                                    <Select
+                                        name="fature_id"
+                                        value={this.state.fatures}
+                                        size="md"
+                                        style={{ width: 150 }}
+                                        onSelect={(value) => {
+                                            const event = {
+                                                target: {
+                                                    name: 'fature_id',
+                                                    value: value
+                                                }
+                                            }
+                                            this.handleChange(event)
+                                        }}
+                                    >
+                                        {this.state.fatures.map(element => {
+                                            return (
+                                                <Option key={element._id}
+                                                    value={element._id}
+                                                >
+                                                    {element.name}
+                                                </Option>
+                                            )
+                                        })}
+                                    </Select>
+                                </Col>
+
+                            </Row>
+                            <br></br>
+                            <Row>
+                                <Col span={12}>
+                                    <span style={{ 'marginRight': '30px' }}>Descrição:</span>
+                                    <Input
+                                        placeholder="Descrição"
+                                        type="text"
+                                        name="description"
+                                        size="md"
+                                        value={this.state.description}
+                                        onChange={this.handleChange}
+                                        style={{ width: 150 }}
+                                    />
                                 </Col>
                                 <Col span={12}>
                                     <span style={{ 'marginRight': '30px' }}>Categoria:</span>
@@ -296,28 +309,14 @@ class ExtratoConta extends React.Component {
                                     </Select>
                                 </Col>
                             </Row>
-                            <br></br>
-                            <Row>
-                                <Col span={12}>
-                                    <span style={{ 'marginRight': '30px' }}>Descrição:</span>
-                                    <Input
-                                        placeholder="Descrição"
-                                        type="text"
-                                        name="description"
-                                        size="md"
-                                        value={this.state.description}
-                                        onChange={this.handleChange}
-                                        style={{ width: 200 }}
-                                    />
-                                </Col>
-                            </Row>
+
                         </>
                     }
                     <br />
                     <Row>
                         <Title level={4}>
                             Transações
-                            <Link style={{ 'paddingLeft': '10px' }} to="/transaction/contaCorrente">
+                            <Link style={{ 'paddingLeft': '10px' }} to="/transaction/cartaoCredito">
                                 <PlusCircleOutlined />
                             </Link>
                         </Title>
@@ -373,6 +372,7 @@ class ExtratoConta extends React.Component {
                                         <Panel header={resume(element, this.genExtra)} key={element._id}>
                                             <Descriptions >
                                                 <Descriptions.Item label="Categoria">{element.category_id.name}</Descriptions.Item>
+                                                <Descriptions.Item label="Fatura">{element.fature_id.name}</Descriptions.Item>
                                                 <Descriptions.Item label="Data Criação">{formatDateToUser(element.createDate)}</Descriptions.Item>
                                                 <Descriptions.Item label="Data Efetivação">{formatDateToUser(element.efectedDate)}</Descriptions.Item>
                                                 <Descriptions.Item label="Status">{element.isCompesed ? "Compensado" : "Não compensado"}</Descriptions.Item>
@@ -394,4 +394,4 @@ class ExtratoConta extends React.Component {
     }
 }
 
-export default ExtratoConta
+export default Banks

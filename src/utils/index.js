@@ -1,5 +1,5 @@
 import { notification } from 'antd';
-import moment from 'moment/min/moment-with-locales'
+import moment from 'moment'
 
 function openNotification(type, message, description) {
     notification[type]({
@@ -9,7 +9,6 @@ function openNotification(type, message, description) {
 };
 
 function actualDateToUser() {
-    moment.locale('pt-br');
     const now = moment()
 
     const dateToUser = now.format("DD/MM/YYYY")
@@ -17,7 +16,6 @@ function actualDateToUser() {
 }
 
 function actualDateTimeToUser() {
-    moment.locale('pt-br');
     const now = moment()
 
     const dateTimeToUser = now.format("DD/MM/YYYY HH:MM")
@@ -25,7 +23,6 @@ function actualDateTimeToUser() {
 }
 
 function actualDateToBataBase() {
-    moment.locale('pt-br');
     const now = moment()
 
     const dateToDataBase = now.format()
@@ -40,7 +37,6 @@ function formatDateToMoment(dateInformed){
 }
 
 function formatDateToUser(dateInformed) {
-    moment.locale('pt-br');
     const dateToMoment = moment(dateInformed)
 
     const dateToUser = dateToMoment.format("DD/MM/YYYY")
@@ -48,7 +44,6 @@ function formatDateToUser(dateInformed) {
 }
 
 function formatDateTimeToUser(dateInformed) {
-    moment.locale('pt-br');
     const dateToMoment = moment(dateInformed)
 
     const dateTimeToUser = dateToMoment.format("DD/MM/YYYY HH:MM")
@@ -57,7 +52,6 @@ function formatDateTimeToUser(dateInformed) {
 
 function formatDateToBataBase(dateInformed) {
     
-    moment.locale('pt-br');
     
     const dateToMoment = moment(dateInformed)
 

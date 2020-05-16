@@ -4,6 +4,8 @@ import Dashboard from './pages/Dashboard';
 import Categoria from './pages/Categorias'
 import Transaction from './pages/Transaction'
 import ExtratoConta from './pages/ExtratoConta'
+import ExtratoCartao from './pages/ExtratoCartao'
+import ExtratoPlano from './pages/ExtratoPlano'
 import Bank from './pages/Bank'
 import NotFound from './pages/NotFound'
 import Login from './pages/Login'
@@ -38,7 +40,21 @@ class Router extends React.Component {
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path="/transaction/:idTransaction?">
+				<Route path="/transaction/contaCorrente/:idTransaction?">
+					<Transaction
+						loading={this.props.loading}
+						mudaTitulo={this.props.mudaTitulo}
+						verificaLogin={this.props.verificaLogin}
+					/>
+				</Route>
+				<Route path="/transaction/cartaoCredito/:idTransaction?">
+					<Transaction
+						loading={this.props.loading}
+						mudaTitulo={this.props.mudaTitulo}
+						verificaLogin={this.props.verificaLogin}
+					/>
+				</Route>
+				<Route path="/transaction/planejamento/:idTransaction?">
 					<Transaction
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
@@ -47,6 +63,20 @@ class Router extends React.Component {
 				</Route>
 				<Route path="/extrato-conta">
 					<ExtratoConta
+						loading={this.props.loading}
+						mudaTitulo={this.props.mudaTitulo}
+						verificaLogin={this.props.verificaLogin}
+					/>
+				</Route>
+				<Route path="/extrato-cartao">
+					<ExtratoCartao
+						loading={this.props.loading}
+						mudaTitulo={this.props.mudaTitulo}
+						verificaLogin={this.props.verificaLogin}
+					/>
+				</Route>
+				<Route path="/extrato-plano">
+					<ExtratoPlano
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
