@@ -103,10 +103,29 @@ const updateTransaction = (transaction, idCategory) => {
     return response
 }
 
+const getSaldosNaoCompensado = () => {
+    const token = localStorage.getItem('token')
+    const response = axios({
+        method: 'get',
+        url: properties.url + 'transaction/not-compensated',
+        headers: {
+            auth: token
+        }
+    })
+        .then((res) => {
+            return res
+        })
+        .catch((err) => {
+            return err.response
+        })
+    return response
+}
+
 export {
     listTransaction,
     getTransaction,
     createTransaction,
     removeTransaction,
-    updateTransaction
+    updateTransaction,
+    getSaldosNaoCompensado,
 }

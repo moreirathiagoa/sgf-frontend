@@ -42,7 +42,6 @@ class Transaction extends React.Component {
             saveExit: null,
             exit: false,
         }
-        console.log(this.state.data.efectedDate)
         this.handleChange = this.handleChange.bind(this)
         this.submitForm = this.submitForm.bind(this)
     }
