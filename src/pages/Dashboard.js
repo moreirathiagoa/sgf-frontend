@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Statistic, Modal, Input, Row, Col } from 'antd';
 import '../App.css'
-import { listBanks, getSaldosNaoCompensado, updateBank } from '../api'
+import { listBanks, getSaldosNaoCompensado, updateBank, getSaldosNaoCompensadoCredit, getSaldosNaoCompensadoDebit } from '../api'
 import { openNotification, formatMoeda } from '../utils'
 
 class Dashboard extends React.Component {
@@ -12,19 +12,27 @@ class Dashboard extends React.Component {
             visible: false,
             banks: [],
             saldoNotCompesated: [],
+            saldoNotCompesatedCredit: null,
+            saldoNotCompesatedDebit: null,
+            saldoReal: null,
+            saldoLiquido: null,
             modalContent: {
                 id: null,
                 banco: null,
                 saldoReal: null,
             },
         }
-        this.getListBanks()
-        this.initSaldoNaoCompensado()
+
         this.handleChange = this.handleChange.bind(this)
     }
 
     componentDidMount() {
         this.props.mudaTitulo("Dashboard")
+        this.getListBanks()
+        this.initSaldoNaoCompensado()
+        this.initSaldoNaoCompensadoCredit()
+        this.initSaldoNaoCompensadoDebit()
+        this.getSaldosGerais()
     }
 
     getListBanks() {
@@ -55,6 +63,42 @@ class Dashboard extends React.Component {
                 else {
                     let state = this.state
                     state.saldoNotCompesated = res.data.data
+                    this.setState(state)
+                }
+            })
+            .catch((err) => {
+                openNotification('error', 'Erro interno', 'Erro ao obter saldo dos Bancos.')
+            })
+    }
+
+    initSaldoNaoCompensadoCredit() {
+        getSaldosNaoCompensadoCredit()
+            .then((res) => {
+                if (res.status === 401) {
+                    localStorage.removeItem('token')
+                    this.props.verificaLogin()
+                }
+                else {
+                    let state = this.state
+                    state.saldoNotCompesatedCredit = res.data.data
+                    this.setState(state)
+                }
+            })
+            .catch((err) => {
+                openNotification('error', 'Erro interno', 'Erro ao obter saldo dos Bancos.')
+            })
+    }
+
+    initSaldoNaoCompensadoDebit() {
+        getSaldosNaoCompensadoDebit()
+            .then((res) => {
+                if (res.status === 401) {
+                    localStorage.removeItem('token')
+                    this.props.verificaLogin()
+                }
+                else {
+                    let state = this.state
+                    state.saldoNotCompesatedDebit = res.data.data
                     this.setState(state)
                 }
             })
@@ -99,6 +143,21 @@ class Dashboard extends React.Component {
         ];
     }
 
+    getSaldosGerais() {
+        let saldoTotal = 0
+        let saldoNaoCompesado = 0
+        this.state.banks.forEach(bank => {
+            saldoTotal += bank.systemBalance
+        })
+        this.state.saldoNotCompesated.forEach(bank => {
+            saldoNaoCompesado += bank.saldoNotCompesated
+        })
+        let state = this.state
+        state.saldoReal = saldoTotal
+        state.saldoLiquido = saldoTotal - saldoNaoCompesado
+        this.setState(state)
+    }
+
     getTableContent() {
         let tableContent = []
         this.state.banks.forEach(bank => {
@@ -125,6 +184,7 @@ class Dashboard extends React.Component {
             }
             tableContent.push(content)
         });
+
         return tableContent
     }
 
@@ -197,26 +257,26 @@ class Dashboard extends React.Component {
                 </Row>
                 <Row style={{ paddingBottom: '10px' }}>
                     <Col span={12}>
-                        <Statistic title="Previsão de entrada" value="R$ 1500,00" />
+                        <Statistic title="Previsão de entrada" value={this.state.saldoNotCompesatedCredit} />
                     </Col>
                     <Col span={12}>
-                        <Statistic title="Previsão Saída" value="R$ 100,00" />
-                    </Col>
-                </Row>
-                <Row style={{ paddingBottom: '10px' }}>
-                    <Col span={12}>
-                        <Statistic title="Saldo Real" value="R$ 600,00" />
-                    </Col>
-                    <Col span={12}>
-                        <Statistic title="Saldo Líquido" value="R$ 800,00" />
+                        <Statistic title="Previsão Saída" value={this.state.saldoNotCompesatedDebit} />
                     </Col>
                 </Row>
                 <Row style={{ paddingBottom: '10px' }}>
                     <Col span={12}>
-                        <Statistic title="Saldo do dia" value="R$ 200,00" />
+                        <Statistic title="Saldo Real" value={this.state.saldoReal} />
                     </Col>
                     <Col span={12}>
-                        <Statistic title="Saldo Cartão" value="R$ 200,00" />
+                        <Statistic title="Saldo Líquido" value={this.state.saldoLiquido} />
+                    </Col>
+                </Row>
+                <Row style={{ paddingBottom: '10px' }}>
+                    <Col span={12}>
+                        <Statistic title="Saldo do dia" value="Indisponível" />
+                    </Col>
+                    <Col span={12}>
+                        <Statistic title="Saldo Cartão" value="Indisponível" />
                     </Col>
                 </Row>
             </div>
