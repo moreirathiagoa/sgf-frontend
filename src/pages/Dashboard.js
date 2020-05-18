@@ -1,7 +1,8 @@
 import React from 'react';
 import { Table, Statistic, Modal, Input, Row, Col } from 'antd';
 import '../App.css'
-import { listBanks, getSaldosNaoCompensado } from '../api'
+import { listBanks, getSaldosNaoCompensado, updateBank } from '../api'
+import { openNotification, formatMoeda } from '../utils'
 
 class Dashboard extends React.Component {
 
@@ -45,7 +46,7 @@ class Dashboard extends React.Component {
                 }
             })
             .catch((err) => {
-                //openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Transações.')
+                openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Bancos.')
             })
     }
 
@@ -63,7 +64,7 @@ class Dashboard extends React.Component {
                 }
             })
             .catch((err) => {
-                //openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Transações.')
+                openNotification('error', 'Erro interno', 'Erro ao obter saldo dos Bancos.')
             })
     }
 
@@ -94,7 +95,7 @@ class Dashboard extends React.Component {
             {
                 title: 'Real',
                 dataIndex: 'saldoReal',
-                render: (data) => <a onClick={() => { this.showModal(data) }}>{data.saldoReal}</a>,
+                render: (data) => <a onClick={() => { this.showModal(data) }}>{formatMoeda(data.saldoReal)}</a>,
             },
             {
                 title: 'Diferença',
@@ -118,14 +119,14 @@ class Dashboard extends React.Component {
                 saldoNotCompesated = 0
             }
 
-            const saldoReal = bank.systemBalance - saldoNotCompesated
-            const diference = bank.systemBalance - saldoReal
+            const saldoSistema = bank.systemBalance - saldoNotCompesated
+            const diference = saldoSistema - bank.manualBalance
             const content = {
                 key: bank._id,
                 banco: bank.name,
-                saldoSistema: bank.systemBalance,
-                saldoReal: { id: bank._id, banco: bank.name, saldoReal: saldoReal },
-                diferenca: diference,
+                saldoSistema: formatMoeda(saldoSistema),
+                saldoReal: { id: bank._id, banco: bank.name, saldoReal: bank.manualBalance },
+                diferenca: diference === 0 ? "-" : formatMoeda(diference),
             }
             tableContent.push(content)
         });
@@ -142,22 +143,36 @@ class Dashboard extends React.Component {
     };
 
     handleOk = e => {
-        console.log(e);
+
+        const bankToUpdate = {
+            manualBalance: e.saldoReal
+        }
+
+        updateBank(bankToUpdate, e.id)
+            .then((res) => {
+                if (res.data.code === 201 || res.data.code === 202) {
+                    openNotification('success', 'Saldo atualizado', 'Saldo atualizado com sucesso.')
+                    this.getListBanks()
+                    this.initSaldoNaoCompensado()
+                }
+                else {
+                    openNotification('error', 'Saldo não atualizado', 'O Saldo não pode ser atualizado.')
+                }
+            })
+            .catch((err) => {
+                openNotification('error', 'Saldo não cadastrado', 'Erro interno. Tente novamente mais tarde.')
+            })
+
         this.setState({
             visible: false,
         });
     };
 
     handleCancel = e => {
-        console.log(e);
         this.setState({
             visible: false,
         });
     };
-
-    updateSaldoReal = data => {
-        console.log(data)
-    }
 
     render() {
         return (

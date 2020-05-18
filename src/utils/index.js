@@ -59,6 +59,10 @@ function formatDateToBataBase(dateInformed) {
     return dateToDataBase
 }
 
+function formatMoeda(entrada){
+    return entrada.toLocaleString('pt-BR',  { style: 'currency', currency: 'BRL' })
+}
+
 export {
     openNotification,
     actualDateToUser,
@@ -67,5 +71,6 @@ export {
     formatDateToUser,
     formatDateTimeToUser,
     formatDateToBataBase,
-    formatDateToMoment
+    formatDateToMoment,
+    formatMoeda,
 }

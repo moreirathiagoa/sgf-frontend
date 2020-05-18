@@ -15,12 +15,11 @@ import {
 } from 'antd';
 import { MenuOutlined, PlusCircleOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
 import { listBanks, listTransaction, removeTransaction, listCategories } from '../api'
-import { openNotification, formatDateToUser } from '../utils'
+import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
 const { Panel } = Collapse;
 const { Title } = Typography;
 const { Option } = Select;
-const formatMoeda = { style: 'currency', currency: 'BRL' }
 
 function callback(key) {
     //console.log(key);
@@ -349,7 +348,7 @@ class ExtratoConta extends React.Component {
                                                     </Col>
                                                     <Col span={6}>
                                                         <span style={{ 'paddingLeft': '20px', 'color': color, alignSelf: 'right' }}>
-                                                            {value.toLocaleString('pt-BR', formatMoeda)}
+                                                            {formatMoeda(value)}
                                                         </span>
                                                     </Col>
                                                     <Col span={3}>

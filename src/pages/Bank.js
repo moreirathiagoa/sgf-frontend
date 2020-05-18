@@ -14,12 +14,11 @@ import {
 } from 'antd';
 import { ArrowLeftOutlined, MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { listBanks, createBank, removeBank, updateBank } from '../api'
-import { openNotification, formatDateToUser } from '../utils'
+import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
 const { Panel } = Collapse;
 const { Title } = Typography;
 const { Option } = Select;
-const formatMoeda = { style: 'currency', currency: 'BRL' }
 
 function callback(key) {
     //console.log(key);
@@ -218,8 +217,8 @@ class Banks extends React.Component {
                                             <Descriptions.Item label="Nome">{element.name}</Descriptions.Item>
                                             <Descriptions.Item label="Status">{element.isActive ? 'Ativo' : 'Inativo'}</Descriptions.Item>
                                             <Descriptions.Item label="Tipo">{element.bankType}</Descriptions.Item>
-                                            <Descriptions.Item label="Saldo Sistema">{element.systemBalance.toLocaleString('pt-BR', formatMoeda)}</Descriptions.Item>
-                                            <Descriptions.Item label="Saldo Manual">{element.manualBalance.toLocaleString('pt-BR', formatMoeda)}</Descriptions.Item>
+                                            <Descriptions.Item label="Saldo Sistema">{formatMoeda(element.systemBalance)}</Descriptions.Item>
+                                            <Descriptions.Item label="Saldo Manual">{formatMoeda(element.manualBalance)}</Descriptions.Item>
                                             <Descriptions.Item label="Data Criação">{formatDateToUser(element.createDate)}</Descriptions.Item>
                                         </Descriptions>
                                     </Panel>
