@@ -27,11 +27,6 @@ class Dashboard extends React.Component {
         this.props.mudaTitulo("Dashboard")
     }
 
-    componentDidUpdate() {
-        console.log('Update: ', this.state)
-
-    }
-
     getListBanks() {
         listBanks('contaCorrente')
             .then((res) => {
@@ -95,7 +90,7 @@ class Dashboard extends React.Component {
             {
                 title: 'Real',
                 dataIndex: 'saldoReal',
-                render: (data) => <a onClick={() => { this.showModal(data) }}>{formatMoeda(data.saldoReal)}</a>,
+                render: (data) => <span onClick={() => { this.showModal(data) }}>{formatMoeda(data.saldoReal)}</span>,
             },
             {
                 title: 'Diferença',
@@ -193,30 +188,35 @@ class Dashboard extends React.Component {
                         style={{ width: 100 }}
                     />
                 </Modal>
-                <Row gutter={16}>
+                <Row style={{ paddingBottom: '20px' }}>
                     <Table
                         pagination={false}
                         columns={this.columns()}
                         dataSource={this.getTableContent()}
                     />
                 </Row>
-                <br />
-                <Row gutter={16}>
+                <Row style={{ paddingBottom: '10px' }}>
                     <Col span={12}>
-                        <Statistic title="Saldo bruto" value="R$ 1500,00" />
+                        <Statistic title="Previsão de entrada" value="R$ 1500,00" />
                     </Col>
                     <Col span={12}>
-                        <Statistic title="Previsão Entrada" value="R$ 100,00" />
+                        <Statistic title="Previsão Saída" value="R$ 100,00" />
+                    </Col>
+                </Row>
+                <Row style={{ paddingBottom: '10px' }}>
+                    <Col span={12}>
+                        <Statistic title="Saldo Real" value="R$ 600,00" />
                     </Col>
                     <Col span={12}>
-                        <Statistic title="Previsão Saída" value="R$ 600,00" />
+                        <Statistic title="Saldo Líquido" value="R$ 800,00" />
                     </Col>
-
+                </Row>
+                <Row style={{ paddingBottom: '10px' }}>
                     <Col span={12}>
-                        <Statistic title="Cartão de Crédito" value="R$ 800,00" />
+                        <Statistic title="Saldo do dia" value="R$ 200,00" />
                     </Col>
                     <Col span={12}>
-                        <Statistic title="Saldo Liquido" value="R$ 200,00" />
+                        <Statistic title="Saldo Cartão" value="R$ 200,00" />
                     </Col>
                 </Row>
             </div>
