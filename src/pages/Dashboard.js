@@ -22,17 +22,18 @@ class Dashboard extends React.Component {
                 saldoReal: null,
             },
         }
-
         this.handleChange = this.handleChange.bind(this)
+    }
+
+    componentDidUpdate() {
+        //console.log('update')
     }
 
     componentDidMount() {
         this.props.mudaTitulo("Dashboard")
         this.getListBanks()
-        this.initSaldoNaoCompensado()
         this.initSaldoNaoCompensadoCredit()
         this.initSaldoNaoCompensadoDebit()
-        this.getSaldosGerais()
     }
 
     getListBanks() {
@@ -46,6 +47,8 @@ class Dashboard extends React.Component {
                     let state = this.state
                     state.banks = res.data.data
                     this.setState(state)
+                    this.initSaldoNaoCompensado()
+
                 }
             })
             .catch((err) => {
@@ -64,6 +67,7 @@ class Dashboard extends React.Component {
                     let state = this.state
                     state.saldoNotCompesated = res.data.data
                     this.setState(state)
+                    this.getSaldosGerais()
                 }
             })
             .catch((err) => {
@@ -92,6 +96,7 @@ class Dashboard extends React.Component {
     initSaldoNaoCompensadoDebit() {
         getSaldosNaoCompensadoDebit()
             .then((res) => {
+
                 if (res.status === 401) {
                     localStorage.removeItem('token')
                     this.props.verificaLogin()
@@ -144,17 +149,20 @@ class Dashboard extends React.Component {
     }
 
     getSaldosGerais() {
-        let saldoTotal = 0
+        let saldoLiquido = 0
         let saldoNaoCompesado = 0
+
         this.state.banks.forEach(bank => {
-            saldoTotal += bank.systemBalance
+            saldoLiquido += bank.systemBalance
         })
         this.state.saldoNotCompesated.forEach(bank => {
             saldoNaoCompesado += bank.saldoNotCompesated
         })
+
         let state = this.state
-        state.saldoReal = saldoTotal
-        state.saldoLiquido = saldoTotal - saldoNaoCompesado
+        state.saldoReal = saldoLiquido - saldoNaoCompesado
+        state.saldoLiquido = saldoLiquido
+
         this.setState(state)
     }
 
