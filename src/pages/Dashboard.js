@@ -1,8 +1,10 @@
 import React from 'react';
-import { Table, Statistic, Modal, Input, Row, Col } from 'antd';
+import { Table, Statistic, Modal, Input, Row, Col, Typography } from 'antd';
 import '../App.css'
 import { updateBank, getSaldosNaoCompensadoCredit, getSaldosNaoCompensadoDebit, listBanksDashboard } from '../api'
 import { openNotification, formatMoeda } from '../utils'
+
+const { Title } = Typography;
 
 class Dashboard extends React.Component {
 
@@ -196,7 +198,7 @@ class Dashboard extends React.Component {
 
     render() {
         return (
-            <div>
+            <>
                 <Modal
                     title={this.state.modalContent.banco}
                     visible={this.state.visible}
@@ -215,39 +217,38 @@ class Dashboard extends React.Component {
                 </Modal>
                 <Row style={{ paddingBottom: '10px' }}>
                     <Col span={12}>
-                        <Statistic title="Previsão de entrada" value={this.state.saldoNotCompesatedCredit} />
+                        <Statistic title="Previsão de entrada" value={formatMoeda(this.state.saldoNotCompesatedCredit)} />
                     </Col>
                     <Col span={12}>
-                        <Statistic title="Previsão Saída" value={this.state.saldoNotCompesatedDebit} />
+                        <Statistic title="Previsão Saída" value={formatMoeda(this.state.saldoNotCompesatedDebit)} />
                     </Col>
                 </Row>
                 <Row style={{ paddingBottom: '10px' }}>
                     <Col span={12}>
-                        <Statistic title="Saldo Real" value={this.state.saldoReal} />
+                        <Statistic title="Saldo Real" value={formatMoeda(this.state.saldoReal)} />
                     </Col>
                     <Col span={12}>
-                        <Statistic title="Saldo Líquido" value={this.state.saldoLiquido} />
+                        <Statistic title="Saldo Líquido" value={formatMoeda(this.state.saldoLiquido)} />
                     </Col>
                 </Row>
                 <Row style={{ paddingBottom: '20px' }}>
                     <Col span={12}>
                         <Statistic title="Saldo do dia" value="Indisponível" />
                     </Col>
-                    <Col span={12}>
-                        <Statistic title="Saldo Cartão" value="Indisponível" />
-                    </Col>
                 </Row>
+                <Title level={4}>Saldo por Banco</Title>
                 <Row>
                     <Table
                         pagination={false}
                         columns={this.columns()}
                         dataSource={this.state.tableContent}
+                        size="small"
                         expandable={{
                             expandedRowRender: record => <p style={{ margin: 0 }}>Diferença: {record.diferenca}</p>,
                         }}
                     />
                 </Row>
-            </div>
+            </>
         )
     }
 }
