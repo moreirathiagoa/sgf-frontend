@@ -30,8 +30,10 @@ class Banks extends React.Component {
         super(props)
         this.state = {
             transations: [],
+            allTransations: [],
             bank_id: 'Selecione',
             category_id: 'Selecione',
+            fature_id: 'Selecione',
             description: null,
             banks: [],
             categories: [],
@@ -42,7 +44,6 @@ class Banks extends React.Component {
         this.handleChange = this.handleChange.bind(this)
         this.submitForm = this.submitForm.bind(this)
         this.getListBanks()
-        this.getListFatures()
         this.getListCategories()
     }
 
@@ -62,6 +63,7 @@ class Banks extends React.Component {
                 else {
                     let state = this.state
                     state.transations = res.data.data
+                    state.allTransations = res.data.data
                     this.setState(state)
                 }
                 this.props.loading(false)
@@ -73,7 +75,7 @@ class Banks extends React.Component {
     }
 
     getListBanks() {
-        listBanks()
+        listBanks("cartaoCredito")
             .then((res) => {
                 if (res.status === 401) {
                     localStorage.removeItem('token')
@@ -90,8 +92,8 @@ class Banks extends React.Component {
             })
     }
 
-    getListFatures() {
-        listFatures(this.state.bank_id)
+    getListFatures(bank_id) {
+        listFatures(bank_id)
             .then((res) => {
                 if (res.status === 401) {
                     localStorage.removeItem('token')
@@ -126,6 +128,46 @@ class Banks extends React.Component {
             })
     }
 
+    filterList() {
+        let state = this.state
+
+        const transationFiltred = state.allTransations.filter((transation) => {
+
+            let toReturn = true
+
+            if (this.state.bank_id.toString() !== "Selecione") {
+                if (transation.bank_id._id.toString() !== this.state.bank_id.toString()) {
+                    toReturn = false
+                }
+            }
+
+            if (this.state.fature_id.toString() !== "Selecione") {
+                if (transation.fature_id._id.toString() !== this.state.fature_id.toString()) {
+                    toReturn = false
+                }
+            }
+
+            if (this.state.category_id.toString() !== "Selecione") {
+                if (transation.category_id._id.toString() !== this.state.category_id.toString()) {
+                    toReturn = false
+                }
+            }
+
+            if (this.state.description !== "") {
+                if (!transation.description.includes(this.state.description)) {
+                    toReturn = false
+                }
+            }
+
+            if (toReturn) {
+                return transation
+            }
+        })
+
+        state.transations = transationFiltred
+        this.setState(state)
+    }
+
     handleChange(event) {
         let state = this.state
 
@@ -143,6 +185,27 @@ class Banks extends React.Component {
 
             case 'bankType':
                 state.data.bankType = event.target.value
+                break
+
+            case 'bank_id':
+                state.bank_id = event.target.value
+                this.getListFatures(event.target.value)
+                this.filterList()
+                break
+
+            case 'fature_id':
+                state.fature_id = event.target.value
+                this.filterList()
+                break
+
+            case 'category_id':
+                state.category_id = event.target.value
+                this.filterList()
+                break
+
+            case 'description':
+                state.description = event.target.value
+                this.filterList()
                 break
 
             default:
@@ -238,7 +301,7 @@ class Banks extends React.Component {
                                     <span style={{ 'marginRight': '30px' }}>Fatura:</span>
                                     <Select
                                         name="fature_id"
-                                        value={this.state.fatures}
+                                        value={this.state.fature_id}
                                         size="md"
                                         style={{ width: 150 }}
                                         onSelect={(value) => {
