@@ -20,6 +20,24 @@ const listBanks = (typeTransaction) => {
     return response
 }
 
+const listBanksDashboard = () => {
+    const token = localStorage.getItem('token')
+    const response = axios({
+        method: 'get',
+        url: properties.url + 'bank/list-dashboard',
+        headers: {
+            auth: token
+        }
+    })
+        .then((res) => {
+            return res
+        })
+        .catch((err) => {
+            return err.response
+        })
+    return response
+}
+
 const createBank = (bank) => {
     const token = localStorage.getItem('token')
 
@@ -83,5 +101,6 @@ export {
     listBanks,
     createBank,
     removeBank,
-    updateBank
+    updateBank,
+    listBanksDashboard,
 }

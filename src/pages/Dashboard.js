@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Statistic, Modal, Input, Row, Col } from 'antd';
 import '../App.css'
-import { listBanks, getSaldosNaoCompensado, updateBank, getSaldosNaoCompensadoCredit, getSaldosNaoCompensadoDebit } from '../api'
+import { updateBank, getSaldosNaoCompensadoCredit, getSaldosNaoCompensadoDebit, listBanksDashboard } from '../api'
 import { openNotification, formatMoeda } from '../utils'
 
 class Dashboard extends React.Component {
@@ -11,16 +11,16 @@ class Dashboard extends React.Component {
         this.state = {
             visible: false,
             banks: [],
-            saldoNotCompesated: [],
-            saldoNotCompesatedCredit: null,
-            saldoNotCompesatedDebit: null,
-            saldoReal: null,
-            saldoLiquido: null,
+            saldoNotCompesatedCredit: 'Aguarde...',
+            saldoNotCompesatedDebit: 'Aguarde...',
+            saldoReal: 'Aguarde...',
+            saldoLiquido: 'Aguarde...',
             modalContent: {
                 id: null,
                 banco: null,
-                saldoReal: null,
+                saldoManual: null,
             },
+            tableContent: [],
         }
         this.handleChange = this.handleChange.bind(this)
     }
@@ -37,7 +37,7 @@ class Dashboard extends React.Component {
     }
 
     getListBanks() {
-        listBanks('contaCorrente')
+        listBanksDashboard()
             .then((res) => {
                 if (res.status === 401) {
                     localStorage.removeItem('token')
@@ -47,31 +47,11 @@ class Dashboard extends React.Component {
                     let state = this.state
                     state.banks = res.data.data
                     this.setState(state)
-                    this.initSaldoNaoCompensado()
-
-                }
-            })
-            .catch((err) => {
-                openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Bancos.')
-            })
-    }
-
-    initSaldoNaoCompensado() {
-        getSaldosNaoCompensado()
-            .then((res) => {
-                if (res.status === 401) {
-                    localStorage.removeItem('token')
-                    this.props.verificaLogin()
-                }
-                else {
-                    let state = this.state
-                    state.saldoNotCompesated = res.data.data
-                    this.setState(state)
                     this.getSaldosGerais()
                 }
             })
             .catch((err) => {
-                openNotification('error', 'Erro interno', 'Erro ao obter saldo dos Bancos.')
+                openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Bancos.')
             })
     }
 
@@ -117,8 +97,8 @@ class Dashboard extends React.Component {
 
         switch (event.target.name) {
 
-            case 'saldoRealModal':
-                state.modalContent.saldoReal = event.target.value
+            case 'saldoManualModal':
+                state.modalContent.saldoManual = event.target.value
                 break
 
             default:
@@ -137,9 +117,9 @@ class Dashboard extends React.Component {
                 dataIndex: 'saldoSistema',
             },
             {
-                title: 'Real',
-                dataIndex: 'saldoReal',
-                render: (data) => <span onClick={() => { this.showModal(data) }}>{formatMoeda(data.saldoReal)}</span>,
+                title: 'Manual',
+                dataIndex: 'saldoManual',
+                render: (data) => <span onClick={() => { this.showModal(data) }}>{formatMoeda(data.saldoManual)}</span>,
             },
             {
                 title: 'Diferença',
@@ -149,58 +129,40 @@ class Dashboard extends React.Component {
     }
 
     getSaldosGerais() {
-        let saldoLiquido = 0
-        let saldoNaoCompesado = 0
-
-        this.state.banks.forEach(bank => {
-            saldoLiquido += bank.systemBalance
-        })
-        this.state.saldoNotCompesated.forEach(bank => {
-            saldoNaoCompesado += bank.saldoNotCompesated
-        })
 
         let state = this.state
-        state.saldoReal = saldoLiquido - saldoNaoCompesado
-        state.saldoLiquido = saldoLiquido
 
-        this.setState(state)
-    }
-
-    getTableContent() {
         let tableContent = []
-        this.state.banks.forEach(bank => {
+        let saldoLiquido = 0
+        let saldoReal = 0
 
-            const result = this.state.saldoNotCompesated.filter(saldoBank => {
-                return saldoBank.bank_id === bank._id
-            })
+        state.banks.forEach(bank => {
 
-            let saldoNotCompesated
-            if (result.length > 0) {
-                saldoNotCompesated = result[0].saldoNotCompesated
-            } else {
-                saldoNotCompesated = 0
-            }
+            saldoLiquido += bank.saldoSistema
+            saldoReal += bank.saldoSistemaDeduzido
 
-            const saldoSistema = bank.systemBalance - saldoNotCompesated
-            const diference = saldoSistema - bank.manualBalance
             const content = {
-                key: bank._id,
+                key: bank.id,
                 banco: bank.name,
-                saldoSistema: formatMoeda(saldoSistema),
-                saldoReal: { id: bank._id, banco: bank.name, saldoReal: bank.manualBalance },
-                diferenca: diference === 0 ? "-" : formatMoeda(diference),
+                saldoSistema: formatMoeda(bank.saldoSistemaDeduzido),
+                saldoManual: { id: bank.id, banco: bank.name, saldoManual: bank.saldoManual },
+                diferenca: formatMoeda(bank.diference),
             }
             tableContent.push(content)
         });
 
-        return tableContent
+        state.saldoReal = saldoReal
+        state.saldoLiquido = saldoLiquido
+        state.tableContent = tableContent
+
+        this.setState(state)
     }
 
     showModal = (data) => {
         let state = this.state
         state.modalContent.id = data.id
         state.modalContent.banco = data.banco
-        state.modalContent.saldoReal = data.saldoReal
+        state.modalContent.saldoManual = data.saldoManual
         state.visible = true
         this.setState(state);
     };
@@ -208,7 +170,7 @@ class Dashboard extends React.Component {
     handleOk = e => {
 
         const bankToUpdate = {
-            manualBalance: e.saldoReal
+            manualBalance: e.saldoManual
         }
 
         updateBank(bankToUpdate, e.id)
@@ -249,9 +211,9 @@ class Dashboard extends React.Component {
                     <Input
                         placeholder=""
                         type="number"
-                        name="saldoRealModal"
+                        name="saldoManualModal"
                         size="md"
-                        value={this.state.modalContent.saldoReal}
+                        value={this.state.modalContent.saldoManual}
                         onChange={this.handleChange}
                         style={{ width: 100 }}
                     />
@@ -260,7 +222,7 @@ class Dashboard extends React.Component {
                     <Table
                         pagination={false}
                         columns={this.columns()}
-                        dataSource={this.getTableContent()}
+                        dataSource={this.state.tableContent}
                     />
                 </Row>
                 <Row style={{ paddingBottom: '10px' }}>
