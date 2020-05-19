@@ -121,10 +121,7 @@ class Dashboard extends React.Component {
                 dataIndex: 'saldoManual',
                 render: (data) => <span onClick={() => { this.showModal(data) }}>{formatMoeda(data.saldoManual)}</span>,
             },
-            {
-                title: 'Diferença',
-                dataIndex: 'diferenca',
-            },
+
         ];
     }
 
@@ -168,7 +165,6 @@ class Dashboard extends React.Component {
     };
 
     handleOk = e => {
-
         const bankToUpdate = {
             manualBalance: e.saldoManual
         }
@@ -178,7 +174,6 @@ class Dashboard extends React.Component {
                 if (res.data.code === 201 || res.data.code === 202) {
                     openNotification('success', 'Saldo atualizado', 'Saldo atualizado com sucesso.')
                     this.getListBanks()
-                    this.initSaldoNaoCompensado()
                 }
                 else {
                     openNotification('error', 'Saldo não atualizado', 'O Saldo não pode ser atualizado.')
@@ -218,13 +213,6 @@ class Dashboard extends React.Component {
                         style={{ width: 100 }}
                     />
                 </Modal>
-                <Row style={{ paddingBottom: '20px' }}>
-                    <Table
-                        pagination={false}
-                        columns={this.columns()}
-                        dataSource={this.state.tableContent}
-                    />
-                </Row>
                 <Row style={{ paddingBottom: '10px' }}>
                     <Col span={12}>
                         <Statistic title="Previsão de entrada" value={this.state.saldoNotCompesatedCredit} />
@@ -241,13 +229,23 @@ class Dashboard extends React.Component {
                         <Statistic title="Saldo Líquido" value={this.state.saldoLiquido} />
                     </Col>
                 </Row>
-                <Row style={{ paddingBottom: '10px' }}>
+                <Row style={{ paddingBottom: '20px' }}>
                     <Col span={12}>
                         <Statistic title="Saldo do dia" value="Indisponível" />
                     </Col>
                     <Col span={12}>
                         <Statistic title="Saldo Cartão" value="Indisponível" />
                     </Col>
+                </Row>
+                <Row>
+                    <Table
+                        pagination={false}
+                        columns={this.columns()}
+                        dataSource={this.state.tableContent}
+                        expandable={{
+                            expandedRowRender: record => <p style={{ margin: 0 }}>Diferença: {record.diferenca}</p>,
+                        }}
+                    />
                 </Row>
             </div>
         )
