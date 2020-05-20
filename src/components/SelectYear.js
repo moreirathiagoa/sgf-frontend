@@ -4,7 +4,7 @@ import { Select } from 'antd';
 
 const { Option } = Select;
 
-class TitleFilter extends React.Component {
+class SelectYear extends React.Component {
 	render() {
 		return (
 			<Select
@@ -24,4 +24,4 @@ class TitleFilter extends React.Component {
 		)
 	}
 }
-export default TitleFilter
+export default SelectYear

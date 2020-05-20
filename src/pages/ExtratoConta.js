@@ -9,18 +9,16 @@ import {
     Dropdown,
     Descriptions,
     Typography,
-    Select,
     Row,
     Col
 } from 'antd';
-import { TitleFilter, SelectYear, SelectMonth, SelectCategories } from '../components'
+import { TitleFilter, SelectYear, SelectMonth, SelectCategories, SelectBank } from '../components'
 import { MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { listBanks, listTransaction, removeTransaction, listCategories } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
 const { Panel } = Collapse;
 const { Title } = Typography;
-const { Option } = Select;
 
 function callback(key) {
     //console.log(key);
@@ -301,31 +299,7 @@ class ExtractAcount extends React.Component {
                             <Row>
                                 <Col span={12}>
                                     <span style={{ 'marginRight': '30px' }}>Banco:</span>
-                                    <Select
-                                        name="bank_id"
-                                        value={this.state.bank_id}
-                                        size="md"
-                                        style={{ width: 150 }}
-                                        onSelect={(value) => {
-                                            const event = {
-                                                target: {
-                                                    name: 'bank_id',
-                                                    value: value
-                                                }
-                                            }
-                                            this.handleChange(event)
-                                        }}
-                                    >
-                                        {this.state.banks.map(element => {
-                                            return (
-                                                <Option key={element._id}
-                                                    value={element._id}
-                                                >
-                                                    {element.name}
-                                                </Option>
-                                            )
-                                        })}
-                                    </Select>
+                                    <SelectBank handleChange={this.handleChange} bank_id={this.state.bank_id} banks={this.state.banks} />
                                 </Col>
                                 <Col span={12}>
                                     <span style={{ 'marginRight': '30px' }}>Categoria:</span>

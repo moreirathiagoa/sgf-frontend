@@ -6,16 +6,13 @@ import {
     Input,
     Button,
     Switch,
-    Select,
     Row,
     Col,
     DatePicker,
 } from 'antd';
 import { createTransaction, updateTransaction, listBanks, listCategories, getTransaction } from '../api'
 import { openNotification, actualDateToUser, formatDateToMoment, formatDateToUser } from '../utils'
-import { SelectCategories } from '../components'
-
-const { Option } = Select;
+import { SelectCategories, SelectBank, SelectFacture } from '../components'
 
 class Transaction extends React.Component {
 
@@ -72,7 +69,11 @@ class Transaction extends React.Component {
             const ano = now.getFullYear()
             let mesFinal = '00' + mes
             mesFinal = mesFinal.substr(mesFinal.length - 2)
-            let fatura = ano + '/' + mesFinal
+            let fatura = {
+                _id: ano + '/' + mesFinal,
+                name: ano + '/' + mesFinal
+            }
+
             state.fatures.push(fatura)
             now.setDate(now.getDate() + 30)
         }
@@ -179,7 +180,7 @@ class Transaction extends React.Component {
                 state.data.category_id = event.target.value
                 break
 
-            case 'fature':
+            case 'fature_id':
                 state.data.fature = event.target.value
                 break
 
@@ -208,6 +209,7 @@ class Transaction extends React.Component {
     }
 
     cadastrar() {
+        console.log(this.state.data)
         createTransaction(this.state.data)
             .then((res) => {
                 if (res.data.code === 201 || res.data.code === 202) {
@@ -278,31 +280,7 @@ class Transaction extends React.Component {
                     onFinishFailed={() => { console.log('falhou') }}
                 >
                     <Form.Item label="Banco">
-                        <Select
-                            name="bank_id"
-                            value={this.state.data.bank_id}
-                            size="md"
-                            style={{ width: 200 }}
-                            onSelect={(value) => {
-                                const event = {
-                                    target: {
-                                        name: 'bank_id',
-                                        value: value
-                                    }
-                                }
-                                this.handleChange(event)
-                            }}
-                        >
-                            {this.state.banks.map(element => {
-                                return (
-                                    <Option key={element._id}
-                                        value={element._id}
-                                    >
-                                        {element.name}
-                                    </Option>
-                                )
-                            })}
-                        </Select>
+                        <SelectBank handleChange={this.handleChange} bank_id={this.state.data.bank_id} banks={this.state.banks} />
                     </Form.Item>
 
                     <Form.Item label="Categoria">
@@ -373,32 +351,7 @@ class Transaction extends React.Component {
                     </Form.Item>
                     {this.state.data.typeTransaction === 'cartaoCredito' &&
                         <Form.Item label="Fatura">
-                            <Select
-                                name="fature"
-                                defaultValue="Selecione"
-                                size="md"
-                                style={{ width: 200 }}
-                                onSelect={(value) => {
-                                    const event = {
-                                        target: {
-                                            name: 'fature',
-                                            value: value
-                                        }
-                                    }
-                                    this.handleChange(event)
-                                }}
-                            >
-                                {this.state.fatures.map(element => {
-                                    return (
-                                        <Option
-                                            key={element}
-                                            value={element}
-                                        >
-                                            {element}
-                                        </Option>
-                                    )
-                                })}
-                            </Select>
+                            <SelectFacture handleChange={this.handleChange} fature_id={this.state.data.fature} fatures={this.state.fatures} />
                         </Form.Item>
                     }
                     <Form.Item label="Recorrência">

@@ -8,18 +8,16 @@ import {
     Dropdown,
     Descriptions,
     Typography,
-    Select,
     Row,
     Col
 } from 'antd';
-import { TitleFilter, SelectCategories } from '../components'
+import { TitleFilter, SelectCategories, SelectBank, SelectFacture } from '../components'
 import { MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { listBanks, listTransaction, removeTransaction, listCategories, listFatures } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
 const { Panel } = Collapse;
 const { Title } = Typography;
-const { Option } = Select;
 
 function callback(key) {
     //console.log(key);
@@ -272,63 +270,14 @@ class ExtractCard extends React.Component {
                             <Row>
                                 <Col span={12}>
                                     <span style={{ 'marginRight': '30px' }}>Banco:</span>
-                                    <Select
-                                        name="bank_id"
-                                        value={this.state.bank_id}
-                                        size="md"
-                                        style={{ width: 150 }}
-                                        onSelect={(value) => {
-                                            const event = {
-                                                target: {
-                                                    name: 'bank_id',
-                                                    value: value
-                                                }
-                                            }
-                                            this.handleChange(event)
-                                        }}
-                                    >
-                                        {this.state.banks.map(element => {
-                                            return (
-                                                <Option key={element._id}
-                                                    value={element._id}
-                                                >
-                                                    {element.name}
-                                                </Option>
-                                            )
-                                        })}
-                                    </Select>
+                                    <SelectBank handleChange={this.handleChange} bank_id={this.state.bank_id} banks={this.state.banks} />
                                 </Col>
                                 <Col span={12}>
                                     <span style={{ 'marginRight': '30px' }}>Fatura:</span>
-                                    <Select
-                                        name="fature_id"
-                                        value={this.state.fature_id}
-                                        size="md"
-                                        style={{ width: 150 }}
-                                        onSelect={(value) => {
-                                            const event = {
-                                                target: {
-                                                    name: 'fature_id',
-                                                    value: value
-                                                }
-                                            }
-                                            this.handleChange(event)
-                                        }}
-                                    >
-                                        {this.state.fatures.map(element => {
-                                            return (
-                                                <Option key={element._id}
-                                                    value={element._id}
-                                                >
-                                                    {element.name}
-                                                </Option>
-                                            )
-                                        })}
-                                    </Select>
+                                    <SelectFacture handleChange={this.handleChange} fature_id={this.state.fature_id} fatures={this.state.fatures} />
                                 </Col>
-
                             </Row>
-                            <br></br>
+                            <br/>
                             <Row>
                                 <Col span={12}>
                                     <span style={{ 'marginRight': '30px' }}>Descrição:</span>
@@ -347,7 +296,6 @@ class ExtractCard extends React.Component {
                                     <SelectCategories handleChange={this.handleChange} category_id={this.state.category_id} categories={this.state.categories} />
                                 </Col>
                             </Row>
-
                         </>
                     }
                     <br />
