@@ -12,7 +12,7 @@ import {
     Row,
     Col
 } from 'antd';
-import { MenuOutlined, PlusCircleOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
+import { MenuOutlined, PlusCircleOutlined, DownOutlined, UpOutlined, ClearOutlined } from '@ant-design/icons';
 import { listBanks, listTransaction, removeTransaction, listCategories, listFatures } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
@@ -34,7 +34,7 @@ class Banks extends React.Component {
             bank_id: 'Selecione',
             category_id: 'Selecione',
             fature_id: 'Selecione',
-            description: null,
+            description: '',
             banks: [],
             categories: [],
             fatures: [],
@@ -154,7 +154,9 @@ class Banks extends React.Component {
             }
 
             if (this.state.description !== "") {
-                if (!transation.description.includes(this.state.description)) {
+                const description = transation.description.toLowerCase()
+                const filterDescription = this.state.description.toLowerCase()
+                if (!description.includes(filterDescription)) {
                     toReturn = false
                 }
             }
@@ -175,6 +177,11 @@ class Banks extends React.Component {
             case 'filtro':
                 state.filtro = !state.filtro
                 break
+
+            case 'clearFilter':
+                state.transations = state.allTransations
+                break
+
             case 'name':
                 state.name = event.target.value
                 break
@@ -257,13 +264,30 @@ class Banks extends React.Component {
         return (
             <div>
                 <div>
-                    <Title
-                        level={4}
-                        onClick={(value) => {
-                            const event = { target: { name: 'filtro' } }
-                            this.handleChange(event)
-                        }}>
-                        Filtros {this.state.filtro ? <UpOutlined /> : <DownOutlined />}
+                    <Title level={4}>
+                        Filtros
+                        <span
+                            style={{ 'paddingLeft': '3px' }}
+                            onClick={
+                                (value) => {
+                                    const event = { target: { name: 'filtro' } }
+                                    this.handleChange(event)
+                                }
+                            }
+                        >
+                            {this.state.filtro ? <UpOutlined /> : <DownOutlined />}
+                        </span>
+                        <span
+                            style={{ 'paddingLeft': '12px' }}
+                            onClick={
+                                (value) => {
+                                    const event = { target: { name: 'clearFilter' } }
+                                    this.handleChange(event)
+                                }
+                            }
+                        >
+                            <ClearOutlined />
+                        </span>
                     </Title>
 
                     {this.state.filtro &&

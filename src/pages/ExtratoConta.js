@@ -13,7 +13,7 @@ import {
     Row,
     Col
 } from 'antd';
-import { MenuOutlined, PlusCircleOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
+import { MenuOutlined, PlusCircleOutlined, DownOutlined, UpOutlined, ClearOutlined } from '@ant-design/icons';
 import { listBanks, listTransaction, removeTransaction, listCategories } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
@@ -31,9 +31,15 @@ class ExtratoConta extends React.Component {
         super(props)
         this.state = {
             transations: [],
+            allTransations: [],
+
+            year: '',
+            month: '',
+            notCompensed: false,
             bank_id: 'Selecione',
             category_id: 'Selecione',
-            description: null,
+            description: '',
+
             banks: [],
             categories: [],
             filtro: false,
@@ -61,6 +67,7 @@ class ExtratoConta extends React.Component {
                 else {
                     let state = this.state
                     state.transations = res.data.data
+                    state.allTransations = res.data.data
                     this.setState(state)
                 }
                 this.props.loading(false)
@@ -114,6 +121,11 @@ class ExtratoConta extends React.Component {
             case 'filtro':
                 state.filtro = !state.filtro
                 break
+
+            case 'clearFilter':
+                state.transations = state.allTransations
+                break
+
             case 'name':
                 state.name = event.target.value
                 break
@@ -126,8 +138,99 @@ class ExtratoConta extends React.Component {
                 state.data.bankType = event.target.value
                 break
 
+            case 'year':
+                state.year = event.target.value
+                this.filterList()
+                break
+
+            case 'month':
+                state.month = event.target.value
+                this.filterList()
+                break
+
+            case 'notCompensed':
+                console.log('vai mudar')
+                state.notCompensed = !state.notCompensed
+                this.filterList()
+                break
+
+            case 'bank_id':
+                state.bank_id = event.target.value
+                this.filterList()
+                break
+
+            case 'category_id':
+                state.category_id = event.target.value
+                this.filterList()
+                break
+
+            case 'description':
+                state.description = event.target.value
+                this.filterList()
+                break
+
             default:
         }
+        this.setState(state)
+    }
+
+    filterList() {
+        let state = this.state
+
+        const transationFiltred = state.allTransations.filter((transation) => {
+
+            let toReturn = true
+
+            if (this.state.bank_id.toString() !== "Selecione") {
+                if (transation.bank_id._id.toString() !== this.state.bank_id.toString()) {
+                    toReturn = false
+                }
+            }
+
+            if (this.state.category_id.toString() !== "Selecione") {
+                if (transation.category_id._id.toString() !== this.state.category_id.toString()) {
+                    toReturn = false
+                }
+            }
+
+            if (this.state.description !== "") {
+                const description = transation.description.toLowerCase()
+                const filterDescription = this.state.description.toLowerCase()
+                if (!description.includes(filterDescription)) {
+                    toReturn = false
+                }
+            }
+
+            if (this.state.notCompensed) {
+                if (transation.isCompesed) {
+                    toReturn = false
+                }
+            }
+
+            if (this.state.year !== "") {
+                let now = new Date(transation.efectedDate)
+                const ano = now.getFullYear()
+
+                if (ano.toString() !== this.state.year.toString()) {
+                    toReturn = false
+                }
+            }
+
+            if (this.state.month !== "") {
+                let now = new Date(transation.efectedDate)
+                const mes = now.getMonth() + 1
+
+                if (mes.toString() !== this.state.month.toString()) {
+                    toReturn = false
+                }
+            }
+
+            if (toReturn) {
+                return transation
+            }
+        })
+
+        state.transations = transationFiltred
         this.setState(state)
     }
 
@@ -175,13 +278,30 @@ class ExtratoConta extends React.Component {
         return (
             <div>
                 <div>
-                    <Title
-                        level={4}
-                        onClick={(value) => {
-                            const event = { target: { name: 'filtro' } }
-                            this.handleChange(event)
-                        }}>
-                        Filtros {this.state.filtro ? <UpOutlined /> : <DownOutlined />}
+                    <Title level={4}>
+                        Filtros
+                        <span
+                            style={{ 'paddingLeft': '3px' }}
+                            onClick={
+                                (value) => {
+                                    const event = { target: { name: 'filtro' } }
+                                    this.handleChange(event)
+                                }
+                            }
+                        >
+                            {this.state.filtro ? <UpOutlined /> : <DownOutlined />}
+                        </span>
+                        <span
+                            style={{ 'paddingLeft': '12px' }}
+                            onClick={
+                                (value) => {
+                                    const event = { target: { name: 'clearFilter' } }
+                                    this.handleChange(event)
+                                }
+                            }
+                        >
+                            <ClearOutlined />
+                        </span>
                     </Title>
 
                     {this.state.filtro &&
@@ -231,7 +351,7 @@ class ExtratoConta extends React.Component {
                                 </Col>
                                 <Col span={8}>
                                     <span style={{ 'marginRight': '30px' }}>Tipo:</span>
-                                    <Checkbox>Futuros</Checkbox>
+                                    <Checkbox name="notCompensed" checked={this.state.notCompensed} onClick={this.handleChange}>Futuros</Checkbox>
                                 </Col>
                             </Row>
 
