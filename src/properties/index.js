@@ -4,8 +4,8 @@ let url = ''
 switch (env) {
     case 'dev':
         //url = "http://localhost:4000/"
-        //url = "http://192.168.1.6:4000/"
-        url = "http://192.168.43.174:4000/"
+        url = "http://192.168.1.6:4000/"
+        //url = "http://192.168.43.174:4000/"
         break
     case 'prod':
         url = "https://sgf-backend.herokuapp.com/"

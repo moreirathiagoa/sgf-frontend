@@ -13,6 +13,7 @@ import {
 } from 'antd';
 import { createTransaction, updateTransaction, listBanks, listCategories, getTransaction } from '../api'
 import { openNotification, actualDateToUser, formatDateToMoment, formatDateToUser } from '../utils'
+import { SelectCategories } from '../components'
 
 const { Option } = Select;
 
@@ -305,32 +306,7 @@ class Transaction extends React.Component {
                     </Form.Item>
 
                     <Form.Item label="Categoria">
-                        <Select
-                            name="category_id"
-                            value={this.state.data.category_id}
-                            size="md"
-                            style={{ width: 200 }}
-                            onSelect={(value) => {
-                                const event = {
-                                    target: {
-                                        name: 'category_id',
-                                        value: value
-                                    }
-                                }
-                                this.handleChange(event)
-                            }}
-                        >
-                            {this.state.categories.map(element => {
-                                return (
-                                    <Option
-                                        key={element._id}
-                                        value={element._id}
-                                    >
-                                        {element.name}
-                                    </Option>
-                                )
-                            })}
-                        </Select>
+                        <SelectCategories handleChange={this.handleChange} category_id={this.state.data.category_id} categories={this.state.categories} />
                     </Form.Item>
 
                     <Form.Item label="Data da Transação">

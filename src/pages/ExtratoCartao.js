@@ -12,7 +12,8 @@ import {
     Row,
     Col
 } from 'antd';
-import { MenuOutlined, PlusCircleOutlined, DownOutlined, UpOutlined, ClearOutlined } from '@ant-design/icons';
+import { TitleFilter, SelectCategories } from '../components'
+import { MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { listBanks, listTransaction, removeTransaction, listCategories, listFatures } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
@@ -24,7 +25,7 @@ function callback(key) {
     //console.log(key);
 }
 
-class Banks extends React.Component {
+class ExtractCard extends React.Component {
 
     constructor(props) {
         super(props)
@@ -265,32 +266,7 @@ class Banks extends React.Component {
         return (
             <div>
                 <div>
-                    <Title level={4}>
-                        Filtros
-                        <span
-                            style={{ 'paddingLeft': '3px' }}
-                            onClick={
-                                (value) => {
-                                    const event = { target: { name: 'filtro' } }
-                                    this.handleChange(event)
-                                }
-                            }
-                        >
-                            {this.state.filtro ? <UpOutlined /> : <DownOutlined />}
-                        </span>
-                        <span
-                            style={{ 'paddingLeft': '12px' }}
-                            onClick={
-                                (value) => {
-                                    const event = { target: { name: 'clearFilter' } }
-                                    this.handleChange(event)
-                                }
-                            }
-                        >
-                            <ClearOutlined />
-                        </span>
-                    </Title>
-
+                    <TitleFilter handleChange={this.handleChange} isfiltred={this.state.filtro} />
                     {this.state.filtro &&
                         <>
                             <Row>
@@ -368,32 +344,7 @@ class Banks extends React.Component {
                                 </Col>
                                 <Col span={12}>
                                     <span style={{ 'marginRight': '30px' }}>Categoria:</span>
-                                    <Select
-                                        name="category_id"
-                                        value={this.state.category_id}
-                                        size="md"
-                                        style={{ width: 150 }}
-                                        onSelect={(value) => {
-                                            const event = {
-                                                target: {
-                                                    name: 'category_id',
-                                                    value: value
-                                                }
-                                            }
-                                            this.handleChange(event)
-                                        }}
-                                    >
-                                        {this.state.categories.map(element => {
-                                            return (
-                                                <Option
-                                                    key={element._id}
-                                                    value={element._id}
-                                                >
-                                                    {element.name}
-                                                </Option>
-                                            )
-                                        })}
-                                    </Select>
+                                    <SelectCategories handleChange={this.handleChange} category_id={this.state.category_id} categories={this.state.categories} />
                                 </Col>
                             </Row>
 
@@ -467,7 +418,6 @@ class Banks extends React.Component {
                                                     <Descriptions.Item label="Recorrência">{element.currentRecurrence + "/" + element.finalRecurrence}</Descriptions.Item>
                                                 }
                                                 <Descriptions.Item label="Descrição">{element.description}</Descriptions.Item>
-
                                             </Descriptions>
                                         </Panel>
                                     )
@@ -480,4 +430,4 @@ class Banks extends React.Component {
         )
     }
 }
-export default Banks
+export default ExtractCard

@@ -12,7 +12,8 @@ import {
     Row,
     Col
 } from 'antd';
-import { MenuOutlined, PlusCircleOutlined, DownOutlined, UpOutlined, ClearOutlined } from '@ant-design/icons';
+import { TitleFilter, SelectYear, SelectMonth, SelectCategories } from '../components'
+import { MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { listBanks, listTransaction, removeTransaction, listCategories } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
@@ -24,7 +25,7 @@ function callback(key) {
     //console.log(key);
 }
 
-class ExtratoConta extends React.Component {
+class ExtractPlan extends React.Component {
 
     constructor(props) {
         super(props)
@@ -266,79 +267,19 @@ class ExtratoConta extends React.Component {
         return (
             <div>
                 <div>
-                    <Title level={4}>
-                        Filtros
-                        <span
-                            style={{ 'paddingLeft': '3px' }}
-                            onClick={
-                                (value) => {
-                                    const event = { target: { name: 'filtro' } }
-                                    this.handleChange(event)
-                                }
-                            }
-                        >
-                            {this.state.filtro ? <UpOutlined /> : <DownOutlined />}
-                        </span>
-                        <span
-                            style={{ 'paddingLeft': '12px' }}
-                            onClick={
-                                (value) => {
-                                    const event = { target: { name: 'clearFilter' } }
-                                    this.handleChange(event)
-                                }
-                            }
-                        >
-                            <ClearOutlined />
-                        </span>
-                    </Title>
-
+                    <TitleFilter handleChange={this.handleChange} isfiltred={this.state.filtro} />
                     {this.state.filtro &&
                         <>
                             <Row>
                                 <Col span={8}>
                                     <span style={{ 'marginRight': '30px' }}>Ano:</span>
-                                    <Select
-                                        name="year"
-                                        defaultValue="Selecione"
-                                        size="md"
-                                        style={{ width: 80 }}
-                                        onSelect={(value) => {
-                                            const event = { target: { name: 'year', value: value } }
-                                            this.handleChange(event)
-                                        }}
-                                    >
-                                        <Option value="2019">2019</Option>
-                                        <Option value="2020">2020</Option>
-                                    </Select>
+                                    <SelectYear handleChange={this.handleChange} />
                                 </Col>
                                 <Col span={8}>
                                     <span style={{ 'marginRight': '30px' }}>Nês:</span>
-                                    <Select
-                                        name="month"
-                                        defaultValue="Selecione"
-                                        size="md"
-                                        style={{ width: 80 }}
-                                        onSelect={(value) => {
-                                            const event = { target: { name: 'month', value: value } }
-                                            this.handleChange(event)
-                                        }}
-                                    >
-                                        <Option value="1">Jan</Option>
-                                        <Option value="2">Fev</Option>
-                                        <Option value="3">Mar</Option>
-                                        <Option value="4">Abr</Option>
-                                        <Option value="5">Mai</Option>
-                                        <Option value="6">Jun</Option>
-                                        <Option value="7">Jul</Option>
-                                        <Option value="8">Ago</Option>
-                                        <Option value="9">Set</Option>
-                                        <Option value="10">Out</Option>
-                                        <Option value="11">Nov</Option>
-                                        <Option value="12">Dex</Option>
-                                    </Select>
+                                    <SelectMonth handleChange={this.handleChange} />
                                 </Col>
                             </Row>
-
                             <br />
                             <Row>
                                 <Col span={12}>
@@ -371,32 +312,7 @@ class ExtratoConta extends React.Component {
                                 </Col>
                                 <Col span={12}>
                                     <span style={{ 'marginRight': '30px' }}>Categoria:</span>
-                                    <Select
-                                        name="category_id"
-                                        value={this.state.category_id}
-                                        size="md"
-                                        style={{ width: 150 }}
-                                        onSelect={(value) => {
-                                            const event = {
-                                                target: {
-                                                    name: 'category_id',
-                                                    value: value
-                                                }
-                                            }
-                                            this.handleChange(event)
-                                        }}
-                                    >
-                                        {this.state.categories.map(element => {
-                                            return (
-                                                <Option
-                                                    key={element._id}
-                                                    value={element._id}
-                                                >
-                                                    {element.name}
-                                                </Option>
-                                            )
-                                        })}
-                                    </Select>
+                                    <SelectCategories handleChange={this.handleChange} category_id={this.state.category_id} categories={this.state.categories} />
                                 </Col>
                             </Row>
                             <br></br>
@@ -483,7 +399,6 @@ class ExtratoConta extends React.Component {
                                                     <Descriptions.Item label="Recorrência">{element.currentRecurrence + "/" + element.finalRecurrence}</Descriptions.Item>
                                                 }
                                                 <Descriptions.Item label="Descrição">{element.description}</Descriptions.Item>
-
                                             </Descriptions>
                                         </Panel>
                                     )
@@ -496,4 +411,4 @@ class ExtratoConta extends React.Component {
         )
     }
 }
-export default ExtratoConta
+export default ExtractPlan
