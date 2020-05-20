@@ -48,7 +48,7 @@ class Banks extends React.Component {
     }
 
     componentDidMount() {
-        this.props.mudaTitulo("Bancos")
+        this.props.mudaTitulo("Extrato Cartões de Crédito")
         this.list()
     }
 
@@ -164,6 +164,7 @@ class Banks extends React.Component {
             if (toReturn) {
                 return transation
             }
+            return null
         })
 
         state.transations = transationFiltred
@@ -479,5 +480,4 @@ class Banks extends React.Component {
         )
     }
 }
-
 export default Banks

@@ -52,7 +52,7 @@ class ExtratoConta extends React.Component {
     }
 
     componentDidMount() {
-        this.props.mudaTitulo("Bancos")
+        this.props.mudaTitulo("Extrato Contas Corrente")
         this.list()
     }
 
@@ -228,6 +228,7 @@ class ExtratoConta extends React.Component {
             if (toReturn) {
                 return transation
             }
+            return null
         })
 
         state.transations = transationFiltred
@@ -512,5 +513,4 @@ class ExtratoConta extends React.Component {
         )
     }
 }
-
 export default ExtratoConta

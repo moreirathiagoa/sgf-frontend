@@ -44,59 +44,75 @@ class MenuPrincipal extends React.Component {
 								<Link to="/dashboard">
 									<AppstoreOutlined />
 									<span>
-										Dashboard
+										Dashboard CC
 									</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="2">
-								<Link to="/transaction/contaCorrente">
-									<WalletOutlined />
-									<span>Nova Compra Débito</span>
+								<Link to="/xpto">
+									<AppstoreOutlined />
+									<span>
+										Dashboard CR
+									</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="3">
-								<Link to="/transaction/cartaoCredito">
-									<WalletOutlined />
-									<span>Nova Compra Crédito</span>
+								<Link to="/xpto">
+									<AppstoreOutlined />
+									<span>
+										Dashboard PL
+									</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="4">
-								<Link to="/transaction/planejamento">
+								<Link to="/transaction/contaCorrente">
 									<WalletOutlined />
-									<span>Novo Planejamento</span>
+									<span>Transação Corrente</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="5">
-								<Link to="/extrato-conta">
-									<FileSearchOutlined />
-									<span>Extrato Conta Corrente</span>
+								<Link to="/transaction/cartaoCredito">
+									<WalletOutlined />
+									<span>Transação Crédito</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="6">
-								<Link to="/extrato-cartao">
-									<FileSearchOutlined />
-									<span>Faturas Cartão Crédito</span>
+								<Link to="/transaction/planejamento">
+									<WalletOutlined />
+									<span>Transação Plano</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="7">
-								<Link to="/extrato-plano">
+								<Link to="/extrato-conta">
 									<FileSearchOutlined />
-									<span>Extrato Planejamento</span>
+									<span>Extrato CC</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="8">
-								<Link to="/banks">
-									<BankOutlined />
-									<span>Bancos</span>
+								<Link to="/extrato-cartao">
+									<FileSearchOutlined />
+									<span>Extrato CR</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="9">
-								<Link to="/category">
-									<ProfileOutlined />
-									<span>Categorias</span>
+								<Link to="/extrato-plano">
+									<FileSearchOutlined />
+									<span>Extrato PL</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="10">
+								<Link to="/banks">
+									<BankOutlined />
+									<span>Cad. Bancos</span>
+								</Link>
+							</Menu.Item>
+							<Menu.Item key="11">
+								<Link to="/category">
+									<ProfileOutlined />
+									<span>Cad. Categorias</span>
+								</Link>
+							</Menu.Item>
+							<Menu.Item key="12">
 								<Link to="/logout">
 									<LogoutOutlined />
 									<span>Logout</span>
