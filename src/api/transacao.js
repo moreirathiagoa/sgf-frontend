@@ -7,7 +7,7 @@ const listTransaction = (typeTransaction) => {
 
     const response = axios({
         method: 'get',
-        url: properties.url + 'transaction/list/'+typeTransaction,
+        url: properties.url + 'transaction/list/' + typeTransaction,
         headers: {
             auth: token
         }

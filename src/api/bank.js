@@ -6,7 +6,7 @@ const listBanks = (typeTransaction) => {
 
     const response = axios({
         method: 'get',
-        url: properties.url + 'bank/list/'+typeTransaction,
+        url: properties.url + 'bank/list/' + typeTransaction,
         headers: {
             auth: token
         }

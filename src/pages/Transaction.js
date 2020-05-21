@@ -107,10 +107,10 @@ class Transaction extends React.Component {
                 else {
                     let state = this.state
                     state.data = res.data.data
-                    
-                    if(res.data.data.fature_id)
+
+                    if (res.data.data.fature_id)
                         state.data.fature = res.data.data.fature_id.name
-                        
+
                     state.data.efectedDate = formatDateToUser(res.data.data.efectedDate)
                     state.banks = state.allBanks
 

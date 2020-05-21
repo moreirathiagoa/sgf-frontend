@@ -29,7 +29,7 @@ function actualDateToBataBase() {
     return dateToDataBase
 }
 
-function formatDateToMoment(dateInformed){
+function formatDateToMoment(dateInformed) {
     moment.locale('pt-br')
     const dateMoment = moment(dateInformed, "DD/MM/YYYY")
 
@@ -51,16 +51,16 @@ function formatDateTimeToUser(dateInformed) {
 }
 
 function formatDateToBataBase(dateInformed) {
-    
-    
+
+
     const dateToMoment = moment(dateInformed)
 
     const dateToDataBase = dateToMoment.format()
     return dateToDataBase
 }
 
-function formatMoeda(entrada){
-    return entrada.toLocaleString('pt-BR',  { style: 'currency', currency: 'BRL' })
+function formatMoeda(entrada) {
+    return entrada.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
 export {

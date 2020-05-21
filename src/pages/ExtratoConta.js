@@ -284,7 +284,7 @@ class ExtractAcount extends React.Component {
                             <Row>
                                 <Col span={8}>
                                     <span style={{ 'marginRight': '30px' }}>Ano:</span>
-                                    <SelectYear handleChange={this.handleChange}/>
+                                    <SelectYear handleChange={this.handleChange} />
                                 </Col>
                                 <Col span={8}>
                                     <span style={{ 'marginRight': '30px' }}>Nês:</span>

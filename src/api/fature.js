@@ -6,7 +6,7 @@ const listFatures = (idBank) => {
 
     const response = axios({
         method: 'get',
-        url: properties.url + 'fature/list/'+idBank,
+        url: properties.url + 'fature/list/' + idBank,
         headers: {
             auth: token
         }
@@ -25,7 +25,7 @@ const getFature = (idFature) => {
 
     const response = axios({
         method: 'get',
-        url: properties.url + 'fature/'+idFature,
+        url: properties.url + 'fature/' + idFature,
         headers: {
             auth: token
         }
@@ -44,7 +44,7 @@ const payFature = (idFature) => {
 
     const response = axios({
         method: 'get',
-        url: properties.url + 'fature/pay/'+idFature,
+        url: properties.url + 'fature/pay/' + idFature,
         headers: {
             auth: token
         }
