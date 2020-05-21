@@ -1,7 +1,7 @@
 export { default as login } from './login';
 export { listCategories, createCategory, removeCategory, updateCategory } from './category';
 export { listBanks, createBank, removeBank, updateBank, listBanksDashboard } from './bank';
-export { listFatures } from './fature';
+export { listFatures, getFature, payFature } from './fature';
 export {
     listTransaction,
     createTransaction,

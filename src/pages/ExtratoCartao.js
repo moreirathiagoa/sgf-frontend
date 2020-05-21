@@ -12,8 +12,8 @@ import {
     Col
 } from 'antd';
 import { TitleFilter, SelectCategories, SelectBank, SelectFacture } from '../components'
-import { MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
-import { listBanks, listTransaction, removeTransaction, listCategories, listFatures } from '../api'
+import { MenuOutlined, PlusCircleOutlined, CheckOutlined } from '@ant-design/icons';
+import { listBanks, listTransaction, removeTransaction, listCategories, listFatures, payFature } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
 const { Panel } = Collapse;
@@ -28,6 +28,7 @@ class ExtractCard extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            faturePayed: null,
             transations: [],
             allTransations: [],
             bank_id: 'Selecione',
@@ -42,6 +43,7 @@ class ExtractCard extends React.Component {
         }
         this.handleChange = this.handleChange.bind(this)
         this.submitForm = this.submitForm.bind(this)
+        this.payFature = this.payFature.bind(this)
         this.getListBanks()
         this.getListCategories()
     }
@@ -220,6 +222,32 @@ class ExtractCard extends React.Component {
         this.setState(state)
     }
 
+    payFature() {
+
+        if (window.confirm('Deseja realmente fechar essa fatura?')) {
+            if (this.state.fature_id !== "Selecione") {
+                payFature(this.state.fature_id)
+                    .then((res) => {
+                        if (res.status === 401) {
+                            localStorage.removeItem('token')
+                            this.props.verificaLogin()
+                        }
+                        else {
+                            let state = this.state
+                            state.faturePayed = res.data.data
+                            this.setState(state)
+                            openNotification('success', 'Fatura Paga', 'Fatura registrada como paga. Registre agora o débito do seu pagamento se necessário.')
+                        }
+                    })
+                    .catch((err) => {
+                        openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Bancos.')
+                    })
+            } else {
+                openNotification('error', 'Fatura não informada', 'Necessário informar uma fatura.')
+            }
+        }
+    }
+
     remover(id) {
 
         if (window.confirm('Deseja realmente apagar essa Transação?')) {
@@ -261,6 +289,10 @@ class ExtractCard extends React.Component {
             return <Redirect to={"/transaction/cartaoCredito/" + this.state.idToEdit} />
         }
 
+        if (this.state.faturePayed) {
+            return <Redirect to={`/transaction/contaCorrente/pagamentoCartao/${this.state.faturePayed._id}`} />
+        }
+
         return (
             <div>
                 <div>
@@ -277,7 +309,7 @@ class ExtractCard extends React.Component {
                                     <SelectFacture handleChange={this.handleChange} fature_id={this.state.fature_id} fatures={this.state.fatures} />
                                 </Col>
                             </Row>
-                            <br/>
+                            <br />
                             <Row>
                                 <Col span={12}>
                                     <span style={{ 'marginRight': '30px' }}>Descrição:</span>
@@ -305,6 +337,11 @@ class ExtractCard extends React.Component {
                             <Link style={{ 'paddingLeft': '10px' }} to="/transaction/cartaoCredito">
                                 <PlusCircleOutlined />
                             </Link>
+                            {this.state.fature_id !== "Selecione" &&
+                                <span style={{ 'paddingLeft': '15px' }} onClick={() => { this.payFature() }}>
+                                    <CheckOutlined />
+                                </span>
+                            }
                         </Title>
                         <Col span={24}>
                             <Collapse

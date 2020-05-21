@@ -10,7 +10,7 @@ import {
     Col,
     DatePicker,
 } from 'antd';
-import { createTransaction, updateTransaction, listBanks, listCategories, getTransaction } from '../api'
+import { createTransaction, updateTransaction, listBanks, listCategories, getTransaction, getFature } from '../api'
 import { openNotification, actualDateToUser, formatDateToMoment, formatDateToUser } from '../utils'
 import { SelectCategories, SelectBank, SelectFacture } from '../components'
 
@@ -20,7 +20,12 @@ class Transaction extends React.Component {
 
         const param = window.location.pathname;
         const typeTransaction = param.split('/')[2]
-        const idTransaction = param.split('/')[3]
+        const parameter = param.split('/')[3]
+
+        let idTransaction
+        if (parameter !== 'pagamentoCartao') {
+            idTransaction = parameter
+        }
 
         super(props)
         this.state = {
@@ -56,6 +61,13 @@ class Transaction extends React.Component {
     }
 
     componentDidMount() {
+
+        const param = window.location.pathname;
+        const parameter = param.split('/')[3]
+        if (parameter === 'pagamentoCartao') {
+            const fatureId = param.split('/')[4]
+            this.getDataFromFature(fatureId)
+        }
 
         this.props.mudaTitulo("Nova Transação")
         let now = new Date()
@@ -95,7 +107,10 @@ class Transaction extends React.Component {
                 else {
                     let state = this.state
                     state.data = res.data.data
-
+                    
+                    if(res.data.data.fature_id)
+                        state.data.fature = res.data.data.fature_id.name
+                        
                     state.data.efectedDate = formatDateToUser(res.data.data.efectedDate)
                     state.banks = state.allBanks
 
@@ -140,6 +155,26 @@ class Transaction extends React.Component {
             })
             .catch((err) => {
                 openNotification('error', 'Erro ao listar', 'Erro interno. Tente novamente mais tarde.')
+            })
+    }
+
+    getDataFromFature(fatureId) {
+        getFature(fatureId)
+            .then((res) => {
+                if (res.status === 401) {
+                    localStorage.removeItem('token')
+                    this.props.verificaLogin()
+                }
+                else {
+                    const fatureInformaion = res.data.data
+                    let state = this.state
+                    state.data.description = `Pg. Fatura ${fatureInformaion.name} - ${fatureInformaion.bank_id.name}`
+                    state.data.value = fatureInformaion.fatureBalance
+                    this.setState(state)
+                }
+            })
+            .catch((err) => {
+                openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Bancos.')
             })
     }
 
@@ -209,7 +244,6 @@ class Transaction extends React.Component {
     }
 
     cadastrar() {
-        console.log(this.state.data)
         createTransaction(this.state.data)
             .then((res) => {
                 if (res.data.code === 201 || res.data.code === 202) {

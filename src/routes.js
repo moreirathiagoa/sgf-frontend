@@ -61,6 +61,13 @@ class Router extends React.Component {
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
+				<Route path="/transaction/contaCorrente/pagamentoCartao/:idFature">
+					<Transaction
+						loading={this.props.loading}
+						mudaTitulo={this.props.mudaTitulo}
+						verificaLogin={this.props.verificaLogin}
+					/>
+				</Route>
 				<Route path="/extrato-conta">
 					<ExtratoConta
 						loading={this.props.loading}
