@@ -12,8 +12,8 @@ import {
     Col
 } from 'antd';
 import { TitleFilter, SelectYear, SelectMonth, SelectCategories, SelectBank } from '../components'
-import { MenuOutlined, PlusCircleOutlined } from '@ant-design/icons';
-import { listBanks, listTransaction, removeTransaction, listCategories } from '../api'
+import { MenuOutlined, PlusCircleOutlined, CheckOutlined } from '@ant-design/icons';
+import { listBanks, listTransaction, removeTransaction, listCategories, planToPrincipal } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
 const { Panel } = Collapse;
@@ -45,6 +45,7 @@ class ExtractPlan extends React.Component {
         }
         this.handleChange = this.handleChange.bind(this)
         this.submitForm = this.submitForm.bind(this)
+        this.toAccount = this.toAccount.bind(this)
         this.getListBanks()
         this.getListCategories()
     }
@@ -245,6 +246,24 @@ class ExtractPlan extends React.Component {
         this.setState({ idToEdit: idTransaction })
     }
 
+    toAccount() {
+        if (window.confirm('Deseja lançar essas transações em Conta Corrente?')) {
+            planToPrincipal(this.state.transations)
+                .then((res) => {
+                    if (res.data.code === 201 || res.data.code === 202) {
+                        openNotification('success', 'Transação atualizadas', 'Transação atualizadas com sucesso.')
+                        this.list()
+                    }
+                    else {
+                        openNotification('error', 'Transação não atualizada', res.data.message)
+                    }
+                })
+                .catch((err) => {
+                    openNotification('error', 'Transação não atualizada', 'Erro interno. Tente novamente mais tarde.')
+                })
+        }
+    }
+
     submitForm(e) {
 
     }
@@ -313,6 +332,9 @@ class ExtractPlan extends React.Component {
                             <Link style={{ 'paddingLeft': '10px' }} to="/transaction/planejamento">
                                 <PlusCircleOutlined />
                             </Link>
+                            <span style={{ 'paddingLeft': '15px' }} onClick={() => { this.toAccount() }}>
+                                <CheckOutlined />
+                            </span>
                         </Title>
                         <Col span={24}>
                             <Collapse

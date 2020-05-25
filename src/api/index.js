@@ -10,6 +10,7 @@ export {
     getTransaction,
     getSaldosNaoCompensado,
     getSaldosNaoCompensadoCredit,
-    getSaldosNaoCompensadoDebit
+    getSaldosNaoCompensadoDebit,
+    planToPrincipal,
 } from './transacao';
 export { startServer } from './verification';

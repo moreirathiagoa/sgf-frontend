@@ -157,6 +157,25 @@ const getSaldosNaoCompensadoDebit = () => {
     return response
 }
 
+const planToPrincipal = (transations) => {
+    const token = localStorage.getItem('token')
+
+    const response = axios({
+        method: 'post',
+        url: properties.url + 'transaction/planToPrincipal',
+        data: transations,
+        headers: {
+            auth: token
+        }
+    })
+        .then((res) => {
+            return res
+        })
+        .catch((err) => {
+            return err.response
+        })
+    return response
+}
 
 export {
     listTransaction,
@@ -167,4 +186,5 @@ export {
     getSaldosNaoCompensado,
     getSaldosNaoCompensadoCredit,
     getSaldosNaoCompensadoDebit,
+    planToPrincipal,
 }
