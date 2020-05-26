@@ -44,7 +44,7 @@ class MenuPrincipal extends React.Component {
 								<Link to="/dashboard-debit">
 									<AppstoreOutlined />
 									<span>
-										Dashboard CC
+										Dashboard Débito
 									</span>
 								</Link>
 							</Menu.Item>
@@ -52,7 +52,7 @@ class MenuPrincipal extends React.Component {
 								<Link to="/xpto">
 									<AppstoreOutlined />
 									<span>
-										Dashboard CR
+										Dashboard Crédito
 									</span>
 								</Link>
 							</Menu.Item>
@@ -60,44 +60,44 @@ class MenuPrincipal extends React.Component {
 								<Link to="/dashboard-plan">
 									<AppstoreOutlined />
 									<span>
-										Dashboard PL
+										Dashboard Plano
 									</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="4">
 								<Link to="/transaction/contaCorrente">
 									<WalletOutlined />
-									<span>Transação Corrente</span>
+									<span>Novo Débito</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="5">
 								<Link to="/transaction/cartaoCredito">
 									<WalletOutlined />
-									<span>Transação Crédito</span>
+									<span>Novo Crédito</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="6">
 								<Link to="/transaction/planejamento">
 									<WalletOutlined />
-									<span>Transação Plano</span>
+									<span>Novo Plano</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="7">
 								<Link to="/extrato-conta">
 									<FileSearchOutlined />
-									<span>Extrato CC</span>
+									<span>Extrato Débito</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="8">
 								<Link to="/extrato-cartao">
 									<FileSearchOutlined />
-									<span>Extrato CR</span>
+									<span>Extrato Crédito</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="9">
 								<Link to="/extrato-plano">
 									<FileSearchOutlined />
-									<span>Extrato PL</span>
+									<span>Extrato Plano</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="10">

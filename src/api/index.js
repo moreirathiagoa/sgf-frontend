@@ -12,5 +12,6 @@ export {
     getSaldosNaoCompensadoCredit,
     getSaldosNaoCompensadoDebit,
     planToPrincipal,
+    futureTransationBalance,
 } from './transacao';
 export { startServer } from './verification';
