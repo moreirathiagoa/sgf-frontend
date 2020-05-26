@@ -297,7 +297,7 @@ class Transaction extends React.Component {
                 }
             }
             else {
-                return <Redirect to="/dashboard" />
+                return <Redirect to="/dashboard-debit" />
             }
         }
 

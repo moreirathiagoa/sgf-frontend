@@ -41,7 +41,7 @@ class MenuPrincipal extends React.Component {
 							onClick={this.props.alterado}
 						>
 							<Menu.Item key="1">
-								<Link to="/dashboard">
+								<Link to="/dashboard-debit">
 									<AppstoreOutlined />
 									<span>
 										Dashboard CC
@@ -57,7 +57,7 @@ class MenuPrincipal extends React.Component {
 								</Link>
 							</Menu.Item>
 							<Menu.Item key="3">
-								<Link to="/xpto">
+								<Link to="/dashboard-plan">
 									<AppstoreOutlined />
 									<span>
 										Dashboard PL

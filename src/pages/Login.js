@@ -93,7 +93,7 @@ class Login extends React.Component {
         }
 
         if (this.props.logado) {
-            return <Redirect to="/dashboard" />
+            return <Redirect to="/dashboard-debit" />
         }
 
         return (

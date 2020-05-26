@@ -1,6 +1,7 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom'
-import Dashboard from './pages/Dashboard';
+import DashboardDebit from './pages/DashboardDebit';
+import DashboardPlan from './pages/DashboardPlan';
 import Categoria from './pages/Categorias'
 import Transaction from './pages/Transaction'
 import ExtratoConta from './pages/ExtratoConta'
@@ -33,8 +34,15 @@ class Router extends React.Component {
 						logado={this.props.logado}
 					/>
 				</Route>
-				<Route path="/dashboard">
-					<Dashboard
+				<Route path="/dashboard-debit">
+					<DashboardDebit
+						loading={this.props.loading}
+						mudaTitulo={this.props.mudaTitulo}
+						verificaLogin={this.props.verificaLogin}
+					/>
+				</Route>
+				<Route path="/dashboard-plan">
+					<DashboardPlan
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}

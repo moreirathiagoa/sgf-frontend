@@ -1,12 +1,12 @@
 import React from 'react';
-import { Table, Statistic, Modal, Input, Row, Col, Typography } from 'antd';
+import { Table, Statistic, Modal, Input, Row, Col, Typography, Card } from 'antd';
 import '../App.css'
 import { updateBank, getSaldosNaoCompensadoCredit, getSaldosNaoCompensadoDebit, listBanksDashboard } from '../api'
 import { openNotification, formatMoeda } from '../utils'
 
 const { Title } = Typography;
 
-class Dashboard extends React.Component {
+class DashboardPlan extends React.Component {
 
     constructor(props) {
         super(props)
@@ -32,7 +32,7 @@ class Dashboard extends React.Component {
     }
 
     componentDidMount() {
-        this.props.mudaTitulo("Dashboard")
+        this.props.mudaTitulo("Dashboard Plano")
         this.getListBanks()
         this.initSaldoNaoCompensadoCredit()
         this.initSaldoNaoCompensadoDebit()
@@ -199,57 +199,40 @@ class Dashboard extends React.Component {
     render() {
         return (
             <>
-                <Modal
-                    title={this.state.modalContent.banco}
-                    visible={this.state.visible}
-                    onOk={() => { this.handleOk(this.state.modalContent) }}
-                    onCancel={this.handleCancel}
+                <Card
+                    size="small"
+                    title="Janeiro"
+                    style={{ width: 370, 'marginBottom': '5px' }}
                 >
-                    <Input
-                        placeholder=""
-                        type="number"
-                        name="saldoManualModal"
-                        size="md"
-                        value={this.state.modalContent.saldoManual}
-                        onChange={this.handleChange}
-                        style={{ width: 100 }}
-                    />
-                </Modal>
-                <Row style={{ paddingBottom: '10px' }}>
-                    <Col span={12}>
-                        <Statistic title="Previsão de entrada" value={formatMoeda(this.state.saldoNotCompesatedCredit)} />
-                    </Col>
-                    <Col span={12}>
-                        <Statistic title="Previsão Saída" value={formatMoeda(this.state.saldoNotCompesatedDebit)} />
-                    </Col>
-                </Row>
-                <Row style={{ paddingBottom: '10px' }}>
-                    <Col span={12}>
-                        <Statistic title="Saldo Real" value={formatMoeda(this.state.saldoReal)} />
-                    </Col>
-                    <Col span={12}>
-                        <Statistic title="Saldo Líquido" value={formatMoeda(this.state.saldoLiquido)} />
-                    </Col>
-                </Row>
-                <Row style={{ paddingBottom: '20px' }}>
-                    <Col span={12}>
-                        <Statistic title="Saldo do dia" value="Indisponível" />
-                    </Col>
-                </Row>
-                <Title level={4}>Saldo por Banco</Title>
-                <Row>
-                    <Table
-                        pagination={false}
-                        columns={this.columns()}
-                        dataSource={this.state.tableContent}
-                        size="small"
-                        expandable={{
-                            expandedRowRender: record => <p style={{ margin: 0 }}>Diferença: {record.diferenca}</p>,
-                        }}
-                    />
-                </Row>
+                    <Row>
+                        <Col span={4}>Entrada:</Col>
+                        <Col span={7}>R$ 30500,00</Col>
+                        <Col span={6}>Saída:</Col>
+                        <Col span={7}>R$ 30850,00</Col>
+                        <Col span={4}>Liquido:</Col>
+                        <Col span={7}>-R$ 350,00</Col>
+                        <Col span={6}>Acumulado:</Col>
+                        <Col span={7}>-R$ 350,00</Col>
+                    </Row>
+                </Card>
+                <Card
+                    size="small"
+                    title="Fevereiro"
+                    style={{ width: 370, 'marginBottom': '5px' }}
+                >
+                    <Row>
+                        <Col span={4}>Entrada:</Col>
+                        <Col span={7}>R$ 30500,00</Col>
+                        <Col span={6}>Saída:</Col>
+                        <Col span={7}>R$ 30850,00</Col>
+                        <Col span={4}>Liquido:</Col>
+                        <Col span={7}>-R$ 350,00</Col>
+                        <Col span={6}>Acumulado:</Col>
+                        <Col span={7}>-R$ 350,00</Col>
+                    </Row>
+                </Card>
             </>
         )
     }
 }
-export default Dashboard
+export default DashboardPlan
