@@ -1,4 +1,4 @@
-const env = process.env.REACT_APP_NODE_ENV || 'dev'
+let env = process.env.REACT_APP_NODE_ENV || 'dev'
 let url = ''
 
 switch (env) {
