@@ -2,6 +2,7 @@ import React from 'react';
 import { Table, Statistic, Modal, Input, Row, Col, Typography } from 'antd';
 import '../App.css'
 import { updateBank, getSaldosNaoCompensadoCredit, getSaldosNaoCompensadoDebit, listBanksDashboard } from '../api'
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { openNotification, formatMoeda } from '../utils'
 
 const { Title } = Typography;
@@ -113,15 +114,16 @@ class DashboardDebit extends React.Component {
             {
                 title: 'Banco',
                 dataIndex: 'banco',
-            },
-            {
+            }, {
                 title: 'Sistema',
                 dataIndex: 'saldoSistema',
-            },
-            {
+            }, {
                 title: 'Manual',
                 dataIndex: 'saldoManual',
                 render: (data) => <span onClick={() => { this.showModal(data) }}>{formatMoeda(data.saldoManual)}</span>,
+            }, {
+                title: '#',
+                dataIndex: 'status',
             },
 
         ];
@@ -138,7 +140,10 @@ class DashboardDebit extends React.Component {
         state.banks.forEach(bank => {
 
             saldoLiquido += bank.saldoSistema
-            saldoReal += bank.saldoSistemaDeduzido
+
+            if (bank.bankType === "Conta Corrente") {
+                saldoReal += bank.saldoSistemaDeduzido
+            }
 
             const content = {
                 key: bank.id,
@@ -146,7 +151,9 @@ class DashboardDebit extends React.Component {
                 saldoSistema: formatMoeda(bank.saldoSistemaDeduzido),
                 saldoManual: { id: bank.id, banco: bank.name, saldoManual: bank.saldoManual },
                 diferenca: formatMoeda(bank.diference),
+                status: bank.diference ? <CloseCircleOutlined style={{ color: 'red' }} /> : <CheckCircleOutlined style={{ color: 'green' }} />
             }
+
             tableContent.push(content)
         });
 
