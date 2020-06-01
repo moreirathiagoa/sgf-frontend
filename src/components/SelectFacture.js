@@ -1,32 +1,30 @@
-import React from 'react';
-import 'antd/dist/antd.css';
-import { Select } from 'antd';
+import React from 'react'
+import 'antd/dist/antd.css'
+import { Select } from 'antd'
 
-const { Option } = Select;
+const { Option } = Select
 
 class SelectFature extends React.Component {
 	render() {
 		return (
 			<Select
-				name="fature_id"
+				name='fature_id'
 				value={this.props.fature_id}
-				size="md"
+				size='md'
 				style={{ width: 150 }}
 				onSelect={(value) => {
 					const event = {
 						target: {
 							name: 'fature_id',
-							value: value
-						}
+							value: value,
+						},
 					}
 					this.props.handleChange(event)
 				}}
 			>
-				{this.props.fatures.map(element => {
+				{this.props.fatures.map((element) => {
 					return (
-						<Option key={element._id}
-							value={element._id}
-						>
+						<Option key={element._id} value={element._id}>
 							{element.name}
 						</Option>
 					)

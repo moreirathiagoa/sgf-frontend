@@ -1,102 +1,102 @@
 .trigger {
-  font-size: 18px;
-  line-height: 64px;
-  padding: 0 24px;
-  cursor: pointer;
-  color: #ccc;
+	font-size: 18px;
+	line-height: 64px;
+	padding: 0 24px;
+	cursor: pointer;
+	color: #ccc;
 }
 
 .trigger-title {
-  font-size: 18px;
-  line-height: 64px;
-  padding: 0 24px 0 38px;
-  cursor: pointer;
-  color: #ccc;
+	font-size: 18px;
+	line-height: 64px;
+	padding: 0 24px 0 38px;
+	cursor: pointer;
+	color: #ccc;
 }
 
 body {
-  background: #112338;
+	background: #112338;
 }
 .ant-menu.ant-menu-dark {
-  background: #000129;
+	background: #000129;
 }
 
 .ant-menu-item-selected {
-  background: #001529 !important;
+	background: #001529 !important;
 }
 
 .ant-switch {
-  background: #3a3939;
+	background: #3a3939;
 }
 
 .ant-switch-checked {
-  background: #1890ff;
+	background: #1890ff;
 }
 
 .logo {
-  height: 32px;
-  color: #ccc;
-  margin-bottom: 15px;
-  text-align: center;
-  font-size: 30px;
-  font-weight: bolder;
+	height: 32px;
+	color: #ccc;
+	margin-bottom: 15px;
+	text-align: center;
+	font-size: 30px;
+	font-weight: bolder;
 }
 
 .site-layout .site-layout-background {
-  background: #112338;
-  color: #ccc;
+	background: #112338;
+	color: #ccc;
 }
 
 h4.ant-typography {
-  color: #ccc;
+	color: #ccc;
 }
 
 h3.ant-typography {
-  color: #ccc;
+	color: #ccc;
 }
 
 .ant-layout-sider-children {
-  background: #010304;
+	background: #010304;
 }
 
 .ant-collapse-item {
-  background: #2a313a;
+	background: #2a313a;
 }
 
 .ant-collapse-header {
-  color: #ccc !important;
+	color: #ccc !important;
 }
 
 .ant-form-item-label {
-  color: #ccc;
+	color: #ccc;
 }
 
 label {
-  color: #ccc !important;
+	color: #ccc !important;
 }
 
 .ant-collapse-content-box {
-  background: #2a313ae3;
+	background: #2a313ae3;
 }
 
 .ant-descriptions-title {
-  color: #ccc;
+	color: #ccc;
 }
 
 .ant-descriptions-item-content {
-  color: #ccc;
+	color: #ccc;
 }
 
 .ant-descriptions-item-label {
-  color: #ccc;
+	color: #ccc;
 }
 
 .ant-statistic-title {
-  color: #ccc;
+	color: #ccc;
 }
 
 .ant-statistic-content {
-  color: #ccc;
+	color: #ccc;
 }
 
 .ant-col {

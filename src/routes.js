@@ -1,7 +1,7 @@
-import React from 'react';
+import React from 'react'
 import { Switch, Route } from 'react-router-dom'
-import DashboardDebit from './pages/DashboardDebit';
-import DashboardPlan from './pages/DashboardPlan';
+import DashboardDebit from './pages/DashboardDebit'
+import DashboardPlan from './pages/DashboardPlan'
 import Categoria from './pages/Categorias'
 import Transaction from './pages/Transaction'
 import ExtratoConta from './pages/ExtratoConta'
@@ -12,7 +12,6 @@ import NotFound from './pages/NotFound'
 import Login from './pages/Login'
 
 class Router extends React.Component {
-
 	render() {
 		if (!this.props.logado) {
 			return (
@@ -26,7 +25,7 @@ class Router extends React.Component {
 
 		return (
 			<Switch>
-				<Route exact path="/">
+				<Route exact path='/'>
 					<Login
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
@@ -34,89 +33,89 @@ class Router extends React.Component {
 						logado={this.props.logado}
 					/>
 				</Route>
-				<Route path="/dashboard-debit">
+				<Route path='/dashboard-debit'>
 					<DashboardDebit
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path="/dashboard-plan">
+				<Route path='/dashboard-plan'>
 					<DashboardPlan
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path="/transaction/contaCorrente/:idTransaction?">
+				<Route path='/transaction/contaCorrente/:idTransaction?'>
 					<Transaction
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path="/transaction/cartaoCredito/:idTransaction?">
+				<Route path='/transaction/cartaoCredito/:idTransaction?'>
 					<Transaction
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path="/transaction/planejamento/:idTransaction?">
+				<Route path='/transaction/planejamento/:idTransaction?'>
 					<Transaction
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path="/transaction/contaCorrente/pagamentoCartao/:idFature">
+				<Route path='/transaction/contaCorrente/pagamentoCartao/:idFature'>
 					<Transaction
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path="/extrato-conta">
+				<Route path='/extrato-conta'>
 					<ExtratoConta
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path="/extrato-cartao">
+				<Route path='/extrato-cartao'>
 					<ExtratoCartao
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path="/extrato-plano">
+				<Route path='/extrato-plano'>
 					<ExtratoPlano
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path="/category">
+				<Route path='/category'>
 					<Categoria
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path="/banks">
+				<Route path='/banks'>
 					<Bank
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path="/logout">
+				<Route path='/logout'>
 					<Login
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
-						mode={"logout"}
+						mode={'logout'}
 					/>
 				</Route>
 				<Route>
@@ -127,7 +126,6 @@ class Router extends React.Component {
 				</Route>
 			</Switch>
 		)
-
 	}
 }
 export default Router

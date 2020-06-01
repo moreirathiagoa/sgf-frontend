@@ -1,17 +1,28 @@
-export { default as login } from './login';
-export { listCategories, createCategory, removeCategory, updateCategory } from './category';
-export { listBanks, createBank, removeBank, updateBank, listBanksDashboard } from './bank';
-export { listFatures, getFature, payFature } from './fature';
+export { default as login } from './login'
 export {
-    listTransaction,
-    createTransaction,
-    removeTransaction,
-    updateTransaction,
-    getTransaction,
-    getSaldosNaoCompensado,
-    getSaldosNaoCompensadoCredit,
-    getSaldosNaoCompensadoDebit,
-    planToPrincipal,
-    futureTransationBalance,
-} from './transacao';
-export { startServer } from './verification';
+	listCategories,
+	createCategory,
+	removeCategory,
+	updateCategory,
+} from './category'
+export {
+	listBanks,
+	createBank,
+	removeBank,
+	updateBank,
+	listBanksDashboard,
+} from './bank'
+export { listFatures, getFature, payFature } from './fature'
+export {
+	listTransaction,
+	createTransaction,
+	removeTransaction,
+	updateTransaction,
+	getTransaction,
+	getSaldosNaoCompensado,
+	getSaldosNaoCompensadoCredit,
+	getSaldosNaoCompensadoDebit,
+	planToPrincipal,
+	futureTransationBalance,
+} from './transacao'
+export { startServer } from './verification'

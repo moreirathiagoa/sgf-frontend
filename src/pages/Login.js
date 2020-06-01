@@ -1,136 +1,153 @@
-import React from 'react';
-import { Form, Input, Button, Checkbox } from 'antd';
+import React from 'react'
+import { Form, Input, Button, Checkbox } from 'antd'
 import { login, startServer } from '../api'
-import { Redirect } from "react-router-dom";
+import { Redirect } from 'react-router-dom'
 import { openNotification } from '../utils'
 
 const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 6 },
-};
+	labelCol: { span: 8 },
+	wrapperCol: { span: 6 },
+}
 const tailLayout = {
-    wrapperCol: { offset: 8, span: 16 },
-};
+	wrapperCol: { offset: 8, span: 16 },
+}
 
 class Login extends React.Component {
+	componentDidMount() {
+		this.verifyServer()
 
-    componentDidMount() {
+		this.props.mudaTitulo('')
 
-        this.verifyServer()
+		if (this.props.mode) {
+			localStorage.removeItem('token')
+			this.props.verificaLogin()
+		}
+	}
 
-        this.props.mudaTitulo("")
+	verifyServer = () => {
+		const online = startServer()
+			.then((res) => {
+				if (res) {
+					console.log('Server Online')
+					return true
+				} else {
+					console.log('Server Offline')
+					return false
+				}
+			})
+			.catch((err) => {
+				console.log('Server Offline')
+				return false
+			})
+		return online
+	}
 
-        if (this.props.mode) {
-            localStorage.removeItem('token')
-            this.props.verificaLogin()
-        }
-    }
+	onFinish = (values) => {
+		this.props.loading(true)
+		this.verifyServer()
+			.then((res) => {
+				if (!res) {
+					this.props.loading(false)
+					openNotification(
+						'error',
+						'Login não efetuado',
+						'O servidor está offline. Tente novamente em alguns segundos.'
+					)
+					return
+				}
+				login(values)
+					.then((res) => {
+						if (res.data.code === 200) {
+							openNotification(
+								'success',
+								'Login efetuado',
+								'Seu login foi registrado com sucesso.'
+							)
+							localStorage.setItem('token', res.data.data.token)
+							this.props.verificaLogin()
+							this.render()
+						} else {
+							openNotification(
+								'error',
+								'Login não efetuado',
+								'Usuário ou senha inválio.'
+							)
+						}
+						this.props.loading(false)
+					})
+					.catch((err) => {
+						openNotification(
+							'error',
+							'Login não efetuado',
+							'Erro interno. Tente novamente mais tarde.'
+						)
+						localStorage.removeItem('token')
+						this.props.verificaLogin()
+						this.props.loading(false)
+					})
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Login não efetuado',
+					'O servidor está offline. Tente novamente em alguns segundos.'
+				)
+				return
+			})
+	}
 
-    verifyServer = () => {
-        const online = startServer()
-            .then((res) => {
-                if (res) {
-                    console.log('Server Online')
-                    return true
-                }
-                else {
-                    console.log('Server Offline')
-                    return false
-                }
+	onFinishFailed = (errorInfo) => {
+		openNotification(
+			'warning',
+			'Login não efetuado',
+			'Preencha os dados corretamente.'
+		)
+	}
 
-            })
-            .catch((err) => {
-                console.log('Server Offline')
-                return false
-            })
-        return online
-    }
+	render() {
+		if (this.props.mode) {
+			return <Redirect to='/' />
+		}
 
-    onFinish = values => {
-        this.props.loading(true)
-        this.verifyServer()
-            .then((res) => {
-                if (!res) {
-                    this.props.loading(false)
-                    openNotification('error', 'Login não efetuado', 'O servidor está offline. Tente novamente em alguns segundos.')
-                    return
-                }
-                login(values)
-                    .then((res) => {
-                        if (res.data.code === 200) {
-                            openNotification('success', 'Login efetuado', 'Seu login foi registrado com sucesso.')
-                            localStorage.setItem('token', res.data.data.token)
-                            this.props.verificaLogin()
-                            this.render()
-                        }
-                        else {
-                            openNotification('error', 'Login não efetuado', 'Usuário ou senha inválio.')
-                        }
-                        this.props.loading(false)
-                    })
-                    .catch((err) => {
-                        openNotification('error', 'Login não efetuado', 'Erro interno. Tente novamente mais tarde.')
-                        localStorage.removeItem('token')
-                        this.props.verificaLogin()
-                        this.props.loading(false)
-                    })
+		if (this.props.logado) {
+			return <Redirect to='/dashboard-debit' />
+		}
 
-            })
-            .catch((err) => {
-                openNotification('error', 'Login não efetuado', 'O servidor está offline. Tente novamente em alguns segundos.')
-                return
-            })
-    };
+		return (
+			<Form
+				{...layout}
+				name='basic'
+				initialValues={{ remember: true }}
+				onFinish={this.onFinish}
+				onFinishFailed={this.onFinishFailed}
+			>
+				<Form.Item
+					label='Username'
+					name='userName'
+					rules={[{ required: true, message: 'Please input your username!' }]}
+				>
+					<Input />
+				</Form.Item>
 
-    onFinishFailed = errorInfo => {
-        openNotification('warning', 'Login não efetuado', 'Preencha os dados corretamente.')
-    };
+				<Form.Item
+					label='Password'
+					name='userPassword'
+					rules={[{ required: true, message: 'Please input your password!' }]}
+				>
+					<Input.Password />
+				</Form.Item>
 
-    render() {
+				<Form.Item {...tailLayout} name='remember' valuePropName=''>
+					<Checkbox>Permanecer Logado</Checkbox>
+				</Form.Item>
 
-        if (this.props.mode) {
-            return <Redirect to="/" />
-        }
-
-        if (this.props.logado) {
-            return <Redirect to="/dashboard-debit" />
-        }
-
-        return (
-            <Form
-                {...layout}
-                name="basic"
-                initialValues={{ remember: true }}
-                onFinish={this.onFinish}
-                onFinishFailed={this.onFinishFailed}
-            >
-                <Form.Item
-                    label="Username"
-                    name="userName"
-                    rules={[{ required: true, message: 'Please input your username!' }]}
-                >
-                    <Input />
-                </Form.Item>
-
-                <Form.Item
-                    label="Password"
-                    name="userPassword"
-                    rules={[{ required: true, message: 'Please input your password!' }]}
-                >
-                    <Input.Password />
-                </Form.Item>
-
-                <Form.Item {...tailLayout} name="remember" valuePropName="">
-                    <Checkbox>Permanecer Logado</Checkbox>
-                </Form.Item>
-
-                <Form.Item {...tailLayout}>
-                    <Button type="primary" htmlType="submit">
-                        Submit
-                    </Button>
-                </Form.Item>
-            </Form>
-        )
-    }
+				<Form.Item {...tailLayout}>
+					<Button type='primary' htmlType='submit'>
+						Submit
+					</Button>
+				</Form.Item>
+			</Form>
+		)
+	}
 }
 export default Login

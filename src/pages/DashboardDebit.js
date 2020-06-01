@@ -1,262 +1,316 @@
-import React from 'react';
-import { Table, Statistic, Modal, Input, Row, Col, Typography } from 'antd';
+import React from 'react'
+import { Table, Statistic, Modal, Input, Row, Col, Typography } from 'antd'
 import '../App.css'
-import { updateBank, getSaldosNaoCompensadoCredit, getSaldosNaoCompensadoDebit, listBanksDashboard } from '../api'
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import {
+	updateBank,
+	getSaldosNaoCompensadoCredit,
+	getSaldosNaoCompensadoDebit,
+	listBanksDashboard,
+} from '../api'
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { openNotification, formatMoeda } from '../utils'
 
-const { Title } = Typography;
+const { Title } = Typography
 
 class DashboardDebit extends React.Component {
+	constructor(props) {
+		super(props)
+		this.state = {
+			visible: false,
+			banks: [],
+			saldoNotCompesatedCredit: 'Aguarde...',
+			saldoNotCompesatedDebit: 'Aguarde...',
+			saldoReal: 'Aguarde...',
+			saldoLiquido: 'Aguarde...',
+			modalContent: {
+				id: null,
+				banco: null,
+				saldoManual: null,
+			},
+			tableContent: [],
+		}
+		this.handleChange = this.handleChange.bind(this)
+	}
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            visible: false,
-            banks: [],
-            saldoNotCompesatedCredit: 'Aguarde...',
-            saldoNotCompesatedDebit: 'Aguarde...',
-            saldoReal: 'Aguarde...',
-            saldoLiquido: 'Aguarde...',
-            modalContent: {
-                id: null,
-                banco: null,
-                saldoManual: null,
-            },
-            tableContent: [],
-        }
-        this.handleChange = this.handleChange.bind(this)
-    }
+	componentDidUpdate() {
+		//console.log('update')
+	}
 
-    componentDidUpdate() {
-        //console.log('update')
-    }
+	componentDidMount() {
+		this.props.mudaTitulo('Dashboard Débito')
+		this.getListBanks()
+		this.initSaldoNaoCompensadoCredit()
+		this.initSaldoNaoCompensadoDebit()
+	}
 
-    componentDidMount() {
-        this.props.mudaTitulo("Dashboard Débito")
-        this.getListBanks()
-        this.initSaldoNaoCompensadoCredit()
-        this.initSaldoNaoCompensadoDebit()
-    }
+	getListBanks() {
+		listBanksDashboard()
+			.then((res) => {
+				if (res.status === 401) {
+					localStorage.removeItem('token')
+					this.props.verificaLogin()
+				} else {
+					let state = this.state
+					state.banks = res.data.data
+					this.setState(state)
+					this.getSaldosGerais()
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Erro interno',
+					'Erro ao obter a listagem de Bancos.'
+				)
+			})
+	}
 
-    getListBanks() {
-        listBanksDashboard()
-            .then((res) => {
-                if (res.status === 401) {
-                    localStorage.removeItem('token')
-                    this.props.verificaLogin()
-                }
-                else {
-                    let state = this.state
-                    state.banks = res.data.data
-                    this.setState(state)
-                    this.getSaldosGerais()
-                }
-            })
-            .catch((err) => {
-                openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Bancos.')
-            })
-    }
+	initSaldoNaoCompensadoCredit() {
+		getSaldosNaoCompensadoCredit()
+			.then((res) => {
+				if (res.status === 401) {
+					localStorage.removeItem('token')
+					this.props.verificaLogin()
+				} else {
+					let state = this.state
+					state.saldoNotCompesatedCredit = res.data.data
+					this.setState(state)
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Erro interno',
+					'Erro ao obter saldo dos Bancos.'
+				)
+			})
+	}
 
-    initSaldoNaoCompensadoCredit() {
-        getSaldosNaoCompensadoCredit()
-            .then((res) => {
-                if (res.status === 401) {
-                    localStorage.removeItem('token')
-                    this.props.verificaLogin()
-                }
-                else {
-                    let state = this.state
-                    state.saldoNotCompesatedCredit = res.data.data
-                    this.setState(state)
-                }
-            })
-            .catch((err) => {
-                openNotification('error', 'Erro interno', 'Erro ao obter saldo dos Bancos.')
-            })
-    }
+	initSaldoNaoCompensadoDebit() {
+		getSaldosNaoCompensadoDebit()
+			.then((res) => {
+				if (res.status === 401) {
+					localStorage.removeItem('token')
+					this.props.verificaLogin()
+				} else {
+					let state = this.state
+					state.saldoNotCompesatedDebit = res.data.data
+					this.setState(state)
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Erro interno',
+					'Erro ao obter saldo dos Bancos.'
+				)
+			})
+	}
 
-    initSaldoNaoCompensadoDebit() {
-        getSaldosNaoCompensadoDebit()
-            .then((res) => {
+	handleChange(event) {
+		let state = this.state
 
-                if (res.status === 401) {
-                    localStorage.removeItem('token')
-                    this.props.verificaLogin()
-                }
-                else {
-                    let state = this.state
-                    state.saldoNotCompesatedDebit = res.data.data
-                    this.setState(state)
-                }
-            })
-            .catch((err) => {
-                openNotification('error', 'Erro interno', 'Erro ao obter saldo dos Bancos.')
-            })
-    }
+		switch (event.target.name) {
+			case 'saldoManualModal':
+				state.modalContent.saldoManual = event.target.value
+				break
 
-    handleChange(event) {
-        let state = this.state
+			default:
+		}
+		this.setState(state)
+	}
 
-        switch (event.target.name) {
+	columns = () => {
+		return [
+			{
+				title: 'Banco',
+				dataIndex: 'banco',
+			},
+			{
+				title: 'Sistema',
+				dataIndex: 'saldoSistema',
+			},
+			{
+				title: 'Manual',
+				dataIndex: 'saldoManual',
+				render: (data) => (
+					<span
+						onClick={() => {
+							this.showModal(data)
+						}}
+					>
+						{formatMoeda(data.saldoManual)}
+					</span>
+				),
+			},
+			{
+				title: '#',
+				dataIndex: 'status',
+			},
+		]
+	}
 
-            case 'saldoManualModal':
-                state.modalContent.saldoManual = event.target.value
-                break
+	getSaldosGerais() {
+		let state = this.state
 
-            default:
-        }
-        this.setState(state)
-    }
+		let tableContent = []
+		let saldoLiquido = 0
+		let saldoReal = 0
 
-    columns = () => {
-        return [
-            {
-                title: 'Banco',
-                dataIndex: 'banco',
-            }, {
-                title: 'Sistema',
-                dataIndex: 'saldoSistema',
-            }, {
-                title: 'Manual',
-                dataIndex: 'saldoManual',
-                render: (data) => <span onClick={() => { this.showModal(data) }}>{formatMoeda(data.saldoManual)}</span>,
-            }, {
-                title: '#',
-                dataIndex: 'status',
-            },
+		state.banks.forEach((bank) => {
+			saldoLiquido += bank.saldoSistema
 
-        ];
-    }
+			if (bank.bankType === 'Conta Corrente') {
+				saldoReal += bank.saldoSistemaDeduzido
+			}
 
-    getSaldosGerais() {
+			const content = {
+				key: bank.id,
+				banco: bank.name,
+				saldoSistema: formatMoeda(bank.saldoSistemaDeduzido),
+				saldoManual: {
+					id: bank.id,
+					banco: bank.name,
+					saldoManual: bank.saldoManual,
+				},
+				diferenca: formatMoeda(bank.diference),
+				status: bank.diference ? (
+					<CloseCircleOutlined style={{ color: 'red' }} />
+				) : (
+					<CheckCircleOutlined style={{ color: 'green' }} />
+				),
+			}
 
-        let state = this.state
+			tableContent.push(content)
+		})
 
-        let tableContent = []
-        let saldoLiquido = 0
-        let saldoReal = 0
+		state.saldoReal = saldoReal
+		state.saldoLiquido = saldoLiquido
+		state.tableContent = tableContent
 
-        state.banks.forEach(bank => {
+		this.setState(state)
+	}
 
-            saldoLiquido += bank.saldoSistema
+	showModal = (data) => {
+		let state = this.state
+		state.modalContent.id = data.id
+		state.modalContent.banco = data.banco
+		state.modalContent.saldoManual = data.saldoManual
+		state.visible = true
+		this.setState(state)
+	}
 
-            if (bank.bankType === "Conta Corrente") {
-                saldoReal += bank.saldoSistemaDeduzido
-            }
+	handleOk = (e) => {
+		const bankToUpdate = {
+			manualBalance: e.saldoManual,
+		}
 
-            const content = {
-                key: bank.id,
-                banco: bank.name,
-                saldoSistema: formatMoeda(bank.saldoSistemaDeduzido),
-                saldoManual: { id: bank.id, banco: bank.name, saldoManual: bank.saldoManual },
-                diferenca: formatMoeda(bank.diference),
-                status: bank.diference ? <CloseCircleOutlined style={{ color: 'red' }} /> : <CheckCircleOutlined style={{ color: 'green' }} />
-            }
+		updateBank(bankToUpdate, e.id)
+			.then((res) => {
+				if (res.data.code === 201 || res.data.code === 202) {
+					openNotification(
+						'success',
+						'Saldo atualizado',
+						'Saldo atualizado com sucesso.'
+					)
+					this.getListBanks()
+				} else {
+					openNotification(
+						'error',
+						'Saldo não atualizado',
+						'O Saldo não pode ser atualizado.'
+					)
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Saldo não cadastrado',
+					'Erro interno. Tente novamente mais tarde.'
+				)
+			})
 
-            tableContent.push(content)
-        });
+		this.setState({
+			visible: false,
+		})
+	}
 
-        state.saldoReal = saldoReal
-        state.saldoLiquido = saldoLiquido
-        state.tableContent = tableContent
+	handleCancel = (e) => {
+		this.setState({
+			visible: false,
+		})
+	}
 
-        this.setState(state)
-    }
-
-    showModal = (data) => {
-        let state = this.state
-        state.modalContent.id = data.id
-        state.modalContent.banco = data.banco
-        state.modalContent.saldoManual = data.saldoManual
-        state.visible = true
-        this.setState(state);
-    };
-
-    handleOk = e => {
-        const bankToUpdate = {
-            manualBalance: e.saldoManual
-        }
-
-        updateBank(bankToUpdate, e.id)
-            .then((res) => {
-                if (res.data.code === 201 || res.data.code === 202) {
-                    openNotification('success', 'Saldo atualizado', 'Saldo atualizado com sucesso.')
-                    this.getListBanks()
-                }
-                else {
-                    openNotification('error', 'Saldo não atualizado', 'O Saldo não pode ser atualizado.')
-                }
-            })
-            .catch((err) => {
-                openNotification('error', 'Saldo não cadastrado', 'Erro interno. Tente novamente mais tarde.')
-            })
-
-        this.setState({
-            visible: false,
-        });
-    };
-
-    handleCancel = e => {
-        this.setState({
-            visible: false,
-        });
-    };
-
-    render() {
-        return (
-            <>
-                <Modal
-                    title={this.state.modalContent.banco}
-                    visible={this.state.visible}
-                    onOk={() => { this.handleOk(this.state.modalContent) }}
-                    onCancel={this.handleCancel}
-                >
-                    <Input
-                        placeholder=""
-                        type="number"
-                        name="saldoManualModal"
-                        size="md"
-                        value={this.state.modalContent.saldoManual}
-                        onChange={this.handleChange}
-                        style={{ width: 100 }}
-                    />
-                </Modal>
-                <Row style={{ paddingBottom: '10px' }}>
-                    <Col span={12}>
-                        <Statistic title="Previsão de entrada" value={formatMoeda(this.state.saldoNotCompesatedCredit)} />
-                    </Col>
-                    <Col span={12}>
-                        <Statistic title="Previsão Saída" value={formatMoeda(this.state.saldoNotCompesatedDebit)} />
-                    </Col>
-                </Row>
-                <Row style={{ paddingBottom: '10px' }}>
-                    <Col span={12}>
-                        <Statistic title="Saldo Real" value={formatMoeda(this.state.saldoReal)} />
-                    </Col>
-                    <Col span={12}>
-                        <Statistic title="Saldo Líquido" value={formatMoeda(this.state.saldoLiquido)} />
-                    </Col>
-                </Row>
-                <Row style={{ paddingBottom: '20px' }}>
-                    <Col span={12}>
-                        <Statistic title="Saldo do dia" value="Indisponível" />
-                    </Col>
-                </Row>
-                <Title level={4}>Saldo por Banco</Title>
-                <Row>
-                    <Table
-                        pagination={false}
-                        columns={this.columns()}
-                        dataSource={this.state.tableContent}
-                        size="small"
-                        expandable={{
-                            expandedRowRender: record => <p style={{ margin: 0 }}>Diferença: {record.diferenca}</p>,
-                        }}
-                    />
-                </Row>
-            </>
-        )
-    }
+	render() {
+		return (
+			<>
+				<Modal
+					title={this.state.modalContent.banco}
+					visible={this.state.visible}
+					onOk={() => {
+						this.handleOk(this.state.modalContent)
+					}}
+					onCancel={this.handleCancel}
+				>
+					<Input
+						placeholder=''
+						type='number'
+						name='saldoManualModal'
+						size='md'
+						value={this.state.modalContent.saldoManual}
+						onChange={this.handleChange}
+						style={{ width: 100 }}
+					/>
+				</Modal>
+				<Row style={{ paddingBottom: '10px' }}>
+					<Col span={12}>
+						<Statistic
+							title='Previsão de entrada'
+							value={formatMoeda(this.state.saldoNotCompesatedCredit)}
+						/>
+					</Col>
+					<Col span={12}>
+						<Statistic
+							title='Previsão Saída'
+							value={formatMoeda(this.state.saldoNotCompesatedDebit)}
+						/>
+					</Col>
+				</Row>
+				<Row style={{ paddingBottom: '10px' }}>
+					<Col span={12}>
+						<Statistic
+							title='Saldo Real'
+							value={formatMoeda(this.state.saldoReal)}
+						/>
+					</Col>
+					<Col span={12}>
+						<Statistic
+							title='Saldo Líquido'
+							value={formatMoeda(this.state.saldoLiquido)}
+						/>
+					</Col>
+				</Row>
+				<Row style={{ paddingBottom: '20px' }}>
+					<Col span={12}>
+						<Statistic title='Saldo do dia' value='Indisponível' />
+					</Col>
+				</Row>
+				<Title level={4}>Saldo por Banco</Title>
+				<Row>
+					<Table
+						pagination={false}
+						columns={this.columns()}
+						dataSource={this.state.tableContent}
+						size='small'
+						expandable={{
+							expandedRowRender: (record) => (
+								<p style={{ margin: 0 }}>Diferença: {record.diferenca}</p>
+							),
+						}}
+					/>
+				</Row>
+			</>
+		)
+	}
 }
 export default DashboardDebit
