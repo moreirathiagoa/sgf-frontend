@@ -10,6 +10,7 @@ const startServer = () => {
 			return true
 		})
 		.catch((err) => {
+			console.log('error: ',err)
 			return false
 		})
 	return response

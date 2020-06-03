@@ -15,6 +15,7 @@ const listFatures = (idBank) => {
 			return res
 		})
 		.catch((err) => {
+			console.log('error: ',err)
 			return err.response
 		})
 	return response
@@ -34,6 +35,7 @@ const getFature = (idFature) => {
 			return res
 		})
 		.catch((err) => {
+			console.log('error: ',err)
 			return err.response
 		})
 	return response
@@ -53,6 +55,7 @@ const payFature = (idFature) => {
 			return res
 		})
 		.catch((err) => {
+			console.log('error: ',err)
 			return err.response
 		})
 	return response

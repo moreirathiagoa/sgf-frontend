@@ -11,6 +11,7 @@ export default (user) => {
 			return res
 		})
 		.catch((err) => {
+			console.log('error: ',err)
 			return err.response
 		})
 	return response

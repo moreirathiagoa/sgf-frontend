@@ -45,25 +45,25 @@ class MenuPrincipal extends React.Component {
 							<Menu.Item key='1'>
 								<Link to='/dashboard-debit'>
 									<AppstoreOutlined />
-									<span>Dashboard Débito</span>
+									<span>Dashboard Bancos</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key='2'>
 								<Link to='/xpto'>
 									<AppstoreOutlined />
-									<span>Dashboard Crédito</span>
+									<span>Dashboard Cartão</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key='3'>
 								<Link to='/dashboard-plan'>
 									<AppstoreOutlined />
-									<span>Dashboard Plano</span>
+									<span>Projeção Futuro</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key='4'>
 								<Link to='/transaction/contaCorrente'>
 									<WalletOutlined />
-									<span>Novo Débito</span>
+									<span>Novo Conta</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key='5'>
@@ -81,13 +81,13 @@ class MenuPrincipal extends React.Component {
 							<Menu.Item key='7'>
 								<Link to='/extrato-conta'>
 									<FileSearchOutlined />
-									<span>Extrato Débito</span>
+									<span>Extrato Conta</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key='8'>
 								<Link to='/extrato-cartao'>
 									<FileSearchOutlined />
-									<span>Extrato Crédito</span>
+									<span>Extrato Cartão</span>
 								</Link>
 							</Menu.Item>
 							<Menu.Item key='9'>

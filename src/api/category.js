@@ -15,6 +15,7 @@ const listCategories = () => {
 			return res
 		})
 		.catch((err) => {
+			console.log('error: ',err)
 			return err.response
 		})
 	return response
@@ -35,6 +36,7 @@ const createCategory = (category) => {
 			return res
 		})
 		.catch((err) => {
+			console.log('error: ',err)
 			return err.response
 		})
 	return response
@@ -54,6 +56,7 @@ const removeCategory = (id) => {
 			return res
 		})
 		.catch((err) => {
+			console.log('error: ',err)
 			return err.response
 		})
 	return response
@@ -74,6 +77,7 @@ const updateCategory = (category, idCategory) => {
 			return res
 		})
 		.catch((err) => {
+			console.log('error: ',err)
 			return err.response
 		})
 	return response
