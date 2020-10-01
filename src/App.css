@@ -14,14 +14,14 @@
 	color: #ccc;
 }
 
-body{
+body {
 	background: #112338;
 }
-.ant-menu.ant-menu-dark{
+.ant-menu.ant-menu-dark {
 	background: #000129;
 }
 
-.ant-menu-item-selected{
+.ant-menu-item-selected {
 	background: #001529 !important;
 }
 
@@ -47,60 +47,57 @@ body{
 	color: #ccc;
 }
 
-h4.ant-typography{
+h4.ant-typography {
 	color: #ccc;
 }
 
-h3.ant-typography{
+h3.ant-typography {
 	color: #ccc;
 }
 
-.ant-layout-sider-children{
+.ant-layout-sider-children {
 	background: #010304;
 }
 
-
-.ant-collapse-item{
+.ant-collapse-item {
 	background: #2a313a;
 }
 
-.ant-collapse-header{
+.ant-collapse-header {
 	color: #ccc !important;
-	
 }
 
-.ant-form-item-label{
+.ant-form-item-label {
 	color: #ccc;
 }
 
-label{
+label {
 	color: #ccc !important;
 }
 
-.ant-collapse-content-box{
+.ant-collapse-content-box {
 	background: #2a313ae3;
 }
 
-.ant-descriptions-title{
+.ant-descriptions-title {
 	color: #ccc;
 }
 
-.ant-descriptions-item-content{
+.ant-descriptions-item-content {
 	color: #ccc;
 }
 
-.ant-descriptions-item-label{
+.ant-descriptions-item-label {
 	color: #ccc;
 }
 
-.ant-statistic-title{
+.ant-statistic-title {
 	color: #ccc;
 }
 
-.ant-statistic-content{
+.ant-statistic-content {
 	color: #ccc;
 }
 
-.ant-col{
-	
+.ant-col {
 }

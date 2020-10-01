@@ -1,18 +1,19 @@
 import axios from 'axios'
 import properties from '../properties'
 
-export default (user) => {
+const startServer = () => {
 	const response = axios({
-		method: 'post',
-		url: properties.url + 'login',
-		data: user,
+		method: 'get',
+		url: properties.url,
 	})
 		.then((res) => {
-			return res
+			return true
 		})
 		.catch((err) => {
 			console.log('error: ',err)
-			return err.response
+			return false
 		})
 	return response
 }
+
+export { startServer }

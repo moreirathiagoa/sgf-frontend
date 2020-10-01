@@ -10,37 +10,37 @@ import {
 	Dropdown,
 	Descriptions,
 	Typography,
-	Select,
 } from 'antd'
 import {
 	ArrowLeftOutlined,
 	MenuOutlined,
 	PlusCircleOutlined,
 } from '@ant-design/icons'
-import { listBanks, createBank, removeBank, updateBank } from '../api'
-import { openNotification, formatDateToUser, formatMoeda } from '../utils'
+import {
+	createCategory,
+	listCategories,
+	removeCategory,
+	updateCategory,
+} from '../api'
+import { openNotification, formatDateToUser } from '../utils'
 
 const { Panel } = Collapse
 const { Title } = Typography
-const { Option } = Select
 
 function callback(key) {
 	//console.log(key);
 }
 
-class Banks extends React.Component {
+class Categorias extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			banks: [],
+			categories: [],
 			idToUpdate: undefined,
 			list: true,
 			data: {
 				name: '',
 				isActive: true,
-				bankType: '',
-				systemBalance: 0,
-				manualBalance: 0,
 			},
 		}
 		this.handleChange = this.handleChange.bind(this)
@@ -51,20 +51,20 @@ class Banks extends React.Component {
 	}
 
 	componentDidMount() {
-		this.props.mudaTitulo('Bancos')
+		this.props.mudaTitulo('Categorias')
 		this.list()
 	}
 
 	list = () => {
 		this.props.loading(true)
-		listBanks()
+		listCategories()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
 					this.props.verificaLogin()
 				} else {
 					let state = this.state
-					state.banks = res.data.data
+					state.categories = res.data.data
 					this.setState(state)
 				}
 				this.props.loading(false)
@@ -103,7 +103,6 @@ class Banks extends React.Component {
 		state.list = false
 		state.idToUpdate = element._id
 		state.data.name = element.name
-		state.data.bankType = element.bankType
 		state.data.isActive = element.isActive
 		this.setState(state)
 	}
@@ -120,38 +119,34 @@ class Banks extends React.Component {
 				state.data.isActive = !state.data.isActive
 				break
 
-			case 'bankType':
-				state.data.bankType = event.target.value
-				break
-
 			default:
 		}
 		this.setState(state)
 	}
 
 	remover(id) {
-		if (window.confirm('Deseja realmente apagar esse Banco?')) {
-			removeBank(id)
+		if (window.confirm('Deseja realmente apagar essa Categoria?')) {
+			removeCategory(id)
 				.then((res) => {
 					if (res.data.code === 202) {
 						openNotification(
 							'success',
-							'Banco removido',
-							'Banco removido com sucesso.'
+							'Categoria removida',
+							'Categoria removida com sucesso.'
 						)
 						this.list()
 					} else {
 						openNotification(
 							'error',
-							'Banco não removido',
-							'O Banco não pode ser removido.'
+							'Categoria não removida',
+							'A Categoria não pode ser removida.'
 						)
 					}
 				})
 				.catch((err) => {
 					openNotification(
 						'error',
-						'Banco não removido',
+						'Categoria não removida',
 						'Erro interno. Tente novamente mais tarde.'
 					)
 				})
@@ -164,56 +159,56 @@ class Banks extends React.Component {
 	}
 
 	cadastrar() {
-		createBank(this.state.data)
+		createCategory(this.state.data)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
 					openNotification(
 						'success',
-						'Banco cadastrado',
-						'Banco cadastrado com sucesso.'
+						'Categoria cadastrada',
+						'Categoria cadastrada com sucesso.'
 					)
 					this.list()
 					this.limpaDataState()
 				} else {
 					openNotification(
 						'error',
-						'Banco não cadastrado',
-						'O Banco não pode ser cadastrado.'
+						'Categoria não cadastrada',
+						'A Categoria não pode ser cadastrada.'
 					)
 				}
 			})
 			.catch((err) => {
 				openNotification(
 					'error',
-					'Banco não cadastrado',
+					'Categoria não cadastrada',
 					'Erro interno. Tente novamente mais tarde.'
 				)
 			})
 	}
 
 	atualizar() {
-		updateBank(this.state.data, this.state.idToUpdate)
+		updateCategory(this.state.data, this.state.idToUpdate)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
 					openNotification(
 						'success',
-						'Banco atualizado',
-						'Banco atualizado com sucesso.'
+						'Categoria atualizada',
+						'Categoria atualizada com sucesso.'
 					)
 					this.list()
 					this.limpaDataState()
 				} else {
 					openNotification(
 						'error',
-						'Banco não atualizado',
-						'O Banco não pode ser atualizado.'
+						'Categoria não atualizada',
+						'A Categoria não pode ser atualizada.'
 					)
 				}
 			})
 			.catch((err) => {
 				openNotification(
 					'error',
-					'Banco não cadastrado',
+					'Categoria não cadastrada',
 					'Erro interno. Tente novamente mais tarde.'
 				)
 			})
@@ -239,11 +234,11 @@ class Banks extends React.Component {
 				{this.state.list ? (
 					<div>
 						<Title level={3}>
-							Lista de Bancos{' '}
+							Lista de Categorias{' '}
 							<PlusCircleOutlined onClick={() => this.actionButtonNew()} />
 						</Title>
 						<Collapse onChange={callback} expandIconPosition='left'>
-							{this.state.banks.map((element) => {
+							{this.state.categories.map((element) => {
 								return (
 									<Panel
 										header={element.name}
@@ -256,16 +251,7 @@ class Banks extends React.Component {
 												{element.name}
 											</Descriptions.Item>
 											<Descriptions.Item label='Status'>
-												{element.isActive ? 'Ativo' : 'Inativo'}
-											</Descriptions.Item>
-											<Descriptions.Item label='Tipo'>
-												{element.bankType}
-											</Descriptions.Item>
-											<Descriptions.Item label='Saldo Sistema'>
-												{formatMoeda(element.systemBalance)}
-											</Descriptions.Item>
-											<Descriptions.Item label='Saldo Manual'>
-												{formatMoeda(element.manualBalance)}
+												{element.isActive ? 'Ativa' : 'Inativa'}
 											</Descriptions.Item>
 											<Descriptions.Item label='Data Criação'>
 												{formatDateToUser(element.createDate)}
@@ -280,7 +266,7 @@ class Banks extends React.Component {
 					<div>
 						<Title level={3}>
 							<ArrowLeftOutlined onClick={() => this.actionButtonNew()} /> Dados
-							do Banco
+							da Categoria
 						</Title>
 						<Form
 							labelCol={{ span: 4 }}
@@ -294,9 +280,9 @@ class Banks extends React.Component {
 								console.log('falhou')
 							}}
 						>
-							<Form.Item label='Nome de Banco'>
+							<Form.Item label='Nome da Categoria'>
 								<Input
-									placeholder='Banco'
+									placeholder='Categoria'
 									type='text'
 									name='name'
 									size='md'
@@ -304,26 +290,7 @@ class Banks extends React.Component {
 									onChange={this.handleChange}
 								/>
 							</Form.Item>
-
-							<Form.Item label='Tipo de Banco'>
-								<Select
-									name='bankType'
-									defaultValue='Selecione'
-									size='md'
-									style={{ width: 200 }}
-									onSelect={(value) => {
-										const event = { target: { name: 'bankType', value: value } }
-										this.handleChange(event)
-									}}
-								>
-									<Option value='Conta Corrente'>Conta Corrente</Option>
-									<Option value='Conta Cartão'>Conta Cartão</Option>
-									<Option value='Cartão de Crédito'>Cartão de Crédito</Option>
-									<Option value='Poupança'>Poupança</Option>
-								</Select>
-							</Form.Item>
-
-							<Form.Item label='Banco Ativo'>
+							<Form.Item label='Categoria Ativa'>
 								<span onClick={this.handleChange}>
 									<Switch
 										name='isActive'
@@ -350,4 +317,4 @@ class Banks extends React.Component {
 	}
 }
 
-export default Banks
+export default Categorias

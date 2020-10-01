@@ -1,12 +1,12 @@
 import axios from 'axios'
 import properties from '../properties'
 
-const listCategories = () => {
+const listFatures = (idBank) => {
 	const token = localStorage.getItem('token')
 
 	const response = axios({
 		method: 'get',
-		url: properties.url + 'category/list',
+		url: properties.url + 'fature/list/' + idBank,
 		headers: {
 			auth: token,
 		},
@@ -21,13 +21,12 @@ const listCategories = () => {
 	return response
 }
 
-const createCategory = (category) => {
+const getFature = (idFature) => {
 	const token = localStorage.getItem('token')
 
 	const response = axios({
-		method: 'post',
-		url: properties.url + 'category/create',
-		data: category,
+		method: 'get',
+		url: properties.url + 'fature/' + idFature,
 		headers: {
 			auth: token,
 		},
@@ -42,12 +41,12 @@ const createCategory = (category) => {
 	return response
 }
 
-const removeCategory = (id) => {
+const payFature = (idFature) => {
 	const token = localStorage.getItem('token')
 
 	const response = axios({
-		method: 'delete',
-		url: properties.url + 'category/delete/' + id,
+		method: 'get',
+		url: properties.url + 'fature/pay/' + idFature,
 		headers: {
 			auth: token,
 		},
@@ -62,25 +61,4 @@ const removeCategory = (id) => {
 	return response
 }
 
-const updateCategory = (category, idCategory) => {
-	const token = localStorage.getItem('token')
-
-	const response = axios({
-		method: 'put',
-		url: properties.url + 'category/update/' + idCategory,
-		data: category,
-		headers: {
-			auth: token,
-		},
-	})
-		.then((res) => {
-			return res
-		})
-		.catch((err) => {
-			console.log('error: ',err)
-			return err.response
-		})
-	return response
-}
-
-export { listCategories, createCategory, removeCategory, updateCategory }
+export { listFatures, payFature, getFature }

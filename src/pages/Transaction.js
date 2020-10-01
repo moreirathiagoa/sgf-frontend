@@ -1,380 +1,519 @@
-import React from 'react';
+import React from 'react'
 import '../App.css'
+import { Redirect } from 'react-router-dom'
+import { Form, Input, Button, Switch, Row, Col, DatePicker } from 'antd'
 import {
-    Form,
-    Input,
-    Button,
-    Switch,
-    Collapse,
-    Typography,
-    Select,
-    Radio,
-    Row,
-    Col,
-    DatePicker,
-} from 'antd';
-import { createTransaction, updateTransaction, listBanks, listCategories } from '../api'
-import { openNotification } from '../utils'
-import moment from 'moment'
-
-const { Option } = Select;
-const formatDate = 'DD/MM/YYYY'
+	createTransaction,
+	updateTransaction,
+	listBanks,
+	listCategories,
+	getTransaction,
+	getFature,
+} from '../api'
+import {
+	openNotification,
+	actualDateToUser,
+	formatDateToMoment,
+	formatDateToUser,
+} from '../utils'
+import { SelectCategories, SelectBank, SelectFacture } from '../components'
 
 class Transaction extends React.Component {
+	constructor(props) {
+		const param = window.location.pathname
+		const typeTransaction = param.split('/')[2]
+		const parameter = param.split('/')[3]
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            idToUpdate: undefined,
-            screenType: 'contaCorrente',
-            data: {
-                isCompesed: true,
-                efectedDate: moment(moment(), formatDate),
-                description: null,
-                value: '',
-                currentRecurrence: null,
-                finalRecurrence: null,
-                bank_id: null,
-                category_id: null,
-                fature_id: null,
-                isSimples: false,
-                isCredit: false
-            },
-            banks: [],
-            categories: []
-        }
-        this.handleChange = this.handleChange.bind(this)
-        this.submitForm = this.submitForm.bind(this)
+		let idTransaction
+		if (parameter !== 'pagamentoCartao') {
+			idTransaction = parameter
+		}
 
-        this.getListBanks()
-        this.getListCategories()
-    }
+		super(props)
+		this.state = {
+			idToUpdate: idTransaction,
+			screenType: null,
+			data: {
+				effectiveDate: actualDateToUser(),
+				bank_id: 'Selecione',
+				category_id: 'Selecione',
+				isSimples: false,
+				typeTransaction: typeTransaction,
+			},
+			allBanks: [],
+			banks: [],
+			categories: [],
+			fatures: [],
+			saveExit: null,
+			exit: false,
+		}
+		this.handleChange = this.handleChange.bind(this)
+		this.submitForm = this.submitForm.bind(this)
+	}
 
-    componentDidMount() {
-        this.props.mudaTitulo("Transação")
-    }
+	UNSAFE_componentWillReceiveProps() {
+		const param = window.location.pathname
+		const typeTransaction = param.split('/')[2]
+		let state = this.state
+		if (typeTransaction === 'contaCorrente') state.data.isCompensated = true
+		state.data.typeTransaction = typeTransaction
+		this.setState(state)
+		this.getListBanks(typeTransaction)
+	}
 
-    getListBanks() {
-        listBanks()
-            .then((res) => {
-                if (res.status === 401) {
-                    localStorage.removeItem('token')
-                    this.props.verificaLogin()
-                }
-                else {
-                    let state = this.state
-                    state.banks = res.data.data
-                    this.setState(state)
-                }
-            })
-            .catch((err) => {
-                openNotification('error', 'Erro interno', 'Erro ao obter a listagem de Bancos.')
-            })
-    }
+	componentDidMount() {
+		const param = window.location.pathname
+		const parameter = param.split('/')[3]
+		if (parameter === 'pagamentoCartao') {
+			const fatureId = param.split('/')[4]
+			this.getDataFromFature(fatureId)
+		}
 
-    getListCategories() {
-        listCategories()
-            .then((res) => {
-                if (res.status === 401) {
-                    localStorage.removeItem('token')
-                    this.props.verificaLogin()
-                }
-                else {
-                    let state = this.state
-                    state.categories = res.data.data
-                    this.setState(state)
-                }
-            })
-            .catch((err) => {
-                openNotification('error', 'Erro ao listar', 'Erro interno. Tente novamente mais tarde.')
-            })
-    }
+		this.props.mudaTitulo('Nova Transação')
+		let now = new Date()
 
-    handleChange(event) {
-        let state = this.state
+		let state = this.state
 
-        switch (event.target.name) {
+		now.setDate('10')
+		now.setDate(now.getDate() - 30)
+		for (let i = 0; i <= 12; i++) {
+			const mes = now.getMonth() + 1
+			const ano = now.getFullYear()
+			let mesFinal = '00' + mes
+			mesFinal = mesFinal.substr(mesFinal.length - 2)
+			let fatura = {
+				_id: ano + '/' + mesFinal,
+				name: ano + '/' + mesFinal,
+			}
 
-            case 'screenType':
-                state.screenType = event.target.value
-                break
+			state.fatures.push(fatura)
+			now.setDate(now.getDate() + 30)
+		}
+		this.setState(state)
 
-            case 'isCompesed':
-                state.data.isCompesed = !state.data.isCompesed
-                break
+		this.getListCategories()
+		if (this.state.idToUpdate) {
+			this.getTransactionToUpdate(this.state.idToUpdate)
+		}
+	}
 
-            case 'efectedDate':
-                state.data.efectedDate = event.target.value
-                break
+	getTransactionToUpdate(idTransaction) {
+		getTransaction(idTransaction)
+			.then((res) => {
+				if (res.status === 401) {
+					localStorage.removeItem('token')
+					this.props.verificaLogin()
+				} else {
+					let state = this.state
+					state.data = res.data.data
 
-            case 'description':
-                state.data.description = event.target.value
-                break
+					if (res.data.data.fature_id)
+						state.data.fature = res.data.data.fature_id.name
 
-            case 'value':
-                state.data.value = event.target.value
-                break
+					state.data.effectiveDate = formatDateToUser(
+						res.data.data.effectiveDate
+					)
+					state.banks = state.allBanks
 
-            case 'finalRecurrence':
-                state.data.finalRecurrence = event.target.value
-                break
+					this.setState(state)
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Erro interno',
+					'Erro ao obter a listagem de Bancos.'
+				)
+			})
+	}
 
-            case 'bank_id':
-                state.data.bank_id = event.target.value
-                break
+	getListBanks(typeTransaction) {
+		listBanks(typeTransaction)
+			.then((res) => {
+				if (res.status === 401) {
+					localStorage.removeItem('token')
+					this.props.verificaLogin()
+				} else {
+					let state = this.state
+					state.banks = res.data.data
+					this.setState(state)
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Erro interno',
+					'Erro ao obter a listagem de Transações.'
+				)
+			})
+	}
 
-            case 'category_id':
-                state.data.category_id = event.target.value
-                break
+	getListCategories() {
+		listCategories()
+			.then((res) => {
+				if (res.status === 401) {
+					localStorage.removeItem('token')
+					this.props.verificaLogin()
+				} else {
+					let state = this.state
+					state.categories = res.data.data
+					this.setState(state)
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Erro ao listar',
+					'Erro interno. Tente novamente mais tarde.'
+				)
+			})
+	}
 
-            case 'fature_id':
-                state.data.fature_id = event.target.value
-                break
+	getDataFromFature(fatureId) {
+		getFature(fatureId)
+			.then((res) => {
+				if (res.status === 401) {
+					localStorage.removeItem('token')
+					this.props.verificaLogin()
+				} else {
+					const fatureInformation = res.data.data
+					let state = this.state
+					state.data.description = `Pg. Fatura ${fatureInformation.name} - ${fatureInformation.bank_id.name}`
+					state.data.value = fatureInformation.fatureBalance
+					this.setState(state)
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Erro interno',
+					'Erro ao obter a listagem de Bancos.'
+				)
+			})
+	}
 
-            case 'isSimples':
-                state.data.isSimples = !state.data.isSimples
-                break
+	handleChange(event) {
+		let state = this.state
 
-            case 'isCredit':
-                state.data.isCredit = !state.data.isCredit
-                break
+		switch (event.target.name) {
+			case 'isCompensated':
+				state.data.isCompensated = !state.data.isCompensated
+				break
 
-            default:
-        }
-        this.setState(state)
-    }
+			case 'effectiveDate':
+				state.data.effectiveDate = event.target.value
+				break
 
-    submitForm(e) {
-        if (this.state.idToUpdate)
-            this.atualizar(e)
-        else
-            this.cadastrar(e)
-    }
+			case 'description':
+				state.data.description = event.target.value
+				break
 
-    cadastrar() {
-        createTransaction(this.state.data)
-            .then((res) => {
-                if (res.data.code === 201 || res.data.code === 202) {
-                    openNotification('success', 'Transação cadastrada', 'Transação cadastrada com sucesso.')
-                    this.limpaDataState()
-                }
-                else {
-                    openNotification('error', 'Transação não cadastrada', 'A Transação não pode ser cadastrada')
-                }
+			case 'value':
+				state.data.value = event.target.value
+				break
 
-            })
-            .catch((err) => {
-                openNotification('error', 'Transação não cadastrada', 'Erro interno. Tente novamente mais tarde.')
-            })
-    }
+			case 'currentRecurrence':
+				state.data.currentRecurrence = event.target.value
+				break
 
-    atualizar() {
-        updateTransaction(this.state.data, this.state.idToUpdate)
-            .then((res) => {
-                if (res.data.code === 201 || res.data.code === 202) {
-                    openNotification('success', 'Transação atualizada', 'Transação atualizada com sucesso.')
-                    this.limpaDataState()
-                }
-                else {
-                    openNotification('error', 'Transação não atualizada', 'A Transação não pode ser atualizada.')
-                }
-            })
-            .catch((err) => {
-                openNotification('error', 'Transação não cadastrada', 'Erro interno. Tente novamente mais tarde.')
-            })
-    }
+			case 'finalRecurrence':
+				state.data.finalRecurrence = event.target.value
+				break
 
-    limpaDataState() {
-        let state = this.state
-        state.list = true
-        state.data.name = ''
-        state.data.isActive = true
-        state.idToUpdate = undefined
-        this.setState(state)
-    }
+			case 'bank_id':
+				state.data.bank_id = event.target.value
+				break
 
-    render() {
-        return (
-            <div>
-                <Form
-                    labelCol={{ span: 4, }}
-                    wrapperCol={{ span: 14, }}
-                    layout="horizontal"
-                    size={'small'}
-                    name="basic"
-                    initialValues={{ remember: true }}
-                    onFinish={this.submitForm}
-                    onFinishFailed={() => { console.log('falhou') }}
-                >
-                    <Form.Item label="Tipo de Transação">
-                        <Radio.Group name="screenType" onChange={this.handleChange} defaultValue="contaCorrente" buttonStyle="solid" size="md">
-                            <Radio.Button value="contaCorrente">Conta</Radio.Button>
-                            <Radio.Button value="cartaoCredito">Crédito</Radio.Button>
-                            <Radio.Button value="planejamento">Plano</Radio.Button>
-                            <Radio.Button value="planejamento" disabled>Investimento</Radio.Button>
-                        </Radio.Group>
-                    </Form.Item>
+			case 'category_id':
+				state.data.category_id = event.target.value
+				break
 
-                    <Form.Item label="Banco">
-                        <Select
-                            name="bank_id"
-                            defaultValue="Selecione"
-                            size="md"
-                            style={{ width: 200 }}
-                            onSelect={(value) => {
-                                const event = { target: { name: 'bank_id', value: value } }
-                                this.handleChange(event)
-                            }}
-                        >
-                            {this.state.banks.map(element => {
-                                return (
-                                    <Option value={element._id}>{element.name}</Option>
-                                )
-                            })}
-                        </Select>
-                    </Form.Item>
+			case 'fature_id':
+				state.data.fature = event.target.value
+				break
 
-                    <Form.Item label="Categoria">
-                        <Select
-                            name="category_id"
-                            defaultValue="Selecione"
-                            size="md"
-                            style={{ width: 200 }}
-                            onSelect={(value) => {
-                                const event = { target: { name: 'category_id', value: value } }
-                                this.handleChange(event)
-                            }}
-                        >
-                            {this.state.categories.map(element => {
-                                return (
-                                    <Option value={element._id}>{element.name}</Option>
-                                )
-                            })}
-                        </Select>
-                    </Form.Item>
+			case 'isSimples':
+				state.data.isSimples = !state.data.isSimples
+				break
 
-                    <Form.Item label="Data da Transação">
-                        <Row>
-                            <Col span={12}>
+			case 'salvarSair':
+				state.saveExit = true
+				break
 
-                                <DatePicker
-                                    format={formatDate}
-                                    name="efectedDate"
-                                    size="md"
-                                    defaultValue={moment(this.state.data.efectedDate, "DD/MM/YYYY")}
-                                    onChange={(date, dateString) => {
-                                        const event = { target: { name: 'efectedDate', value: dateString } }
-                                        this.handleChange(event)
-                                    }}
-                                />
-                            </Col>
-                            <Col span={10}>
-                                {this.state.screenType === 'contaCorrente' &&
-                                    <>
-                                        <span style={{ color: '#ccc' }}>Compensado: </span>
-                                        <span onClick={this.handleChange}>
-                                            <Switch name="isCompesed" checked={this.state.data.isCompesed} size="md" />
-                                        </span>
-                                    </>
-                                }
-                            </Col>
-                        </Row>
-                    </Form.Item>
+			case 'salvar':
+				state.saveExit = false
+				break
 
-                    <Form.Item label="Valor da Transação">
-                        <Row>
-                            <Col span={8}>
-                                <Input
-                                    placeholder=""
-                                    type="number"
-                                    name="value"
-                                    size="md"
-                                    value={this.state.data.value}
-                                    onChange={this.handleChange}
-                                    style={{ width: 100 }}
-                                />
-                            </Col>
-                            <Col span={10}>
-                                <span style={{ color: '#ccc' }}>Crédito: </span>
-                                <span onClick={this.handleChange}>
-                                    <Switch name="isCredit" checked={this.state.data.isCredit} size="md" />
-                                </span>
-                            </Col>
-                        </Row>
-                    </Form.Item>
+			default:
+		}
+		this.setState(state)
+	}
 
-                    <Form.Item label="Descrição">
-                        <Input
-                            placeholder=""
-                            type="text"
-                            name="description"
-                            size="md"
-                            value={this.state.data.description}
-                            onChange={this.handleChange}
-                            style={{ width: 350 }}
-                        />
-                    </Form.Item>
-                    {this.state.screenType === 'cartaoCredito' &&
-                        <Form.Item label="Fatura">
-                            <Select
-                                name="fature_id"
-                                defaultValue="Selecione"
-                                size="md"
-                                style={{ width: 200 }}
-                                onSelect={(value) => {
-                                    const event = { target: { name: 'fature_id', value: value } }
-                                    this.handleChange(event)
-                                }}
-                            >
-                                <Option value="1">05/2020</Option>
-                                <Option value="2">06/2020</Option>
-                                <Option value="3">07/2020</Option>
-                            </Select>
-                        </Form.Item>
-                    }
-                    <Form.Item label="Recorrência">
-                        <Row>
-                            {this.state.idToUpdate &&
-                                <Col span={6}>
-                                    <Input
-                                        placeholder="Atual"
-                                        type="number"
-                                        name="finalRecurrence"
-                                        size="md"
-                                        value={this.state.data.currentRecurrence}
-                                        onChange={this.handleChange}
-                                        style={{ width: 60 }}
-                                    />
-                                </Col>
-                            }
-                            <Col span={6}>
-                                <Input
-                                    placeholder="Final"
-                                    type="number"
-                                    name="finalRecurrence"
-                                    size="md"
-                                    value={this.state.data.finalRecurrence}
-                                    onChange={this.handleChange}
-                                    style={{ width: 60 }}
-                                />
-                            </Col>
-                            <Col span={8}>
-                                <span onClick={this.handleChange}>
-                                    <span style={{ color: '#ccc' }}>Simples:</span> <Switch name="isSimples" checked={this.state.data.isSimples} size="md" />
-                                </span>
-                            </Col>
-                        </Row>
-                    </Form.Item>
+	submitForm(e) {
+		if (this.state.idToUpdate) this.atualizar(e)
+		else this.cadastrar(e)
+	}
 
-                    <Form.Item label="Ação">
-                        <Button className="btn-fill" size="lg" type="primary" htmlType="submit">
-                            Confirmar
-                        </Button>
-                    </Form.Item>
-                </Form>
-            </div>
-        )
-    }
+	cadastrar() {
+		createTransaction(this.state.data)
+			.then((res) => {
+				if (res.data.code === 201 || res.data.code === 202) {
+					openNotification(
+						'success',
+						'Transação cadastrada',
+						'Transação cadastrada com sucesso.'
+					)
+					this.limpaDataState()
+				} else {
+					openNotification(
+						'error',
+						'Transação não cadastrada',
+						res.data.message
+					)
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Transação não cadastrada',
+					'Erro interno. Tente novamente mais tarde.'
+				)
+			})
+	}
+
+	atualizar() {
+		updateTransaction(this.state.data, this.state.idToUpdate)
+			.then((res) => {
+				if (res.data.code === 201 || res.data.code === 202) {
+					openNotification(
+						'success',
+						'Transação atualizada',
+						'Transação atualizada com sucesso.'
+					)
+					this.limpaDataState()
+				} else {
+					openNotification(
+						'error',
+						'Transação não atualizada',
+						'A Transação não pode ser atualizada.'
+					)
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Transação não cadastrada',
+					'Erro interno. Tente novamente mais tarde.'
+				)
+			})
+	}
+
+	limpaDataState() {
+		let state = this.state
+		if (state.saveExit === true) {
+			state.exit = true
+		}
+		this.setState(state)
+	}
+
+	render() {
+		if (this.state.exit === true) {
+			if (this.state.idToUpdate) {
+				switch (this.state.data.typeTransaction) {
+					case 'contaCorrente':
+						return <Redirect to='/extrato-conta' />
+					case 'cartaoCredito':
+						return <Redirect to='/extrato-cartao' />
+					case 'planejamento':
+						return <Redirect to='/extrato-plano' />
+					default:
+				}
+			} else {
+				return <Redirect to='/dashboard-debit' />
+			}
+		}
+
+		return (
+			<div>
+				<Form
+					labelCol={{ span: 4 }}
+					wrapperCol={{ span: 14 }}
+					layout='horizontal'
+					size={'small'}
+					name='basic'
+					initialValues={{ remember: true }}
+					onFinish={this.submitForm}
+					onFinishFailed={() => {
+						console.log('falhou')
+					}}
+				>
+					<Form.Item label='Banco'>
+						<SelectBank
+							handleChange={this.handleChange}
+							bank_id={this.state.data.bank_id}
+							banks={this.state.banks}
+						/>
+					</Form.Item>
+
+					<Form.Item label='Categoria'>
+						<SelectCategories
+							handleChange={this.handleChange}
+							category_id={this.state.data.category_id}
+							categories={this.state.categories}
+						/>
+					</Form.Item>
+
+					<Form.Item label='Data da Transação'>
+						<Row>
+							<Col span={8}>
+								<DatePicker
+									format={'DD/MM/YYYY'}
+									name='effectiveDate'
+									size='md'
+									defaultValue={formatDateToMoment(
+										this.state.data.effectiveDate
+									)}
+									onChange={(date, dateString) => {
+										const event = {
+											target: {
+												name: 'effectiveDate',
+												value: dateString,
+											},
+										}
+										this.handleChange(event)
+									}}
+								/>
+							</Col>
+							<Col span={10}>
+								{this.state.data.typeTransaction === 'contaCorrente' && (
+									<>
+										<span
+											style={{ padding: '0 10px' }}
+											onClick={this.handleChange}
+										>
+											<Switch
+												name='isCompensated'
+												checked={this.state.data.isCompensated}
+												size='md'
+											/>
+										</span>
+										<span style={{ color: '#ccc' }}>
+											{this.state.data.isCompensated
+												? 'Compensado'
+												: 'Programado'}
+										</span>
+									</>
+								)}
+							</Col>
+						</Row>
+					</Form.Item>
+
+					<Form.Item label='Valor da Transação'>
+						<Input
+							placeholder=''
+							type='number'
+							name='value'
+							size='md'
+							value={this.state.data.value}
+							onChange={this.handleChange}
+							style={{ width: 100 }}
+						/>
+					</Form.Item>
+
+					<Form.Item label='Descrição'>
+						<Input
+							placeholder=''
+							type='text'
+							name='description'
+							size='md'
+							value={this.state.data.description}
+							onChange={this.handleChange}
+							style={{ width: 350 }}
+						/>
+					</Form.Item>
+					{this.state.data.typeTransaction === 'cartaoCredito' && (
+						<Form.Item label='Fatura'>
+							<SelectFacture
+								handleChange={this.handleChange}
+								fature_id={this.state.data.fature}
+								fatures={this.state.fatures}
+							/>
+						</Form.Item>
+					)}
+					<Form.Item label='Recorrência'>
+						<Row>
+							{this.state.idToUpdate && (
+								<Col span={6}>
+									<Input
+										placeholder='Atual'
+										type='number'
+										name='currentRecurrence'
+										size='md'
+										value={this.state.data.currentRecurrence}
+										onChange={this.handleChange}
+										style={{ width: 60 }}
+									/>
+								</Col>
+							)}
+							<Col span={8}>
+								<Input
+									placeholder='Final'
+									type='number'
+									name='finalRecurrence'
+									size='md'
+									value={this.state.data.finalRecurrence}
+									onChange={this.handleChange}
+									style={{ width: 60 }}
+								/>
+							</Col>
+							<Col span={10}>
+								<span style={{ padding: '0 10px' }} onClick={this.handleChange}>
+									<Switch
+										name='isSimples'
+										checked={this.state.data.isSimples}
+										size='md'
+									/>
+								</span>
+								<span style={{ color: '#ccc' }}>
+									{this.state.data.isSimples ? 'Simples' : 'Completa'}
+								</span>
+							</Col>
+						</Row>
+					</Form.Item>
+
+					<Form.Item label='Ação'>
+						<Row>
+							{!this.state.idToUpdate && (
+								<Col span={8}>
+									<Button
+										className='btn-fill'
+										size='lg'
+										htmlType='submit'
+										name='salvar'
+										onClick={this.handleChange}
+									>
+										Salvar
+									</Button>
+								</Col>
+							)}
+							<Col span={8}>
+								<Button
+									className='btn-fill'
+									size='lg'
+									type='primary'
+									htmlType='submit'
+									name='salvarSair'
+									onClick={this.handleChange}
+								>
+									Salvar e Sair
+								</Button>
+							</Col>
+						</Row>
+					</Form.Item>
+				</Form>
+			</div>
+		)
+	}
 }
 
 export default Transaction
