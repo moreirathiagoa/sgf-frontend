@@ -1,7 +1,7 @@
 import React from 'react'
 import { Row, Col, Card } from 'antd'
 import '../App.css'
-import { listBanksDashboard, futureTransationBalance } from '../api'
+import { listBanksDashboard, futureTransactionBalance } from '../api'
 import { openNotification, formatMoeda } from '../utils'
 
 class DashboardPlan extends React.Component {
@@ -25,7 +25,7 @@ class DashboardPlan extends React.Component {
 	}
 
 	initFutureTransationBalance() {
-		futureTransationBalance()
+		futureTransactionBalance()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')

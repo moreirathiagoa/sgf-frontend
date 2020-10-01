@@ -23,6 +23,6 @@ export {
 	getSaldosNaoCompensadoCredit,
 	getSaldosNaoCompensadoDebit,
 	planToPrincipal,
-	futureTransationBalance,
-} from './transacao'
+	futureTransactionBalance,
+} from './transaction'
 export { startServer } from './verification'
