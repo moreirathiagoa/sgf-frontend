@@ -2,11 +2,11 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import DashboardDebit from './pages/DashboardDebit'
 import DashboardPlan from './pages/DashboardPlan'
-import Categoria from './pages/Categorias'
+import Category from './pages/Category'
 import Transaction from './pages/Transaction'
-import ExtratoConta from './pages/ExtratoConta'
-import ExtratoCartao from './pages/ExtratoCartao'
-import ExtratoPlano from './pages/ExtratoPlano'
+import ExtractAccount from './pages/ExtractAccount'
+import ExtractCard from './pages/ExtractCard'
+import ExtractPlan from './pages/ExtractPlan'
 import Bank from './pages/Bank'
 import NotFound from './pages/NotFound'
 import Login from './pages/Login'
@@ -76,28 +76,28 @@ class Router extends React.Component {
 					/>
 				</Route>
 				<Route path='/extrato-conta'>
-					<ExtratoConta
+					<ExtractAccount
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
 				<Route path='/extrato-cartao'>
-					<ExtratoCartao
+					<ExtractCard
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
 				<Route path='/extrato-plano'>
-					<ExtratoPlano
+					<ExtractPlan
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
 				<Route path='/category'>
-					<Categoria
+					<Category
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}

@@ -3,6 +3,7 @@ import '../App.css'
 import { Link, Redirect } from 'react-router-dom'
 import {
 	Input,
+	Checkbox,
 	Collapse,
 	Menu,
 	Dropdown,
@@ -18,17 +19,12 @@ import {
 	SelectCategories,
 	SelectBank,
 } from '../components'
-import {
-	MenuOutlined,
-	PlusCircleOutlined,
-	CheckOutlined,
-} from '@ant-design/icons'
+import { MenuOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import {
 	listBanks,
 	listTransaction,
 	removeTransaction,
 	listCategories,
-	planToPrincipal,
 } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
@@ -39,16 +35,16 @@ function callback(key) {
 	//console.log(key);
 }
 
-class ExtractPlan extends React.Component {
+class ExtractAcount extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			transations: [],
-			allTransations: [],
+			transactions: [],
+			allTransactions: [],
 
 			year: '',
 			month: '',
-			notCompensed: false,
+			notCompensated: false,
 			bank_id: 'Selecione',
 			category_id: 'Selecione',
 			description: '',
@@ -60,27 +56,26 @@ class ExtractPlan extends React.Component {
 		}
 		this.handleChange = this.handleChange.bind(this)
 		this.submitForm = this.submitForm.bind(this)
-		this.toAccount = this.toAccount.bind(this)
 		this.getListBanks()
 		this.getListCategories()
 	}
 
 	componentDidMount() {
-		this.props.mudaTitulo('Extrato Planejamentos Futuros')
+		this.props.mudaTitulo('Extrato Contas Corrente')
 		this.list()
 	}
 
 	list = () => {
 		this.props.loading(true)
-		listTransaction('planejamento')
+		listTransaction('contaCorrente')
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
 					this.props.verificaLogin()
 				} else {
 					let state = this.state
-					state.transations = res.data.data
-					state.allTransations = res.data.data
+					state.transactions = res.data.data
+					state.allTransactions = res.data.data
 					this.setState(state)
 				}
 				this.props.loading(false)
@@ -146,7 +141,7 @@ class ExtractPlan extends React.Component {
 				break
 
 			case 'clearFilter':
-				state.transations = state.allTransations
+				state.transactions = state.allTransactions
 				break
 
 			case 'name':
@@ -168,6 +163,12 @@ class ExtractPlan extends React.Component {
 
 			case 'month':
 				state.month = event.target.value
+				this.filterList()
+				break
+
+			case 'notCompensated':
+				console.log('vai mudar')
+				state.notCompensated = !state.notCompensated
 				this.filterList()
 				break
 
@@ -194,12 +195,12 @@ class ExtractPlan extends React.Component {
 	filterList() {
 		let state = this.state
 
-		const transationFiltred = state.allTransations.filter((transation) => {
+		const transactionFiltered = state.allTransactions.filter((transaction) => {
 			let toReturn = true
 
 			if (this.state.bank_id.toString() !== 'Selecione') {
 				if (
-					transation.bank_id._id.toString() !== this.state.bank_id.toString()
+					transaction.bank_id._id.toString() !== this.state.bank_id.toString()
 				) {
 					toReturn = false
 				}
@@ -207,7 +208,7 @@ class ExtractPlan extends React.Component {
 
 			if (this.state.category_id.toString() !== 'Selecione') {
 				if (
-					transation.category_id._id.toString() !==
+					transaction.category_id._id.toString() !==
 					this.state.category_id.toString()
 				) {
 					toReturn = false
@@ -215,15 +216,21 @@ class ExtractPlan extends React.Component {
 			}
 
 			if (this.state.description !== '') {
-				const description = transation.description.toLowerCase()
+				const description = transaction.description.toLowerCase()
 				const filterDescription = this.state.description.toLowerCase()
 				if (!description.includes(filterDescription)) {
 					toReturn = false
 				}
 			}
 
+			if (this.state.notCompensated) {
+				if (transaction.isCompesed) {
+					toReturn = false
+				}
+			}
+
 			if (this.state.year !== '') {
-				let now = new Date(transation.efectedDate)
+				let now = new Date(transaction.efectedDate)
 				const ano = now.getFullYear()
 
 				if (ano.toString() !== this.state.year.toString()) {
@@ -232,7 +239,7 @@ class ExtractPlan extends React.Component {
 			}
 
 			if (this.state.month !== '') {
-				let now = new Date(transation.efectedDate)
+				let now = new Date(transaction.efectedDate)
 				const mes = now.getMonth() + 1
 
 				if (mes.toString() !== this.state.month.toString()) {
@@ -241,12 +248,12 @@ class ExtractPlan extends React.Component {
 			}
 
 			if (toReturn) {
-				return transation
+				return transaction
 			}
 			return null
 		})
 
-		state.transations = transationFiltred
+		state.transactions = transactionFiltered
 		this.setState(state)
 	}
 
@@ -283,35 +290,6 @@ class ExtractPlan extends React.Component {
 		this.setState({ idToEdit: idTransaction })
 	}
 
-	toAccount() {
-		if (window.confirm('Deseja lançar essas transações em Conta Corrente?')) {
-			planToPrincipal(this.state.transations)
-				.then((res) => {
-					if (res.data.code === 201 || res.data.code === 202) {
-						openNotification(
-							'success',
-							'Transação atualizadas',
-							'Transação atualizadas com sucesso.'
-						)
-						this.list()
-					} else {
-						openNotification(
-							'error',
-							'Transação não atualizada',
-							res.data.message
-						)
-					}
-				})
-				.catch((err) => {
-					openNotification(
-						'error',
-						'Transação não atualizada',
-						'Erro interno. Tente novamente mais tarde.'
-					)
-				})
-		}
-	}
-
 	submitForm(e) {}
 
 	menu = (element) => (
@@ -324,7 +302,7 @@ class ExtractPlan extends React.Component {
 	render() {
 		if (this.state.idToEdit) {
 			return (
-				<Redirect to={'/transaction/planejamento/' + this.state.idToEdit} />
+				<Redirect to={'/transaction/contaCorrente/' + this.state.idToEdit} />
 			)
 		}
 
@@ -333,7 +311,7 @@ class ExtractPlan extends React.Component {
 				<div>
 					<TitleFilter
 						handleChange={this.handleChange}
-						isfiltred={this.state.filtro}
+						isFiltered={this.state.filtro}
 					/>
 					{this.state.filtro && (
 						<>
@@ -345,6 +323,16 @@ class ExtractPlan extends React.Component {
 								<Col span={8}>
 									<span style={{ marginRight: '30px' }}>Nês:</span>
 									<SelectMonth handleChange={this.handleChange} />
+								</Col>
+								<Col span={8}>
+									<span style={{ marginRight: '30px' }}>Tipo:</span>
+									<Checkbox
+										name='notCompensated'
+										checked={this.state.notCompensated}
+										onClick={this.handleChange}
+									>
+										Futuros
+									</Checkbox>
 								</Col>
 							</Row>
 							<br />
@@ -389,22 +377,14 @@ class ExtractPlan extends React.Component {
 							Transações
 							<Link
 								style={{ paddingLeft: '10px' }}
-								to='/transaction/planejamento'
+								to='/transaction/contaCorrente'
 							>
 								<PlusCircleOutlined />
 							</Link>
-							<span
-								style={{ paddingLeft: '15px' }}
-								onClick={() => {
-									this.toAccount()
-								}}
-							>
-								<CheckOutlined />
-							</span>
 						</Title>
 						<Col span={24}>
 							<Collapse onChange={callback} expandIconPosition='left'>
-								{this.state.transations.map((element) => {
+								{this.state.transactions.map((element) => {
 									const resume = (element, action) => {
 										let color = 'green'
 										let value = element.value
@@ -491,4 +471,4 @@ class ExtractPlan extends React.Component {
 		)
 	}
 }
-export default ExtractPlan
+export default ExtractAcount

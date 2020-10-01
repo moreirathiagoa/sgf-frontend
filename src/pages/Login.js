@@ -70,7 +70,7 @@ class Login extends React.Component {
 							openNotification(
 								'error',
 								'Login não efetuado',
-								'Usuário ou senha inválio.'
+								'Usuário ou senha inválido.'
 							)
 						}
 						this.props.loading(false)

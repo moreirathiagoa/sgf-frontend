@@ -47,7 +47,7 @@ class Categorias extends React.Component {
 		this.submitForm = this.submitForm.bind(this)
 		this.editInit = this.editInit.bind(this)
 		this.remover = this.remover.bind(this)
-		this.acaoBotaoNovo = this.acaoBotaoNovo.bind(this)
+		this.actionButtonNew = this.actionButtonNew.bind(this)
 	}
 
 	componentDidMount() {
@@ -223,7 +223,7 @@ class Categorias extends React.Component {
 		this.setState(state)
 	}
 
-	acaoBotaoNovo() {
+	actionButtonNew() {
 		this.setState({ list: !this.state.list })
 		if (!this.state.list) this.limpaDataState()
 	}
@@ -235,7 +235,7 @@ class Categorias extends React.Component {
 					<div>
 						<Title level={3}>
 							Lista de Categorias{' '}
-							<PlusCircleOutlined onClick={() => this.acaoBotaoNovo()} />
+							<PlusCircleOutlined onClick={() => this.actionButtonNew()} />
 						</Title>
 						<Collapse onChange={callback} expandIconPosition='left'>
 							{this.state.categories.map((element) => {
@@ -265,7 +265,7 @@ class Categorias extends React.Component {
 				) : (
 					<div>
 						<Title level={3}>
-							<ArrowLeftOutlined onClick={() => this.acaoBotaoNovo()} /> Dados
+							<ArrowLeftOutlined onClick={() => this.actionButtonNew()} /> Dados
 							da Categoria
 						</Title>
 						<Form

@@ -13,9 +13,10 @@ import {
 } from 'antd'
 import {
 	TitleFilter,
+	SelectYear,
+	SelectMonth,
 	SelectCategories,
 	SelectBank,
-	SelectFacture,
 } from '../components'
 import {
 	MenuOutlined,
@@ -27,8 +28,7 @@ import {
 	listTransaction,
 	removeTransaction,
 	listCategories,
-	listFatures,
-	payFature,
+	planToPrincipal,
 } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
@@ -39,46 +39,48 @@ function callback(key) {
 	//console.log(key);
 }
 
-class ExtractCard extends React.Component {
+class ExtractPlan extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			faturePayed: null,
-			transations: [],
-			allTransations: [],
+			transactions: [],
+			allTransactions: [],
+
+			year: '',
+			month: '',
+			notCompensated: false,
 			bank_id: 'Selecione',
 			category_id: 'Selecione',
-			fature_id: 'Selecione',
 			description: '',
+
 			banks: [],
 			categories: [],
-			fatures: [],
 			filtro: false,
 			idToEdit: null,
 		}
 		this.handleChange = this.handleChange.bind(this)
 		this.submitForm = this.submitForm.bind(this)
-		this.payFature = this.payFature.bind(this)
+		this.toAccount = this.toAccount.bind(this)
 		this.getListBanks()
 		this.getListCategories()
 	}
 
 	componentDidMount() {
-		this.props.mudaTitulo('Extrato Cartões de Crédito')
+		this.props.mudaTitulo('Extrato Planejamentos Futuros')
 		this.list()
 	}
 
 	list = () => {
 		this.props.loading(true)
-		listTransaction('cartaoCredito')
+		listTransaction('planejamento')
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
 					this.props.verificaLogin()
 				} else {
 					let state = this.state
-					state.transations = res.data.data
-					state.allTransations = res.data.data
+					state.transactions = res.data.data
+					state.allTransactions = res.data.data
 					this.setState(state)
 				}
 				this.props.loading(false)
@@ -94,7 +96,7 @@ class ExtractCard extends React.Component {
 	}
 
 	getListBanks() {
-		listBanks('cartaoCredito')
+		listBanks()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -102,27 +104,6 @@ class ExtractCard extends React.Component {
 				} else {
 					let state = this.state
 					state.banks = res.data.data
-					this.setState(state)
-				}
-			})
-			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro interno',
-					'Erro ao obter a listagem de Bancos.'
-				)
-			})
-	}
-
-	getListFatures(bank_id) {
-		listFatures(bank_id)
-			.then((res) => {
-				if (res.status === 401) {
-					localStorage.removeItem('token')
-					this.props.verificaLogin()
-				} else {
-					let state = this.state
-					state.fatures = res.data.data
 					this.setState(state)
 				}
 			})
@@ -156,56 +137,6 @@ class ExtractCard extends React.Component {
 			})
 	}
 
-	filterList() {
-		let state = this.state
-
-		const transationFiltred = state.allTransations.filter((transation) => {
-			let toReturn = true
-
-			if (this.state.bank_id.toString() !== 'Selecione') {
-				if (
-					transation.bank_id._id.toString() !== this.state.bank_id.toString()
-				) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.fature_id.toString() !== 'Selecione') {
-				if (
-					transation.fature_id._id.toString() !==
-					this.state.fature_id.toString()
-				) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.category_id.toString() !== 'Selecione') {
-				if (
-					transation.category_id._id.toString() !==
-					this.state.category_id.toString()
-				) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.description !== '') {
-				const description = transation.description.toLowerCase()
-				const filterDescription = this.state.description.toLowerCase()
-				if (!description.includes(filterDescription)) {
-					toReturn = false
-				}
-			}
-
-			if (toReturn) {
-				return transation
-			}
-			return null
-		})
-
-		state.transations = transationFiltred
-		this.setState(state)
-	}
-
 	handleChange(event) {
 		let state = this.state
 
@@ -215,7 +146,7 @@ class ExtractCard extends React.Component {
 				break
 
 			case 'clearFilter':
-				state.transations = state.allTransations
+				state.transactions = state.allTransactions
 				break
 
 			case 'name':
@@ -230,14 +161,18 @@ class ExtractCard extends React.Component {
 				state.data.bankType = event.target.value
 				break
 
-			case 'bank_id':
-				state.bank_id = event.target.value
-				this.getListFatures(event.target.value)
+			case 'year':
+				state.year = event.target.value
 				this.filterList()
 				break
 
-			case 'fature_id':
-				state.fature_id = event.target.value
+			case 'month':
+				state.month = event.target.value
+				this.filterList()
+				break
+
+			case 'bank_id':
+				state.bank_id = event.target.value
 				this.filterList()
 				break
 
@@ -256,40 +191,63 @@ class ExtractCard extends React.Component {
 		this.setState(state)
 	}
 
-	payFature() {
-		if (window.confirm('Deseja realmente fechar essa fatura?')) {
-			if (this.state.fature_id !== 'Selecione') {
-				payFature(this.state.fature_id)
-					.then((res) => {
-						if (res.status === 401) {
-							localStorage.removeItem('token')
-							this.props.verificaLogin()
-						} else {
-							let state = this.state
-							state.faturePayed = res.data.data
-							this.setState(state)
-							openNotification(
-								'success',
-								'Fatura Paga',
-								'Fatura registrada como paga. Registre agora o débito do seu pagamento se necessário.'
-							)
-						}
-					})
-					.catch((err) => {
-						openNotification(
-							'error',
-							'Erro interno',
-							'Erro ao obter a listagem de Bancos.'
-						)
-					})
-			} else {
-				openNotification(
-					'error',
-					'Fatura não informada',
-					'Necessário informar uma fatura.'
-				)
+	filterList() {
+		let state = this.state
+
+		const transactionFiltered = state.allTransactions.filter((transaction) => {
+			let toReturn = true
+
+			if (this.state.bank_id.toString() !== 'Selecione') {
+				if (
+					transaction.bank_id._id.toString() !== this.state.bank_id.toString()
+				) {
+					toReturn = false
+				}
 			}
-		}
+
+			if (this.state.category_id.toString() !== 'Selecione') {
+				if (
+					transaction.category_id._id.toString() !==
+					this.state.category_id.toString()
+				) {
+					toReturn = false
+				}
+			}
+
+			if (this.state.description !== '') {
+				const description = transaction.description.toLowerCase()
+				const filterDescription = this.state.description.toLowerCase()
+				if (!description.includes(filterDescription)) {
+					toReturn = false
+				}
+			}
+
+			if (this.state.year !== '') {
+				let now = new Date(transaction.efectedDate)
+				const ano = now.getFullYear()
+
+				if (ano.toString() !== this.state.year.toString()) {
+					toReturn = false
+				}
+			}
+
+			if (this.state.month !== '') {
+				let now = new Date(transaction.efectedDate)
+				const mes = now.getMonth() + 1
+
+				if (mes.toString() !== this.state.month.toString()) {
+					toReturn = false
+				}
+			}
+
+			if (toReturn) {
+				return transaction
+			}
+			return null
+		})
+
+		state.transactions = transactionFiltered
+		this.setState(state)
 	}
 
 	remover(id) {
@@ -325,6 +283,35 @@ class ExtractCard extends React.Component {
 		this.setState({ idToEdit: idTransaction })
 	}
 
+	toAccount() {
+		if (window.confirm('Deseja lançar essas transações em Conta Corrente?')) {
+			planToPrincipal(this.state.transactions)
+				.then((res) => {
+					if (res.data.code === 201 || res.data.code === 202) {
+						openNotification(
+							'success',
+							'Transação atualizadas',
+							'Transação atualizadas com sucesso.'
+						)
+						this.list()
+					} else {
+						openNotification(
+							'error',
+							'Transação não atualizada',
+							res.data.message
+						)
+					}
+				})
+				.catch((err) => {
+					openNotification(
+						'error',
+						'Transação não atualizada',
+						'Erro interno. Tente novamente mais tarde.'
+					)
+				})
+		}
+	}
+
 	submitForm(e) {}
 
 	menu = (element) => (
@@ -337,15 +324,7 @@ class ExtractCard extends React.Component {
 	render() {
 		if (this.state.idToEdit) {
 			return (
-				<Redirect to={'/transaction/cartaoCredito/' + this.state.idToEdit} />
-			)
-		}
-
-		if (this.state.faturePayed) {
-			return (
-				<Redirect
-					to={`/transaction/contaCorrente/pagamentoCartao/${this.state.faturePayed._id}`}
-				/>
+				<Redirect to={'/transaction/planejamento/' + this.state.idToEdit} />
 			)
 		}
 
@@ -354,10 +333,21 @@ class ExtractCard extends React.Component {
 				<div>
 					<TitleFilter
 						handleChange={this.handleChange}
-						isfiltred={this.state.filtro}
+						isFiltered={this.state.filtro}
 					/>
 					{this.state.filtro && (
 						<>
+							<Row>
+								<Col span={8}>
+									<span style={{ marginRight: '30px' }}>Ano:</span>
+									<SelectYear handleChange={this.handleChange} />
+								</Col>
+								<Col span={8}>
+									<span style={{ marginRight: '30px' }}>Nês:</span>
+									<SelectMonth handleChange={this.handleChange} />
+								</Col>
+							</Row>
+							<br />
 							<Row>
 								<Col span={12}>
 									<span style={{ marginRight: '30px' }}>Banco:</span>
@@ -365,29 +355,6 @@ class ExtractCard extends React.Component {
 										handleChange={this.handleChange}
 										bank_id={this.state.bank_id}
 										banks={this.state.banks}
-									/>
-								</Col>
-								<Col span={12}>
-									<span style={{ marginRight: '30px' }}>Fatura:</span>
-									<SelectFacture
-										handleChange={this.handleChange}
-										fature_id={this.state.fature_id}
-										fatures={this.state.fatures}
-									/>
-								</Col>
-							</Row>
-							<br />
-							<Row>
-								<Col span={12}>
-									<span style={{ marginRight: '30px' }}>Descrição:</span>
-									<Input
-										placeholder='Descrição'
-										type='text'
-										name='description'
-										size='md'
-										value={this.state.description}
-										onChange={this.handleChange}
-										style={{ width: 150 }}
 									/>
 								</Col>
 								<Col span={12}>
@@ -399,6 +366,21 @@ class ExtractCard extends React.Component {
 									/>
 								</Col>
 							</Row>
+							<br></br>
+							<Row>
+								<Col span={12}>
+									<span style={{ marginRight: '30px' }}>Descrição:</span>
+									<Input
+										placeholder='Descrição'
+										type='text'
+										name='description'
+										size='md'
+										value={this.state.description}
+										onChange={this.handleChange}
+										style={{ width: 200 }}
+									/>
+								</Col>
+							</Row>
 						</>
 					)}
 					<br />
@@ -407,24 +389,22 @@ class ExtractCard extends React.Component {
 							Transações
 							<Link
 								style={{ paddingLeft: '10px' }}
-								to='/transaction/cartaoCredito'
+								to='/transaction/planejamento'
 							>
 								<PlusCircleOutlined />
 							</Link>
-							{this.state.fature_id !== 'Selecione' && (
-								<span
-									style={{ paddingLeft: '15px' }}
-									onClick={() => {
-										this.payFature()
-									}}
-								>
-									<CheckOutlined />
-								</span>
-							)}
+							<span
+								style={{ paddingLeft: '15px' }}
+								onClick={() => {
+									this.toAccount()
+								}}
+							>
+								<CheckOutlined />
+							</span>
 						</Title>
 						<Col span={24}>
 							<Collapse onChange={callback} expandIconPosition='left'>
-								{this.state.transations.map((element) => {
+								{this.state.transactions.map((element) => {
 									const resume = (element, action) => {
 										let color = 'green'
 										let value = element.value
@@ -480,9 +460,6 @@ class ExtractCard extends React.Component {
 												<Descriptions.Item label='Categoria'>
 													{element.category_id.name}
 												</Descriptions.Item>
-												<Descriptions.Item label='Fatura'>
-													{element.fature_id.name}
-												</Descriptions.Item>
 												<Descriptions.Item label='Data Criação'>
 													{formatDateToUser(element.createDate)}
 												</Descriptions.Item>
@@ -514,4 +491,4 @@ class ExtractCard extends React.Component {
 		)
 	}
 }
-export default ExtractCard
+export default ExtractPlan

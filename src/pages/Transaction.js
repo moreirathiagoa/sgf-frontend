@@ -34,7 +34,7 @@ class Transaction extends React.Component {
 			idToUpdate: idTransaction,
 			screenType: null,
 			data: {
-				efectedDate: actualDateToUser(),
+				effectiveDate: actualDateToUser(),
 				bank_id: 'Selecione',
 				category_id: 'Selecione',
 				isSimples: false,
@@ -55,7 +55,7 @@ class Transaction extends React.Component {
 		const param = window.location.pathname
 		const typeTransaction = param.split('/')[2]
 		let state = this.state
-		if (typeTransaction === 'contaCorrente') state.data.isCompesed = true
+		if (typeTransaction === 'contaCorrente') state.data.isCompensated = true
 		state.data.typeTransaction = typeTransaction
 		this.setState(state)
 		this.getListBanks(typeTransaction)
@@ -110,7 +110,9 @@ class Transaction extends React.Component {
 					if (res.data.data.fature_id)
 						state.data.fature = res.data.data.fature_id.name
 
-					state.data.efectedDate = formatDateToUser(res.data.data.efectedDate)
+					state.data.effectiveDate = formatDateToUser(
+						res.data.data.effectiveDate
+					)
 					state.banks = state.allBanks
 
 					this.setState(state)
@@ -174,10 +176,10 @@ class Transaction extends React.Component {
 					localStorage.removeItem('token')
 					this.props.verificaLogin()
 				} else {
-					const fatureInformaion = res.data.data
+					const fatureInformation = res.data.data
 					let state = this.state
-					state.data.description = `Pg. Fatura ${fatureInformaion.name} - ${fatureInformaion.bank_id.name}`
-					state.data.value = fatureInformaion.fatureBalance
+					state.data.description = `Pg. Fatura ${fatureInformation.name} - ${fatureInformation.bank_id.name}`
+					state.data.value = fatureInformation.fatureBalance
 					this.setState(state)
 				}
 			})
@@ -194,12 +196,12 @@ class Transaction extends React.Component {
 		let state = this.state
 
 		switch (event.target.name) {
-			case 'isCompesed':
-				state.data.isCompesed = !state.data.isCompesed
+			case 'isCompensated':
+				state.data.isCompensated = !state.data.isCompensated
 				break
 
-			case 'efectedDate':
-				state.data.efectedDate = event.target.value
+			case 'effectiveDate':
+				state.data.effectiveDate = event.target.value
 				break
 
 			case 'description':
@@ -366,13 +368,15 @@ class Transaction extends React.Component {
 							<Col span={8}>
 								<DatePicker
 									format={'DD/MM/YYYY'}
-									name='efectedDate'
+									name='effectiveDate'
 									size='md'
-									defaultValue={formatDateToMoment(this.state.data.efectedDate)}
+									defaultValue={formatDateToMoment(
+										this.state.data.effectiveDate
+									)}
 									onChange={(date, dateString) => {
 										const event = {
 											target: {
-												name: 'efectedDate',
+												name: 'effectiveDate',
 												value: dateString,
 											},
 										}
@@ -388,13 +392,15 @@ class Transaction extends React.Component {
 											onClick={this.handleChange}
 										>
 											<Switch
-												name='isCompesed'
-												checked={this.state.data.isCompesed}
+												name='isCompensated'
+												checked={this.state.data.isCompensated}
 												size='md'
 											/>
 										</span>
 										<span style={{ color: '#ccc' }}>
-											{this.state.data.isCompesed ? 'Compensado' : 'Programado'}
+											{this.state.data.isCompensated
+												? 'Compensado'
+												: 'Programado'}
 										</span>
 									</>
 								)}
