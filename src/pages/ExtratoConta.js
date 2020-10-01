@@ -39,12 +39,12 @@ class ExtractAcount extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			transations: [],
-			allTransations: [],
+			transactions: [],
+			allTransactions: [],
 
 			year: '',
 			month: '',
-			notCompensed: false,
+			notCompensated: false,
 			bank_id: 'Selecione',
 			category_id: 'Selecione',
 			description: '',
@@ -74,8 +74,8 @@ class ExtractAcount extends React.Component {
 					this.props.verificaLogin()
 				} else {
 					let state = this.state
-					state.transations = res.data.data
-					state.allTransations = res.data.data
+					state.transactions = res.data.data
+					state.allTransactions = res.data.data
 					this.setState(state)
 				}
 				this.props.loading(false)
@@ -141,7 +141,7 @@ class ExtractAcount extends React.Component {
 				break
 
 			case 'clearFilter':
-				state.transations = state.allTransations
+				state.transactions = state.allTransactions
 				break
 
 			case 'name':
@@ -166,9 +166,9 @@ class ExtractAcount extends React.Component {
 				this.filterList()
 				break
 
-			case 'notCompensed':
+			case 'notCompensated':
 				console.log('vai mudar')
-				state.notCompensed = !state.notCompensed
+				state.notCompensated = !state.notCompensated
 				this.filterList()
 				break
 
@@ -195,12 +195,12 @@ class ExtractAcount extends React.Component {
 	filterList() {
 		let state = this.state
 
-		const transationFiltred = state.allTransations.filter((transation) => {
+		const transactionFiltered = state.allTransactions.filter((transaction) => {
 			let toReturn = true
 
 			if (this.state.bank_id.toString() !== 'Selecione') {
 				if (
-					transation.bank_id._id.toString() !== this.state.bank_id.toString()
+					transaction.bank_id._id.toString() !== this.state.bank_id.toString()
 				) {
 					toReturn = false
 				}
@@ -208,7 +208,7 @@ class ExtractAcount extends React.Component {
 
 			if (this.state.category_id.toString() !== 'Selecione') {
 				if (
-					transation.category_id._id.toString() !==
+					transaction.category_id._id.toString() !==
 					this.state.category_id.toString()
 				) {
 					toReturn = false
@@ -216,21 +216,21 @@ class ExtractAcount extends React.Component {
 			}
 
 			if (this.state.description !== '') {
-				const description = transation.description.toLowerCase()
+				const description = transaction.description.toLowerCase()
 				const filterDescription = this.state.description.toLowerCase()
 				if (!description.includes(filterDescription)) {
 					toReturn = false
 				}
 			}
 
-			if (this.state.notCompensed) {
-				if (transation.isCompesed) {
+			if (this.state.notCompensated) {
+				if (transaction.isCompesed) {
 					toReturn = false
 				}
 			}
 
 			if (this.state.year !== '') {
-				let now = new Date(transation.efectedDate)
+				let now = new Date(transaction.efectedDate)
 				const ano = now.getFullYear()
 
 				if (ano.toString() !== this.state.year.toString()) {
@@ -239,7 +239,7 @@ class ExtractAcount extends React.Component {
 			}
 
 			if (this.state.month !== '') {
-				let now = new Date(transation.efectedDate)
+				let now = new Date(transaction.efectedDate)
 				const mes = now.getMonth() + 1
 
 				if (mes.toString() !== this.state.month.toString()) {
@@ -248,12 +248,12 @@ class ExtractAcount extends React.Component {
 			}
 
 			if (toReturn) {
-				return transation
+				return transaction
 			}
 			return null
 		})
 
-		state.transations = transationFiltred
+		state.transactions = transactionFiltered
 		this.setState(state)
 	}
 
@@ -327,8 +327,8 @@ class ExtractAcount extends React.Component {
 								<Col span={8}>
 									<span style={{ marginRight: '30px' }}>Tipo:</span>
 									<Checkbox
-										name='notCompensed'
-										checked={this.state.notCompensed}
+										name='notCompensated'
+										checked={this.state.notCompensated}
 										onClick={this.handleChange}
 									>
 										Futuros
@@ -384,7 +384,7 @@ class ExtractAcount extends React.Component {
 						</Title>
 						<Col span={24}>
 							<Collapse onChange={callback} expandIconPosition='left'>
-								{this.state.transations.map((element) => {
+								{this.state.transactions.map((element) => {
 									const resume = (element, action) => {
 										let color = 'green'
 										let value = element.value

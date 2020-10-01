@@ -44,8 +44,8 @@ class ExtractCard extends React.Component {
 		super(props)
 		this.state = {
 			faturePayed: null,
-			transations: [],
-			allTransations: [],
+			transactions: [],
+			allTransactions: [],
 			bank_id: 'Selecione',
 			category_id: 'Selecione',
 			fature_id: 'Selecione',
@@ -77,8 +77,8 @@ class ExtractCard extends React.Component {
 					this.props.verificaLogin()
 				} else {
 					let state = this.state
-					state.transations = res.data.data
-					state.allTransations = res.data.data
+					state.transactions = res.data.data
+					state.allTransactions = res.data.data
 					this.setState(state)
 				}
 				this.props.loading(false)
@@ -159,12 +159,12 @@ class ExtractCard extends React.Component {
 	filterList() {
 		let state = this.state
 
-		const transationFiltred = state.allTransations.filter((transation) => {
+		const transactionFiltered = state.allTransactions.filter((transaction) => {
 			let toReturn = true
 
 			if (this.state.bank_id.toString() !== 'Selecione') {
 				if (
-					transation.bank_id._id.toString() !== this.state.bank_id.toString()
+					transaction.bank_id._id.toString() !== this.state.bank_id.toString()
 				) {
 					toReturn = false
 				}
@@ -172,7 +172,7 @@ class ExtractCard extends React.Component {
 
 			if (this.state.fature_id.toString() !== 'Selecione') {
 				if (
-					transation.fature_id._id.toString() !==
+					transaction.fature_id._id.toString() !==
 					this.state.fature_id.toString()
 				) {
 					toReturn = false
@@ -181,7 +181,7 @@ class ExtractCard extends React.Component {
 
 			if (this.state.category_id.toString() !== 'Selecione') {
 				if (
-					transation.category_id._id.toString() !==
+					transaction.category_id._id.toString() !==
 					this.state.category_id.toString()
 				) {
 					toReturn = false
@@ -189,7 +189,7 @@ class ExtractCard extends React.Component {
 			}
 
 			if (this.state.description !== '') {
-				const description = transation.description.toLowerCase()
+				const description = transaction.description.toLowerCase()
 				const filterDescription = this.state.description.toLowerCase()
 				if (!description.includes(filterDescription)) {
 					toReturn = false
@@ -197,12 +197,12 @@ class ExtractCard extends React.Component {
 			}
 
 			if (toReturn) {
-				return transation
+				return transaction
 			}
 			return null
 		})
 
-		state.transations = transationFiltred
+		state.transactions = transactionFiltered
 		this.setState(state)
 	}
 
@@ -215,7 +215,7 @@ class ExtractCard extends React.Component {
 				break
 
 			case 'clearFilter':
-				state.transations = state.allTransations
+				state.transactions = state.allTransactions
 				break
 
 			case 'name':
@@ -424,7 +424,7 @@ class ExtractCard extends React.Component {
 						</Title>
 						<Col span={24}>
 							<Collapse onChange={callback} expandIconPosition='left'>
-								{this.state.transations.map((element) => {
+								{this.state.transactions.map((element) => {
 									const resume = (element, action) => {
 										let color = 'green'
 										let value = element.value

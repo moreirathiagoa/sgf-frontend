@@ -18,8 +18,8 @@ class DashboardDebit extends React.Component {
 		this.state = {
 			visible: false,
 			banks: [],
-			saldoNotCompesatedCredit: 'Aguarde...',
-			saldoNotCompesatedDebit: 'Aguarde...',
+			saldoNotCompensatedCredit: 'Aguarde...',
+			saldoNotCompensatedDebit: 'Aguarde...',
 			saldoReal: 'Aguarde...',
 			saldoLiquido: 'Aguarde...',
 			modalContent: {
@@ -73,7 +73,7 @@ class DashboardDebit extends React.Component {
 					this.props.verificaLogin()
 				} else {
 					let state = this.state
-					state.saldoNotCompesatedCredit = res.data.data
+					state.saldoNotCompensatedCredit = res.data.data
 					this.setState(state)
 				}
 			})
@@ -94,7 +94,7 @@ class DashboardDebit extends React.Component {
 					this.props.verificaLogin()
 				} else {
 					let state = this.state
-					state.saldoNotCompesatedDebit = res.data.data
+					state.saldoNotCompensatedDebit = res.data.data
 					this.setState(state)
 				}
 			})
@@ -173,7 +173,7 @@ class DashboardDebit extends React.Component {
 					banco: bank.name,
 					saldoManual: bank.saldoManual,
 				},
-				diferenca: formatMoeda(bank.diference),
+				diference: formatMoeda(bank.diference),
 				status: bank.diference ? (
 					<CloseCircleOutlined style={{ color: 'red' }} />
 				) : (
@@ -266,13 +266,13 @@ class DashboardDebit extends React.Component {
 					<Col span={12}>
 						<Statistic
 							title='Previsão de entrada'
-							value={formatMoeda(this.state.saldoNotCompesatedCredit)}
+							value={formatMoeda(this.state.saldoNotCompensatedCredit)}
 						/>
 					</Col>
 					<Col span={12}>
 						<Statistic
 							title='Previsão Saída'
-							value={formatMoeda(this.state.saldoNotCompesatedDebit)}
+							value={formatMoeda(this.state.saldoNotCompensatedDebit)}
 						/>
 					</Col>
 				</Row>
@@ -304,7 +304,7 @@ class DashboardDebit extends React.Component {
 						size='small'
 						expandable={{
 							expandedRowRender: (record) => (
-								<p style={{ margin: 0 }}>Diferença: {record.diferenca}</p>
+								<p style={{ margin: 0 }}>Diferença: {record.diference}</p>
 							),
 						}}
 					/>

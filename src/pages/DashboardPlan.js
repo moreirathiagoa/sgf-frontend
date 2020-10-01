@@ -20,11 +20,11 @@ class DashboardPlan extends React.Component {
 
 	componentDidMount() {
 		this.props.mudaTitulo('Dashboard Plano')
-		this.initFutureTransationBalance()
+		this.initFutureTransactionBalance()
 		this.getListBanks()
 	}
 
-	initFutureTransationBalance() {
+	initFutureTransactionBalance() {
 		futureTransactionBalance()
 			.then((res) => {
 				if (res.status === 401) {

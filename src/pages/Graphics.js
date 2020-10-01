@@ -64,7 +64,7 @@ class Dashboard extends React.Component {
 				} else {
 					let state = this.state
 					console.log(res.data.data)
-					//state.saldoNotCompesed = res.data.data
+					//state.saldoNotCompensated = res.data.data
 					this.setState(state)
 				}
 			})

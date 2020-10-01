@@ -43,12 +43,12 @@ class ExtractPlan extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			transations: [],
-			allTransations: [],
+			transactions: [],
+			allTransactions: [],
 
 			year: '',
 			month: '',
-			notCompensed: false,
+			notCompensated: false,
 			bank_id: 'Selecione',
 			category_id: 'Selecione',
 			description: '',
@@ -79,8 +79,8 @@ class ExtractPlan extends React.Component {
 					this.props.verificaLogin()
 				} else {
 					let state = this.state
-					state.transations = res.data.data
-					state.allTransations = res.data.data
+					state.transactions = res.data.data
+					state.allTransactions = res.data.data
 					this.setState(state)
 				}
 				this.props.loading(false)
@@ -146,7 +146,7 @@ class ExtractPlan extends React.Component {
 				break
 
 			case 'clearFilter':
-				state.transations = state.allTransations
+				state.transactions = state.allTransactions
 				break
 
 			case 'name':
@@ -194,12 +194,12 @@ class ExtractPlan extends React.Component {
 	filterList() {
 		let state = this.state
 
-		const transationFiltred = state.allTransations.filter((transation) => {
+		const transactionFiltered = state.allTransactions.filter((transaction) => {
 			let toReturn = true
 
 			if (this.state.bank_id.toString() !== 'Selecione') {
 				if (
-					transation.bank_id._id.toString() !== this.state.bank_id.toString()
+					transaction.bank_id._id.toString() !== this.state.bank_id.toString()
 				) {
 					toReturn = false
 				}
@@ -207,7 +207,7 @@ class ExtractPlan extends React.Component {
 
 			if (this.state.category_id.toString() !== 'Selecione') {
 				if (
-					transation.category_id._id.toString() !==
+					transaction.category_id._id.toString() !==
 					this.state.category_id.toString()
 				) {
 					toReturn = false
@@ -215,7 +215,7 @@ class ExtractPlan extends React.Component {
 			}
 
 			if (this.state.description !== '') {
-				const description = transation.description.toLowerCase()
+				const description = transaction.description.toLowerCase()
 				const filterDescription = this.state.description.toLowerCase()
 				if (!description.includes(filterDescription)) {
 					toReturn = false
@@ -223,7 +223,7 @@ class ExtractPlan extends React.Component {
 			}
 
 			if (this.state.year !== '') {
-				let now = new Date(transation.efectedDate)
+				let now = new Date(transaction.efectedDate)
 				const ano = now.getFullYear()
 
 				if (ano.toString() !== this.state.year.toString()) {
@@ -232,7 +232,7 @@ class ExtractPlan extends React.Component {
 			}
 
 			if (this.state.month !== '') {
-				let now = new Date(transation.efectedDate)
+				let now = new Date(transaction.efectedDate)
 				const mes = now.getMonth() + 1
 
 				if (mes.toString() !== this.state.month.toString()) {
@@ -241,12 +241,12 @@ class ExtractPlan extends React.Component {
 			}
 
 			if (toReturn) {
-				return transation
+				return transaction
 			}
 			return null
 		})
 
-		state.transations = transationFiltred
+		state.transactions = transactionFiltered
 		this.setState(state)
 	}
 
@@ -285,7 +285,7 @@ class ExtractPlan extends React.Component {
 
 	toAccount() {
 		if (window.confirm('Deseja lançar essas transações em Conta Corrente?')) {
-			planToPrincipal(this.state.transations)
+			planToPrincipal(this.state.transactions)
 				.then((res) => {
 					if (res.data.code === 201 || res.data.code === 202) {
 						openNotification(
@@ -404,7 +404,7 @@ class ExtractPlan extends React.Component {
 						</Title>
 						<Col span={24}>
 							<Collapse onChange={callback} expandIconPosition='left'>
-								{this.state.transations.map((element) => {
+								{this.state.transactions.map((element) => {
 									const resume = (element, action) => {
 										let color = 'green'
 										let value = element.value
