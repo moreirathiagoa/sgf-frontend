@@ -17,7 +17,7 @@ class TitleFilter extends React.Component {
 						this.props.handleChange(event)
 					}}
 				>
-					{this.props.isfiltred ? <UpOutlined /> : <DownOutlined />}
+					{this.props.isFiltered ? <UpOutlined /> : <DownOutlined />}
 				</span>
 				<span
 					style={{ paddingLeft: '12px' }}

@@ -31,7 +31,7 @@ class App extends React.Component {
 			if (this.state.logado)
 				openNotification(
 					'error',
-					'Você foi deslogado',
+					'Você foi desconectado',
 					'Realize login novamente.'
 				)
 			this.setState({ logado: false })

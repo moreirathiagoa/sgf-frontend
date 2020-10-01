@@ -333,7 +333,7 @@ class ExtractPlan extends React.Component {
 				<div>
 					<TitleFilter
 						handleChange={this.handleChange}
-						isfiltred={this.state.filtro}
+						isFiltered={this.state.filtro}
 					/>
 					{this.state.filtro && (
 						<>
