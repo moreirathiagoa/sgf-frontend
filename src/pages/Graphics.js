@@ -1,7 +1,8 @@
 import React from 'react'
+
+import '../App.css'
 import { Statistic, Row, Col } from 'antd'
 import { BarChart, Bar, XAxis, YAxis } from 'recharts'
-import '../App.css'
 import { getSaldosNaoCompensado } from '../api'
 
 const data = [

@@ -1,4 +1,5 @@
 import React from 'react'
+
 import '../App.css'
 import { Form, Input, Button, Switch, Row, Col, DatePicker } from 'antd'
 import {
@@ -31,6 +32,7 @@ class Transaction extends React.Component {
 				bank_id: 'Selecione',
 				category_id: 'Selecione',
 				isSimples: false,
+				value: null,
 				isCompesed: transactionType === 'contaCorrente' ? true : undefined,
 				typeTransaction: transactionType,
 			},
@@ -96,6 +98,12 @@ class Transaction extends React.Component {
 
 					if (res.data.data.fature_id)
 						state.data.fature = res.data.data.fature_id.name
+
+					if (res.data.data.value >= 0) {
+						state.isCredit = true
+					} else {
+						state.data.value = -1 * state.data.value
+					}
 
 					state.data.efectedDate = formatDateToUser(res.data.data.efectedDate)
 

@@ -1,25 +1,18 @@
 import React from 'react'
-import '../App.css'
 
-import {
-	Input,
-	Checkbox,
-	Collapse,
-	Menu,
-	Dropdown,
-	Descriptions,
-	Typography,
-	Row,
-	Col,
-} from 'antd'
+import '../App.css'
+import { get } from 'lodash'
+
+import { Input, Checkbox, Typography, Row, Col, Card, Modal } from 'antd'
 import {
 	TitleFilter,
 	SelectYear,
 	SelectMonth,
 	SelectCategories,
 	SelectBank,
+	TransactionOptions,
 } from '../components'
-import { MenuOutlined, PlusCircleOutlined } from '@ant-design/icons'
+import { PlusCircleOutlined } from '@ant-design/icons'
 import {
 	listBanks,
 	listTransaction,
@@ -28,12 +21,7 @@ import {
 } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
-const { Panel } = Collapse
 const { Title } = Typography
-
-function callback(key) {
-	//console.log(key);
-}
 
 class ExtractAccount extends React.Component {
 	constructor(props) {
@@ -53,6 +41,10 @@ class ExtractAccount extends React.Component {
 			categories: [],
 			filtro: false,
 			idToEdit: null,
+			menu: {
+				modalVisible: false,
+				transactionToUpdate: null,
+			},
 		}
 		this.handleChange = this.handleChange.bind(this)
 		this.submitForm = this.submitForm.bind(this)
@@ -259,7 +251,7 @@ class ExtractAccount extends React.Component {
 
 	remover(id) {
 		if (window.confirm('Deseja realmente apagar essa Transação?')) {
-			removeTransaction(id)
+			return removeTransaction(id)
 				.then((res) => {
 					if (res.data.code === 202) {
 						openNotification(
@@ -267,7 +259,6 @@ class ExtractAccount extends React.Component {
 							'Transação removida',
 							'Transação removida com sucesso.'
 						)
-						this.list()
 					} else {
 						openNotification(
 							'error',
@@ -288,22 +279,20 @@ class ExtractAccount extends React.Component {
 
 	submitForm(e) {}
 
-	menu = (element) => (
-		<Menu>
-			<Menu.Item onClick={() => this.remover(element._id)}>Apagar</Menu.Item>
+	showMenuModal = (data) => {
+		if (this.state.menu.modalVisible !== data) {
+			let state = this.state
+			state.menu.modalVisible = true
+			state.menu.transactionToUpdate = data
+			this.setState(state)
+		}
+	}
 
-			<Menu.Item
-				onClick={() =>
-					this.props.showModal({
-						typeTransaction: 'contaCorrente',
-						idTransaction: element._id,
-					})
-				}
-			>
-				Editar
-			</Menu.Item>
-		</Menu>
-	)
+	menuModalClose = (e) => {
+		let state = this.state
+		state.menu.modalVisible = false
+		this.setState(state)
+	}
 
 	render() {
 		return (
@@ -372,7 +361,7 @@ class ExtractAccount extends React.Component {
 						</>
 					)}
 					<br />
-					<Row>
+					<div>
 						<Title level={4}>
 							Transações
 							<PlusCircleOutlined
@@ -382,90 +371,88 @@ class ExtractAccount extends React.Component {
 								}}
 							/>
 						</Title>
-						<Col span={24}>
-							<Collapse onChange={callback} expandIconPosition='left'>
-								{this.state.transactions.map((element) => {
-									const resume = (element, action) => {
-										let color = 'green'
-										let value = element.value
-										if (element.value < 0) {
-											color = 'red'
-											value = -1 * element.value
-										}
-										return (
-											<div style={{ fontSize: '12px' }}>
-												<Row>
-													<Col span={4}>
-														<span>{formatDateToUser(element.efectedDate)}</span>
-													</Col>
-													<Col span={11}>
-														<span style={{ paddingLeft: '22px' }}>
-															{element.bank_id.name}
-														</span>
-													</Col>
-													<Col span={6}>
-														<span
-															style={{
-																paddingLeft: '20px',
-																color: color,
-																alignSelf: 'right',
-															}}
-														>
-															{formatMoeda(value)}
-														</span>
-													</Col>
-													<Col span={3}>
-														<span style={{ float: 'right' }}>
-															<Dropdown
-																overlay={this.menu(element)}
-																placement='bottomRight'
-																onClick={(event) => {
-																	event.stopPropagation()
-																}}
-															>
-																<MenuOutlined />
-															</Dropdown>
-														</span>
-													</Col>
-												</Row>
-											</div>
-										)
-									}
-									return (
-										<Panel
-											header={resume(element, this.genExtra)}
-											key={element._id}
-										>
-											<Descriptions>
-												<Descriptions.Item label='Categoria'>
-													{element.category_id.name}
-												</Descriptions.Item>
-												<Descriptions.Item label='Data Criação'>
-													{formatDateToUser(element.createDate)}
-												</Descriptions.Item>
-												<Descriptions.Item label='Data Efetivação'>
-													{formatDateToUser(element.efectedDate)}
-												</Descriptions.Item>
-												<Descriptions.Item label='Status'>
-													{element.isCompesed ? 'Compensado' : 'Não compensado'}
-												</Descriptions.Item>
-												{element.currentRecurrence && (
-													<Descriptions.Item label='Recorrência'>
-														{element.currentRecurrence +
-															'/' +
-															element.finalRecurrence}
-													</Descriptions.Item>
-												)}
-												<Descriptions.Item label='Descrição'>
-													{element.description}
-												</Descriptions.Item>
-											</Descriptions>
-										</Panel>
-									)
-								})}
-							</Collapse>
-						</Col>
-					</Row>
+					</div>
+					<Modal
+						visible={this.state.menu.modalVisible}
+						onCancel={this.menuModalClose}
+						footer={null}
+						title=''
+						destroyOnClose={true}
+					>
+						<TransactionOptions
+							element={this.state.menu.transactionToUpdate}
+							screenType={'contaCorrente'}
+							showModal={this.props.showModal}
+							closeModal={this.menuModalClose}
+							remover={this.remover}
+							list={this.list}
+						/>
+					</Modal>
+
+					{this.state.transactions.map((element) => {
+						let color = 'green'
+						let value = element.value
+
+						if (element.value < 0) {
+							color = 'red'
+							value = -1 * element.value
+						}
+						if (!element.isCompesed) {
+							value = `[ ${formatMoeda(value)} ]`
+						} else {
+							value = formatMoeda(value)
+						}
+						const title = (
+							<>
+								<span>{element.bank_id.name}</span>
+								<span
+									style={{
+										paddingLeft: '20px',
+										color: color,
+										alignSelf: 'right',
+										float: 'right',
+									}}
+								>
+									{value}
+								</span>
+							</>
+						)
+
+						return (
+							<Card
+								size='small'
+								title={title}
+								style={{ width: 370, marginBottom: '5px' }}
+								onClick={() => {
+									this.showMenuModal(element)
+								}}
+								key={'card' + element._id}
+							>
+								<Row>
+									<Col span={24}>Categoria: {element.category_id.name}</Col>
+								</Row>
+								<Row>
+									<Col span={12}>
+										Criação: {formatDateToUser(element.createDate)}
+									</Col>
+									<Col span={12}>
+										Efetivação: {formatDateToUser(element.efectedDate)}
+									</Col>
+								</Row>
+								<Row>
+									<Col span={12}>
+										Recorrência:{' '}
+										{get(element, 'currentRecurrence', '1') +
+											'/' +
+											get(element, 'finalRecurrence', '1')}
+									</Col>
+								</Row>
+								<Row>
+									<Col span={24}>Descrição: {element.description}</Col>
+								</Row>
+							</Card>
+						)
+					})}
 				</div>
 			</div>
 		)

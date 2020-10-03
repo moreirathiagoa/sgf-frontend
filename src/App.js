@@ -5,9 +5,7 @@ import './App.css'
 import { BrowserRouter } from 'react-router-dom'
 import { Layout, Spin, Modal } from 'antd'
 import Routes from './routes'
-import MenuPrincipal from './components/MenuPrincipal'
-import HeaderPrincipal from './components/HeaderPrincipal'
-import Transaction from './components/Transaction'
+import { MenuPrincipal, HeaderPrincipal, Transaction } from './components'
 import { openNotification } from './utils'
 
 const { Content } = Layout
