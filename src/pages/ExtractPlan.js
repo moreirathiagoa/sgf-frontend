@@ -1,6 +1,5 @@
 import React from 'react'
 import '../App.css'
-import { Link, Redirect } from 'react-router-dom'
 import {
 	Input,
 	Collapse,
@@ -279,10 +278,6 @@ class ExtractPlan extends React.Component {
 		}
 	}
 
-	editInit(idTransaction) {
-		this.setState({ idToEdit: idTransaction })
-	}
-
 	toAccount() {
 		if (window.confirm('Deseja lançar essas transações em Conta Corrente?')) {
 			planToPrincipal(this.state.transactions)
@@ -317,17 +312,21 @@ class ExtractPlan extends React.Component {
 	menu = (element) => (
 		<Menu>
 			<Menu.Item onClick={() => this.remover(element._id)}>Apagar</Menu.Item>
-			<Menu.Item onClick={() => this.editInit(element._id)}>Editar</Menu.Item>
+
+			<Menu.Item
+				onClick={() =>
+					this.props.showModal({
+						typeTransaction: 'constaCorrente',
+						idTransaction: element._id,
+					})
+				}
+			>
+				Editar
+			</Menu.Item>
 		</Menu>
 	)
 
 	render() {
-		if (this.state.idToEdit) {
-			return (
-				<Redirect to={'/transaction/planejamento/' + this.state.idToEdit} />
-			)
-		}
-
 		return (
 			<div>
 				<div>
@@ -387,12 +386,12 @@ class ExtractPlan extends React.Component {
 					<Row>
 						<Title level={4}>
 							Transações
-							<Link
+							<PlusCircleOutlined
 								style={{ paddingLeft: '10px' }}
-								to='/transaction/planejamento'
-							>
-								<PlusCircleOutlined />
-							</Link>
+								onClick={() => {
+									this.props.showModal({ typeTransaction: 'planejamento' })
+								}}
+							/>
 							<span
 								style={{ paddingLeft: '15px' }}
 								onClick={() => {

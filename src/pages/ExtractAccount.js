@@ -1,6 +1,6 @@
 import React from 'react'
 import '../App.css'
-import { Link, Redirect } from 'react-router-dom'
+
 import {
 	Input,
 	Checkbox,
@@ -286,26 +286,26 @@ class ExtractAcount extends React.Component {
 		}
 	}
 
-	editInit(idTransaction) {
-		this.setState({ idToEdit: idTransaction })
-	}
-
 	submitForm(e) {}
 
 	menu = (element) => (
 		<Menu>
 			<Menu.Item onClick={() => this.remover(element._id)}>Apagar</Menu.Item>
-			<Menu.Item onClick={() => this.editInit(element._id)}>Editar</Menu.Item>
+
+			<Menu.Item
+				onClick={() =>
+					this.props.showModal({
+						typeTransaction: 'constaCorrente',
+						idTransaction: element._id,
+					})
+				}
+			>
+				Editar
+			</Menu.Item>
 		</Menu>
 	)
 
 	render() {
-		if (this.state.idToEdit) {
-			return (
-				<Redirect to={'/transaction/contaCorrente/' + this.state.idToEdit} />
-			)
-		}
-
 		return (
 			<div>
 				<div>
@@ -375,12 +375,12 @@ class ExtractAcount extends React.Component {
 					<Row>
 						<Title level={4}>
 							Transações
-							<Link
+							<PlusCircleOutlined
 								style={{ paddingLeft: '10px' }}
-								to='/transaction/contaCorrente'
-							>
-								<PlusCircleOutlined />
-							</Link>
+								onClick={() => {
+									this.props.showModal({ typeTransaction: 'contaCorrente' })
+								}}
+							/>
 						</Title>
 						<Col span={24}>
 							<Collapse onChange={callback} expandIconPosition='left'>

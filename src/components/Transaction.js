@@ -16,29 +16,18 @@ import {
 	formatDateToMoment,
 	formatDateToUser,
 } from '../utils'
-import { SelectCategories, SelectBank, SelectFacture } from '../components'
+import { SelectCategories, SelectBank, SelectFacture } from '.'
 
 class Transaction extends React.Component {
 	constructor(props) {
-		const param = window.location.pathname
-		const typeTransaction = param.split('/')[2]
-		const parameter = param.split('/')[3]
-
-		let idTransaction
-		if (parameter !== 'pagamentoCartao') {
-			idTransaction = parameter
-		}
-
 		super(props)
 		this.state = {
-			idToUpdate: idTransaction,
 			screenType: null,
 			data: {
 				effectiveDate: actualDateToUser(),
 				bank_id: 'Selecione',
 				category_id: 'Selecione',
 				isSimples: false,
-				typeTransaction: typeTransaction,
 			},
 			allBanks: [],
 			banks: [],
@@ -51,17 +40,31 @@ class Transaction extends React.Component {
 		this.submitForm = this.submitForm.bind(this)
 	}
 
-	UNSAFE_componentWillReceiveProps() {
-		const param = window.location.pathname
-		const typeTransaction = param.split('/')[2]
+	componentDidUpdate(props) {
+		const typeTransaction = props.transactionType
+		const idTransaction = props.transactionId
+
 		let state = this.state
-		if (typeTransaction === 'contaCorrente') state.data.isCompesed = true
-		state.data.typeTransaction = typeTransaction
-		this.setState(state)
-		this.getListBanks(typeTransaction)
+
+		if (
+			state.data.typeTransaction !== typeTransaction ||
+			state.idToUpdate !== idTransaction
+		) {
+			state.data.typeTransaction = typeTransaction
+			state.data.isCompesed = typeTransaction === 'contaCorrente' ? true : false
+
+			this.getListBanks(typeTransaction)
+			if (state.idToUpdate !== idTransaction) {
+				state.idToUpdate = idTransaction
+				this.getTransactionToUpdate(this.state.idToUpdate)
+			}
+
+			this.setState(state)
+		}
 	}
 
 	componentDidMount() {
+		console.log('MOUNTED')
 		const param = window.location.pathname
 		const parameter = param.split('/')[3]
 		if (parameter === 'pagamentoCartao') {
@@ -92,9 +95,6 @@ class Transaction extends React.Component {
 		this.setState(state)
 
 		this.getListCategories()
-		if (this.state.idToUpdate) {
-			this.getTransactionToUpdate(this.state.idToUpdate)
-		}
 	}
 
 	getTransactionToUpdate(idTransaction) {
