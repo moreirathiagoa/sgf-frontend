@@ -17,19 +17,20 @@ class SelectMonth extends React.Component {
 					const event = { target: { name: 'month', value: value } }
 					this.props.handleChange(event)
 				}}
+				value={this.props.month}
 			>
-				<Option value='1'>Jan</Option>
-				<Option value='2'>Fev</Option>
-				<Option value='3'>Mar</Option>
-				<Option value='4'>Abr</Option>
-				<Option value='5'>Mai</Option>
-				<Option value='6'>Jun</Option>
-				<Option value='7'>Jul</Option>
-				<Option value='8'>Ago</Option>
-				<Option value='9'>Set</Option>
-				<Option value='10'>Out</Option>
-				<Option value='11'>Nov</Option>
-				<Option value='12'>Dex</Option>
+				<Option value='1'>01</Option>
+				<Option value='2'>02</Option>
+				<Option value='3'>03</Option>
+				<Option value='4'>04</Option>
+				<Option value='5'>05</Option>
+				<Option value='6'>06</Option>
+				<Option value='7'>07</Option>
+				<Option value='8'>08</Option>
+				<Option value='9'>09</Option>
+				<Option value='10'>10</Option>
+				<Option value='11'>11</Option>
+				<Option value='12'>12</Option>
 			</Select>
 		)
 	}

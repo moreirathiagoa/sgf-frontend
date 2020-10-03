@@ -25,17 +25,23 @@ const { Title } = Typography
 
 class ExtractAccount extends React.Component {
 	constructor(props) {
+		const today = new Date()
+		const actualYear = today.getFullYear()
+		const actualMonth = today.getMonth() + 1
+
 		super(props)
 		this.state = {
 			transactions: [],
 			allTransactions: [],
 
-			year: '',
-			month: '',
-			notCompensated: false,
-			bank_id: 'Selecione',
-			category_id: 'Selecione',
-			description: '',
+			filters: {
+				year: actualYear,
+				month: actualMonth,
+				onlyFuture: false,
+				bank_id: 'Selecione',
+				category_id: 'Selecione',
+				description: '',
+			},
 
 			banks: [],
 			categories: [],
@@ -48,18 +54,18 @@ class ExtractAccount extends React.Component {
 		}
 		this.handleChange = this.handleChange.bind(this)
 		this.submitForm = this.submitForm.bind(this)
-		this.getListBanks()
-		this.getListCategories()
 	}
 
 	componentDidMount() {
 		this.props.mudaTitulo('Extrato Contas Corrente')
+		this.getListBanks()
+		this.getListCategories()
 		this.list()
 	}
 
 	list = () => {
 		this.props.loading(true)
-		listTransaction('contaCorrente')
+		listTransaction('contaCorrente', this.state.filters)
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -141,111 +147,46 @@ class ExtractAccount extends React.Component {
 				break
 
 			case 'isActive':
-				state.data.isActive = !state.data.isActive
+				state.filters.data.isActive = !state.filters.data.isActive
 				break
 
 			case 'bankType':
-				state.data.bankType = event.target.value
+				state.filters.data.bankType = event.target.value
 				break
 
 			case 'year':
-				state.year = event.target.value
-				this.filterList()
+				state.filters.year = event.target.value
+				this.list()
 				break
 
 			case 'month':
-				state.month = event.target.value
-				this.filterList()
+				state.filters.month = event.target.value
+				this.list()
 				break
 
 			case 'notCompensated':
 				console.log('vai mudar')
-				state.notCompensated = !state.notCompensated
-				this.filterList()
+				state.filters.onlyFuture = !state.filters.onlyFuture
+				this.list()
 				break
 
 			case 'bank_id':
-				state.bank_id = event.target.value
-				this.filterList()
+				state.filters.bank_id = event.target.value
+				this.list()
 				break
 
 			case 'category_id':
-				state.category_id = event.target.value
-				this.filterList()
+				state.filters.category_id = event.target.value
+				this.list()
 				break
 
 			case 'description':
-				state.description = event.target.value
-				this.filterList()
+				state.filters.description = event.target.value
+				this.list()
 				break
 
 			default:
 		}
-		this.setState(state)
-	}
-
-	filterList() {
-		let state = this.state
-
-		const transactionFiltered = state.allTransactions.filter((transaction) => {
-			let toReturn = true
-
-			if (this.state.bank_id.toString() !== 'Selecione') {
-				if (
-					transaction.bank_id._id.toString() !== this.state.bank_id.toString()
-				) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.category_id.toString() !== 'Selecione') {
-				if (
-					transaction.category_id._id.toString() !==
-					this.state.category_id.toString()
-				) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.description !== '') {
-				const description = transaction.description.toLowerCase()
-				const filterDescription = this.state.description.toLowerCase()
-				if (!description.includes(filterDescription)) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.notCompensated) {
-				if (transaction.isCompesed) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.year !== '') {
-				let now = new Date(transaction.efectedDate)
-				const ano = now.getFullYear()
-
-				if (ano.toString() !== this.state.year.toString()) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.month !== '') {
-				let now = new Date(transaction.efectedDate)
-				const mes = now.getMonth() + 1
-
-				if (mes.toString() !== this.state.month.toString()) {
-					toReturn = false
-				}
-			}
-
-			if (toReturn) {
-				return transaction
-			}
-			return null
-		})
-
-		state.transactions = transactionFiltered
 		this.setState(state)
 	}
 
@@ -307,17 +248,23 @@ class ExtractAccount extends React.Component {
 							<Row>
 								<Col span={8}>
 									<span style={{ marginRight: '30px' }}>Ano:</span>
-									<SelectYear handleChange={this.handleChange} />
+									<SelectYear
+										handleChange={this.handleChange}
+										year={this.state.filters.year}
+									/>
 								</Col>
 								<Col span={8}>
 									<span style={{ marginRight: '30px' }}>Nês:</span>
-									<SelectMonth handleChange={this.handleChange} />
+									<SelectMonth
+										handleChange={this.handleChange}
+										month={this.state.filters.month}
+									/>
 								</Col>
 								<Col span={8}>
 									<span style={{ marginRight: '30px' }}>Tipo:</span>
 									<Checkbox
 										name='notCompensated'
-										checked={this.state.notCompensated}
+										checked={this.state.filters.onlyFuture}
 										onClick={this.handleChange}
 									>
 										Futuros
@@ -330,7 +277,7 @@ class ExtractAccount extends React.Component {
 									<span style={{ marginRight: '30px' }}>Banco:</span>
 									<SelectBank
 										handleChange={this.handleChange}
-										bank_id={this.state.bank_id}
+										bank_id={this.state.filters.bank_id}
 										banks={this.state.banks}
 									/>
 								</Col>
@@ -338,7 +285,7 @@ class ExtractAccount extends React.Component {
 									<span style={{ marginRight: '30px' }}>Categoria:</span>
 									<SelectCategories
 										handleChange={this.handleChange}
-										category_id={this.state.category_id}
+										category_id={this.state.filters.category_id}
 										categories={this.state.categories}
 									/>
 								</Col>
@@ -352,7 +299,7 @@ class ExtractAccount extends React.Component {
 										type='text'
 										name='description'
 										size='md'
-										value={this.state.description}
+										value={this.state.filters.description}
 										onChange={this.handleChange}
 										style={{ width: 200 }}
 									/>
@@ -397,7 +344,7 @@ class ExtractAccount extends React.Component {
 							color = 'red'
 							value = -1 * element.value
 						}
-						if (!element.isCompesed) {
+						if (!element.onlyFuture) {
 							value = `[ ${formatMoeda(value)} ]`
 						} else {
 							value = formatMoeda(value)
