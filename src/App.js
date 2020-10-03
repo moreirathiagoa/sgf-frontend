@@ -114,7 +114,9 @@ class App extends React.Component {
 		return (
 			<div>
 				<Modal
-					title='Nova Transação'
+					title={
+						this.state.transaction.id ? 'Editar Transação' : 'Nova Transação'
+					}
 					visible={this.state.transaction.modalVisible}
 					onCancel={this.transactionModalClose}
 					footer={null}
@@ -122,11 +124,9 @@ class App extends React.Component {
 				>
 					<Transaction
 						loading={this.setLoading}
-						mudaTitulo={this.mudaTitulo}
 						verificaLogin={this.verificaLogin}
 						transactionType={this.state.transaction.type}
 						transactionId={this.state.transaction.id}
-						transactionModalVisible={this.state.transaction.modalVisible}
 						transactionFatureId={this.state.transaction.fatureId}
 						handleClose={this.transactionModalClose}
 					/>
