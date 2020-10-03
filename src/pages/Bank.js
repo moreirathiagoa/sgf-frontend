@@ -25,9 +25,7 @@ const { Panel } = Collapse
 const { Title } = Typography
 const { Option } = Select
 
-function callback(key) {
-	//console.log(key);
-}
+function callback(key) {}
 
 class Banks extends React.Component {
 	constructor(props) {
@@ -49,6 +47,12 @@ class Banks extends React.Component {
 		this.editInit = this.editInit.bind(this)
 		this.remover = this.remover.bind(this)
 		this.actionButtonNew = this.actionButtonNew.bind(this)
+	}
+
+	componentDidUpdate() {
+		if (this.props.update) {
+			this.list()
+		}
 	}
 
 	componentDidMount() {
@@ -291,9 +295,7 @@ class Banks extends React.Component {
 							name='basic'
 							initialValues={{ remember: true }}
 							onFinish={this.submitForm}
-							onFinishFailed={() => {
-								console.log('falhou')
-							}}
+							onFinishFailed={() => {}}
 						>
 							<Form.Item label='Nome de Banco'>
 								<Input

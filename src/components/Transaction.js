@@ -329,9 +329,7 @@ class Transaction extends React.Component {
 					size={'small'}
 					name='basic'
 					initialValues={{ remember: true }}
-					onFinishFailed={() => {
-						console.log('falhou')
-					}}
+					onFinishFailed={() => {}}
 				>
 					<Form.Item label='Banco'>
 						<SelectBank

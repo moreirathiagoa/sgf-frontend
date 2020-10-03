@@ -4,6 +4,7 @@ import { Row, Col, Card } from 'antd'
 import '../App.css'
 import { listBanksDashboard, futureTransactionBalance } from '../api'
 import { openNotification, formatMoeda } from '../utils'
+import { uniqueId } from 'lodash'
 
 class DashboardPlan extends React.Component {
 	constructor(props) {
@@ -16,10 +17,16 @@ class DashboardPlan extends React.Component {
 	}
 
 	componentDidUpdate() {
-		//console.log('update')
+		if (this.props.update) {
+			this.processUpdate()
+		}
 	}
 
 	componentDidMount() {
+		this.processUpdate()
+	}
+
+	processUpdate() {
 		this.props.mudaTitulo('Dashboard Plano')
 		this.initFutureTransactionBalance()
 		this.getListBanks()
@@ -87,6 +94,7 @@ class DashboardPlan extends React.Component {
 
 	render() {
 		let actualBalance = this.state.actualBalance
+
 		return (
 			<>
 				<p>Saldo Liquido Atual: {formatMoeda(actualBalance)}</p>
@@ -106,24 +114,23 @@ class DashboardPlan extends React.Component {
 						)
 
 						return (
-							<>
-								<Card
-									size='small'
-									title={title}
-									style={{ width: 370, marginBottom: '5px' }}
-								>
-									<Row>
-										<Col span={4}>Entrada:</Col>
-										<Col span={7}>{formatMoeda(element.credit)}</Col>
-										<Col span={6}>Saída:</Col>
-										<Col span={7}>{formatMoeda(element.debit)}</Col>
-										<Col span={4}>Cartão:</Col>
-										<Col span={7}>{formatMoeda(element.card)}</Col>
-										<Col span={6}>Liquido:</Col>
-										<Col span={7}>{formatMoeda(liquidBalance)}</Col>
-									</Row>
-								</Card>
-							</>
+							<Card
+								size='small'
+								title={title}
+								style={{ width: 370, marginBottom: '5px' }}
+								key={uniqueId()}
+							>
+								<Row>
+									<Col span={4}>Entrada:</Col>
+									<Col span={7}>{formatMoeda(element.credit)}</Col>
+									<Col span={6}>Saída:</Col>
+									<Col span={7}>{formatMoeda(element.debit)}</Col>
+									<Col span={4}>Cartão:</Col>
+									<Col span={7}>{formatMoeda(element.card)}</Col>
+									<Col span={6}>Liquido:</Col>
+									<Col span={7}>{formatMoeda(liquidBalance)}</Col>
+								</Row>
+							</Card>
 						)
 					})
 				) : (

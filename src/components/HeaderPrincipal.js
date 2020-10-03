@@ -26,7 +26,13 @@ class HeaderPrincipal extends React.Component {
 						/>
 					</span>
 				)}
-				{this.props.titulo}
+				<span
+					onClick={() => {
+						this.props.update()
+					}}
+				>
+					{this.props.titulo}
+				</span>
 			</Header>
 		)
 	}

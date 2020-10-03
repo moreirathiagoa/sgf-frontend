@@ -64,7 +64,6 @@ class Dashboard extends React.Component {
 					this.props.verificaLogin()
 				} else {
 					let state = this.state
-					console.log(res.data.data)
 					//state.saldoNotCompensated = res.data.data
 					this.setState(state)
 				}

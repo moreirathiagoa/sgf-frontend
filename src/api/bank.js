@@ -15,7 +15,6 @@ const listBanks = (typeTransaction) => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ',err)
 			return err.response
 		})
 	return response
@@ -34,7 +33,6 @@ const listBanksDashboard = () => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ',err)
 			return err.response
 		})
 	return response
@@ -55,7 +53,6 @@ const createBank = (bank) => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ',err)
 			return err.response
 		})
 	return response
@@ -75,7 +72,6 @@ const removeBank = (id) => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ',err)
 			return err.response
 		})
 	return response
@@ -96,7 +92,6 @@ const updateBank = (bank, idBank) => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ',err)
 			return err.response
 		})
 	return response

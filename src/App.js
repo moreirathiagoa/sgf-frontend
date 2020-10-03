@@ -12,7 +12,6 @@ const { Content } = Layout
 
 class App extends React.Component {
 	state = {
-		collapsed: true,
 		titulo: 'Sistema de Gerenciamento Financeiro',
 		logado: false,
 		loading: false,
@@ -25,10 +24,17 @@ class App extends React.Component {
 		menu: {
 			modalVisible: false,
 		},
+		forceUpdate: false,
 	}
 
 	componentDidMount() {
 		this.verificaLogin()
+	}
+
+	componentDidUpdate() {
+		if (this.state.forceUpdate) {
+			this.setState({ forceUpdate: false })
+		}
 	}
 
 	verificaLogin = () => {
@@ -44,12 +50,6 @@ class App extends React.Component {
 				)
 			this.setState({ logado: false })
 		}
-	}
-
-	toggle = () => {
-		this.setState({
-			collapsed: !this.state.collapsed,
-		})
 	}
 
 	mudaTitulo = (pagina) => {
@@ -108,6 +108,10 @@ class App extends React.Component {
 		this.setState(state)
 	}
 
+	update = () => {
+		this.setState({ forceUpdate: true })
+	}
+
 	render() {
 		return (
 			<div>
@@ -119,6 +123,9 @@ class App extends React.Component {
 					onCancel={this.transactionModalClose}
 					footer={null}
 					destroyOnClose={true}
+					afterClose={() => {
+						this.update()
+					}}
 				>
 					<Transaction
 						loading={this.setLoading}
@@ -137,6 +144,7 @@ class App extends React.Component {
 								toggle={this.toggle}
 								logado={this.state.logado}
 								titulo={this.state.titulo}
+								update={this.update}
 								showModal={this.showMenuModal}
 							/>
 							<Modal
@@ -155,12 +163,9 @@ class App extends React.Component {
 								title=''
 							>
 								<MenuPrincipal
-									toggle={this.toggle}
-									collapsed={this.state.collapsed}
 									logado={this.state.logado}
-									alterado={this.toggle}
-									showModal={this.showTransactionModal}
 									handleClose={this.menuModalClose}
+									showModal={this.showTransactionModal}
 								/>
 							</Modal>
 							<Content
@@ -177,6 +182,7 @@ class App extends React.Component {
 										logado={this.state.logado}
 										verificaLogin={this.verificaLogin}
 										showModal={this.showTransactionModal}
+										update={this.state.forceUpdate}
 									/>
 								</Spin>
 							</Content>

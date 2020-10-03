@@ -28,9 +28,7 @@ import { openNotification, formatDateToUser } from '../utils'
 const { Panel } = Collapse
 const { Title } = Typography
 
-function callback(key) {
-	//console.log(key);
-}
+function callback(key) {}
 
 class Categorias extends React.Component {
 	constructor(props) {
@@ -49,6 +47,12 @@ class Categorias extends React.Component {
 		this.editInit = this.editInit.bind(this)
 		this.remover = this.remover.bind(this)
 		this.actionButtonNew = this.actionButtonNew.bind(this)
+	}
+
+	componentDidUpdate() {
+		if (this.props.update) {
+			this.list()
+		}
 	}
 
 	componentDidMount() {
@@ -277,9 +281,7 @@ class Categorias extends React.Component {
 							name='basic'
 							initialValues={{ remember: true }}
 							onFinish={this.submitForm}
-							onFinishFailed={() => {
-								console.log('falhou')
-							}}
+							onFinishFailed={() => {}}
 						>
 							<Form.Item label='Nome da Categoria'>
 								<Input
