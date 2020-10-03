@@ -55,7 +55,7 @@ class Transaction extends React.Component {
 		const param = window.location.pathname
 		const typeTransaction = param.split('/')[2]
 		let state = this.state
-		if (typeTransaction === 'contaCorrente') state.data.isCompensated = true
+		if (typeTransaction === 'contaCorrente') state.data.isCompesed = true
 		state.data.typeTransaction = typeTransaction
 		this.setState(state)
 		this.getListBanks(typeTransaction)
@@ -197,7 +197,7 @@ class Transaction extends React.Component {
 
 		switch (event.target.name) {
 			case 'isCompensated':
-				state.data.isCompensated = !state.data.isCompensated
+				state.data.isCompesed = !state.data.isCompesed
 				break
 
 			case 'effectiveDate':
@@ -393,14 +393,12 @@ class Transaction extends React.Component {
 										>
 											<Switch
 												name='isCompensated'
-												checked={this.state.data.isCompensated}
+												checked={this.state.data.isCompesed}
 												size='md'
 											/>
 										</span>
 										<span style={{ color: '#ccc' }}>
-											{this.state.data.isCompensated
-												? 'Compensado'
-												: 'Programado'}
+											{this.state.data.isCompesed ? 'Compensado' : 'Programado'}
 										</span>
 									</>
 								)}
