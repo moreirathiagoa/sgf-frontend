@@ -34,6 +34,7 @@ class Transaction extends React.Component {
 				isCompesed: transactionType === 'contaCorrente' ? true : undefined,
 				typeTransaction: transactionType,
 			},
+			isCredit: false,
 			banks: [],
 			categories: [],
 			fatures: [],
@@ -48,8 +49,6 @@ class Transaction extends React.Component {
 		const transactionType = this.props.transactionType
 		const transactionId = this.props.transactionId
 		const transactionFatureId = this.props.transactionFatureId
-
-		this.props.mudaTitulo('Nova Transação')
 
 		let now = new Date()
 
@@ -221,6 +220,10 @@ class Transaction extends React.Component {
 				state.data.isSimples = !state.data.isSimples
 				break
 
+			case 'isCredit':
+				state.isCredit = !state.isCredit
+				break
+
 			case 'salvarSair':
 				this.finalizeForm().then((res) => {
 					if (res === 'success') this.props.handleClose()
@@ -237,6 +240,12 @@ class Transaction extends React.Component {
 	}
 
 	finalizeForm() {
+		if (!this.state.isCredit) {
+			const state = this.state
+			state.data.value = state.data.value * -1
+			this.setState(state)
+		}
+
 		if (this.state.idToUpdate) {
 			return this.atualizar()
 		} else {
@@ -306,7 +315,7 @@ class Transaction extends React.Component {
 		return (
 			<div>
 				<Form
-					labelCol={{ span: 4 }}
+					labelCol={{ span: 5 }}
 					wrapperCol={{ span: 14 }}
 					layout='horizontal'
 					size={'small'}
@@ -332,9 +341,9 @@ class Transaction extends React.Component {
 						/>
 					</Form.Item>
 
-					<Form.Item label='Data da Transação'>
+					<Form.Item label='Data'>
 						<Row>
-							<Col span={8}>
+							<Col span={12}>
 								<DatePicker
 									format={'DD/MM/YYYY'}
 									name='efectedDate'
@@ -373,16 +382,37 @@ class Transaction extends React.Component {
 						</Row>
 					</Form.Item>
 
-					<Form.Item label='Valor da Transação'>
-						<Input
-							placeholder=''
-							type='number'
-							name='value'
-							size='md'
-							value={this.state.data.value}
-							onChange={this.handleChange}
-							style={{ width: 100 }}
-						/>
+					<Form.Item label='Valor'>
+						<Row>
+							<Col span={10}>
+								<Input
+									placeholder=''
+									type='number'
+									name='value'
+									size='md'
+									value={this.state.data.value}
+									onChange={this.handleChange}
+									style={{ width: 100 }}
+								/>
+							</Col>
+							<Col span={10}>
+								<>
+									<span
+										style={{ padding: '0 10px' }}
+										onClick={this.handleChange}
+									>
+										<Switch
+											name='isCredit'
+											checked={this.state.isCredit}
+											size='md'
+										/>
+									</span>
+									<span style={{ color: '#ccc' }}>
+										{this.state.isCredit ? 'Crédito' : 'Débito'}
+									</span>
+								</>
+							</Col>
+						</Row>
 					</Form.Item>
 
 					<Form.Item label='Descrição'>
@@ -431,7 +461,7 @@ class Transaction extends React.Component {
 									style={{ width: 60 }}
 								/>
 							</Col>
-							<Col span={10}>
+							<Col span={12}>
 								<span style={{ padding: '0 10px' }} onClick={this.handleChange}>
 									<Switch
 										name='isSimples'
