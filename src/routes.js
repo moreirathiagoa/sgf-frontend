@@ -38,6 +38,7 @@ class Router extends React.Component {
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
+						update={this.props.update}
 					/>
 				</Route>
 				<Route path='/dashboard-plan'>
@@ -45,6 +46,7 @@ class Router extends React.Component {
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
+						update={this.props.update}
 					/>
 				</Route>
 				<Route path='/extrato-conta'>
@@ -53,6 +55,7 @@ class Router extends React.Component {
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 						showModal={this.props.showModal}
+						update={this.props.update}
 					/>
 				</Route>
 				<Route path='/extrato-cartao'>
@@ -61,6 +64,7 @@ class Router extends React.Component {
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 						showModal={this.props.showModal}
+						update={this.props.update}
 					/>
 				</Route>
 				<Route path='/extrato-plano'>
@@ -69,6 +73,7 @@ class Router extends React.Component {
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 						showModal={this.props.showModal}
+						update={this.props.update}
 					/>
 				</Route>
 				<Route path='/category'>
@@ -76,6 +81,7 @@ class Router extends React.Component {
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
+						update={this.props.update}
 					/>
 				</Route>
 				<Route path='/banks'>
@@ -83,6 +89,7 @@ class Router extends React.Component {
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
+						update={this.props.update}
 					/>
 				</Route>
 				<Route path='/logout'>
@@ -97,6 +104,7 @@ class Router extends React.Component {
 					<NotFound
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
+						update={this.props.update}
 					/>
 				</Route>
 			</Switch>

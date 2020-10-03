@@ -53,6 +53,12 @@ class ExtractPlan extends React.Component {
 		this.getListCategories()
 	}
 
+	componentDidUpdate() {
+		if (this.props.update) {
+			this.list()
+		}
+	}
+
 	componentDidMount() {
 		this.props.mudaTitulo('Extrato Planejamentos Futuros')
 		this.list()

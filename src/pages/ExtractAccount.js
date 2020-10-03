@@ -56,6 +56,12 @@ class ExtractAccount extends React.Component {
 		this.submitForm = this.submitForm.bind(this)
 	}
 
+	componentDidUpdate() {
+		if (this.props.update) {
+			this.list()
+		}
+	}
+
 	componentDidMount() {
 		this.props.mudaTitulo('Extrato Contas Corrente')
 		this.getListBanks()
@@ -165,7 +171,6 @@ class ExtractAccount extends React.Component {
 				break
 
 			case 'notCompensated':
-				console.log('vai mudar')
 				state.filters.onlyFuture = !state.filters.onlyFuture
 				this.list()
 				break

@@ -34,10 +34,16 @@ class DashboardDebit extends React.Component {
 	}
 
 	componentDidUpdate() {
-		//console.log('update')
+		if (this.props.update) {
+			this.processUpdate()
+		}
 	}
 
 	componentDidMount() {
+		this.processUpdate()
+	}
+
+	processUpdate() {
 		this.props.mudaTitulo('Dashboard Débito')
 		this.getListBanks()
 		this.initSaldoNaoCompensadoCredit()
