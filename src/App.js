@@ -19,8 +19,8 @@ class App extends React.Component {
 		logado: false,
 		loading: false,
 		transaction: {
-			modalVisible: true,
-			type: 'cartaoCredito',
+			modalVisible: false,
+			type: null,
 			id: null,
 			fatureId: null,
 		},
