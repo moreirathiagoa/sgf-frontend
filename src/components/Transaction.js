@@ -98,8 +98,8 @@ class Transaction extends React.Component {
 
 					if (res.data.data.fature_id)
 						state.data.fature = res.data.data.fature_id.name
-					console.log('res.data :>> ', res.data)
-					if (res.data.Transactiondata.value >= 0) {
+
+					if (res.data.data.value >= 0) {
 						state.isCredit = true
 					} else {
 						state.data.value = -1 * state.data.value
