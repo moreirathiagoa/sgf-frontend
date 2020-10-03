@@ -18,7 +18,11 @@ class HeaderPrincipal extends React.Component {
 			>
 				{this.props.logado && (
 					<span className={'trigger'}>
-						<MenuUnfoldOutlined onClick={this.props.toggle} />
+						<MenuUnfoldOutlined
+							onClick={() => {
+								this.props.showModal('abrir')
+							}}
+						/>
 					</span>
 				)}
 				{this.props.titulo}
