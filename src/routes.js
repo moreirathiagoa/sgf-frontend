@@ -3,7 +3,6 @@ import { Switch, Route } from 'react-router-dom'
 import DashboardDebit from './pages/DashboardDebit'
 import DashboardPlan from './pages/DashboardPlan'
 import Category from './pages/Category'
-import Transaction from './pages/Transaction'
 import ExtractAccount from './pages/ExtractAccount'
 import ExtractCard from './pages/ExtractCard'
 import ExtractPlan from './pages/ExtractPlan'
@@ -47,39 +46,12 @@ class Router extends React.Component {
 						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
-				<Route path='/transaction/contaCorrente/:idTransaction?'>
-					<Transaction
-						loading={this.props.loading}
-						mudaTitulo={this.props.mudaTitulo}
-						verificaLogin={this.props.verificaLogin}
-					/>
-				</Route>
-				<Route path='/transaction/cartaoCredito/:idTransaction?'>
-					<Transaction
-						loading={this.props.loading}
-						mudaTitulo={this.props.mudaTitulo}
-						verificaLogin={this.props.verificaLogin}
-					/>
-				</Route>
-				<Route path='/transaction/planejamento/:idTransaction?'>
-					<Transaction
-						loading={this.props.loading}
-						mudaTitulo={this.props.mudaTitulo}
-						verificaLogin={this.props.verificaLogin}
-					/>
-				</Route>
-				<Route path='/transaction/contaCorrente/pagamentoCartao/:idFature'>
-					<Transaction
-						loading={this.props.loading}
-						mudaTitulo={this.props.mudaTitulo}
-						verificaLogin={this.props.verificaLogin}
-					/>
-				</Route>
 				<Route path='/extrato-conta'>
 					<ExtractAccount
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
+						showModal={this.props.showModal}
 					/>
 				</Route>
 				<Route path='/extrato-cartao'>
@@ -87,6 +59,7 @@ class Router extends React.Component {
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
+						showModal={this.props.showModal}
 					/>
 				</Route>
 				<Route path='/extrato-plano'>
@@ -94,6 +67,7 @@ class Router extends React.Component {
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
+						showModal={this.props.showModal}
 					/>
 				</Route>
 				<Route path='/category'>

@@ -60,24 +60,35 @@ class MenuPrincipal extends React.Component {
 									<span>Projeção Futuro</span>
 								</Link>
 							</Menu.Item>
-							<Menu.Item key='4'>
-								<Link to='/transaction/contaCorrente'>
-									<WalletOutlined />
-									<span>Novo Conta</span>
-								</Link>
+
+							<Menu.Item
+								key='4'
+								onClick={() => {
+									this.props.showModal({ typeTransaction: 'contaCorrente' })
+								}}
+							>
+								<WalletOutlined />
+								<span>Novo Conta</span>
 							</Menu.Item>
-							<Menu.Item key='5'>
-								<Link to='/transaction/cartaoCredito'>
-									<WalletOutlined />
-									<span>Novo Crédito</span>
-								</Link>
+							<Menu.Item
+								key='5'
+								onClick={() => {
+									this.props.showModal({ typeTransaction: 'cartaoCredito' })
+								}}
+							>
+								<WalletOutlined />
+								<span>Novo Crédito</span>
 							</Menu.Item>
-							<Menu.Item key='6'>
-								<Link to='/transaction/planejamento'>
-									<WalletOutlined />
-									<span>Novo Plano</span>
-								</Link>
+							<Menu.Item
+								key='6'
+								onClick={() => {
+									this.props.showModal({ typeTransaction: 'planejamento' })
+								}}
+							>
+								<WalletOutlined />
+								<span>Novo Plano</span>
 							</Menu.Item>
+
 							<Menu.Item key='7'>
 								<Link to='/extrato-conta'>
 									<FileSearchOutlined />

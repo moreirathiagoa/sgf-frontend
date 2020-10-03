@@ -1,6 +1,6 @@
 import React from 'react'
 import '../App.css'
-import { Link, Redirect } from 'react-router-dom'
+import { Redirect } from 'react-router-dom'
 import {
 	Input,
 	Collapse,
@@ -266,7 +266,13 @@ class ExtractCard extends React.Component {
 							this.props.verificaLogin()
 						} else {
 							let state = this.state
-							state.faturePayed = res.data.data
+
+							this.props.showModal({
+								typeTransaction: 'contaCorrente',
+								transactionFatureId: res.data.data._id,
+							})
+
+							//state.faturePayed = res.data.data
 							this.setState(state)
 							openNotification(
 								'success',
@@ -321,26 +327,26 @@ class ExtractCard extends React.Component {
 		}
 	}
 
-	editInit(idTransaction) {
-		this.setState({ idToEdit: idTransaction })
-	}
-
 	submitForm(e) {}
 
 	menu = (element) => (
 		<Menu>
 			<Menu.Item onClick={() => this.remover(element._id)}>Apagar</Menu.Item>
-			<Menu.Item onClick={() => this.editInit(element._id)}>Editar</Menu.Item>
+
+			<Menu.Item
+				onClick={() =>
+					this.props.showModal({
+						typeTransaction: 'cartaoCredito',
+						idTransaction: element._id,
+					})
+				}
+			>
+				Editar
+			</Menu.Item>
 		</Menu>
 	)
 
 	render() {
-		if (this.state.idToEdit) {
-			return (
-				<Redirect to={'/transaction/cartaoCredito/' + this.state.idToEdit} />
-			)
-		}
-
 		if (this.state.faturePayed) {
 			return (
 				<Redirect
@@ -405,12 +411,12 @@ class ExtractCard extends React.Component {
 					<Row>
 						<Title level={4}>
 							Transações
-							<Link
+							<PlusCircleOutlined
 								style={{ paddingLeft: '10px' }}
-								to='/transaction/cartaoCredito'
-							>
-								<PlusCircleOutlined />
-							</Link>
+								onClick={() => {
+									this.props.showModal({ typeTransaction: 'cartaoCredito' })
+								}}
+							/>
 							{this.state.fature_id !== 'Selecione' && (
 								<span
 									style={{ paddingLeft: '15px' }}
