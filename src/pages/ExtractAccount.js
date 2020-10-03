@@ -35,7 +35,7 @@ function callback(key) {
 	//console.log(key);
 }
 
-class ExtractAcount extends React.Component {
+class ExtractAccount extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
@@ -295,7 +295,7 @@ class ExtractAcount extends React.Component {
 			<Menu.Item
 				onClick={() =>
 					this.props.showModal({
-						typeTransaction: 'constaCorrente',
+						typeTransaction: 'contaCorrente',
 						idTransaction: element._id,
 					})
 				}
@@ -471,4 +471,4 @@ class ExtractAcount extends React.Component {
 		)
 	}
 }
-export default ExtractAcount
+export default ExtractAccount

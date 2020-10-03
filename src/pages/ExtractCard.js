@@ -266,7 +266,13 @@ class ExtractCard extends React.Component {
 							this.props.verificaLogin()
 						} else {
 							let state = this.state
-							state.faturePayed = res.data.data
+
+							this.props.showModal({
+								typeTransaction: 'contaCorrente',
+								transactionFatureId: res.data.data._id,
+							})
+
+							//state.faturePayed = res.data.data
 							this.setState(state)
 							openNotification(
 								'success',
@@ -330,7 +336,7 @@ class ExtractCard extends React.Component {
 			<Menu.Item
 				onClick={() =>
 					this.props.showModal({
-						typeTransaction: 'constaCorrente',
+						typeTransaction: 'cartaoCredito',
 						idTransaction: element._id,
 					})
 				}

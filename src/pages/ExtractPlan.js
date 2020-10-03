@@ -316,7 +316,7 @@ class ExtractPlan extends React.Component {
 			<Menu.Item
 				onClick={() =>
 					this.props.showModal({
-						typeTransaction: 'constaCorrente',
+						typeTransaction: 'contaCorrente',
 						idTransaction: element._id,
 					})
 				}

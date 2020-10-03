@@ -1,6 +1,5 @@
 import React from 'react'
 import '../App.css'
-import { Redirect } from 'react-router-dom'
 import { Form, Input, Button, Switch, Row, Col, DatePicker } from 'antd'
 import {
 	createTransaction,
@@ -20,59 +19,38 @@ import { SelectCategories, SelectBank, SelectFacture } from '.'
 
 class Transaction extends React.Component {
 	constructor(props) {
+		const transactionType = props.transactionType
+		const transactionId = props.transactionId
+
 		super(props)
+
 		this.state = {
-			screenType: null,
+			idToUpdate: transactionId,
 			data: {
-				effectiveDate: actualDateToUser(),
+				efectedDate: actualDateToUser(),
 				bank_id: 'Selecione',
 				category_id: 'Selecione',
 				isSimples: false,
+				isCompesed: transactionType === 'contaCorrente' ? true : undefined,
+				typeTransaction: transactionType,
 			},
-			allBanks: [],
 			banks: [],
 			categories: [],
 			fatures: [],
 			saveExit: null,
 			exit: false,
 		}
+
 		this.handleChange = this.handleChange.bind(this)
-		this.submitForm = this.submitForm.bind(this)
-	}
-
-	componentDidUpdate(props) {
-		const typeTransaction = props.transactionType
-		const idTransaction = props.transactionId
-
-		let state = this.state
-
-		if (
-			state.data.typeTransaction !== typeTransaction ||
-			state.idToUpdate !== idTransaction
-		) {
-			state.data.typeTransaction = typeTransaction
-			state.data.isCompesed = typeTransaction === 'contaCorrente' ? true : false
-
-			this.getListBanks(typeTransaction)
-			if (state.idToUpdate !== idTransaction) {
-				state.idToUpdate = idTransaction
-				this.getTransactionToUpdate(this.state.idToUpdate)
-			}
-
-			this.setState(state)
-		}
 	}
 
 	componentDidMount() {
-		console.log('MOUNTED')
-		const param = window.location.pathname
-		const parameter = param.split('/')[3]
-		if (parameter === 'pagamentoCartao') {
-			const fatureId = param.split('/')[4]
-			this.getDataFromFature(fatureId)
-		}
+		const transactionType = this.props.transactionType
+		const transactionId = this.props.transactionId
+		const transactionFatureId = this.props.transactionFatureId
 
 		this.props.mudaTitulo('Nova Transação')
+
 		let now = new Date()
 
 		let state = this.state
@@ -95,6 +73,16 @@ class Transaction extends React.Component {
 		this.setState(state)
 
 		this.getListCategories()
+
+		this.getListBanks(transactionType)
+
+		if (transactionId) {
+			this.getTransactionToUpdate(transactionId)
+		}
+
+		if (transactionFatureId) {
+			this.getDataFromFature(transactionFatureId)
+		}
 	}
 
 	getTransactionToUpdate(idTransaction) {
@@ -110,10 +98,7 @@ class Transaction extends React.Component {
 					if (res.data.data.fature_id)
 						state.data.fature = res.data.data.fature_id.name
 
-					state.data.effectiveDate = formatDateToUser(
-						res.data.data.effectiveDate
-					)
-					state.banks = state.allBanks
+					state.data.efectedDate = formatDateToUser(res.data.data.efectedDate)
 
 					this.setState(state)
 				}
@@ -128,7 +113,7 @@ class Transaction extends React.Component {
 	}
 
 	getListBanks(typeTransaction) {
-		listBanks(typeTransaction)
+		return listBanks(typeTransaction)
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -200,8 +185,8 @@ class Transaction extends React.Component {
 				state.data.isCompesed = !state.data.isCompesed
 				break
 
-			case 'effectiveDate':
-				state.data.effectiveDate = event.target.value
+			case 'efectedDate':
+				state.data.efectedDate = event.target.value
 				break
 
 			case 'description':
@@ -237,11 +222,13 @@ class Transaction extends React.Component {
 				break
 
 			case 'salvarSair':
-				state.saveExit = true
+				this.finalizeForm().then((res) => {
+					if (res === 'success') this.props.handleClose()
+				})
 				break
 
 			case 'salvar':
-				state.saveExit = false
+				this.finalizeForm()
 				break
 
 			default:
@@ -249,13 +236,16 @@ class Transaction extends React.Component {
 		this.setState(state)
 	}
 
-	submitForm(e) {
-		if (this.state.idToUpdate) this.atualizar(e)
-		else this.cadastrar(e)
+	finalizeForm() {
+		if (this.state.idToUpdate) {
+			return this.atualizar()
+		} else {
+			return this.cadastrar()
+		}
 	}
 
 	cadastrar() {
-		createTransaction(this.state.data)
+		return createTransaction(this.state.data)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
 					openNotification(
@@ -263,13 +253,14 @@ class Transaction extends React.Component {
 						'Transação cadastrada',
 						'Transação cadastrada com sucesso.'
 					)
-					this.limpaDataState()
+					return 'success'
 				} else {
 					openNotification(
 						'error',
 						'Transação não cadastrada',
 						res.data.message
 					)
+					return 'error'
 				}
 			})
 			.catch((err) => {
@@ -278,11 +269,12 @@ class Transaction extends React.Component {
 					'Transação não cadastrada',
 					'Erro interno. Tente novamente mais tarde.'
 				)
+				return 'error'
 			})
 	}
 
 	atualizar() {
-		updateTransaction(this.state.data, this.state.idToUpdate)
+		return updateTransaction(this.state.data, this.state.idToUpdate)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
 					openNotification(
@@ -290,13 +282,14 @@ class Transaction extends React.Component {
 						'Transação atualizada',
 						'Transação atualizada com sucesso.'
 					)
-					this.limpaDataState()
+					return 'success'
 				} else {
 					openNotification(
 						'error',
 						'Transação não atualizada',
 						'A Transação não pode ser atualizada.'
 					)
+					return 'error'
 				}
 			})
 			.catch((err) => {
@@ -305,34 +298,11 @@ class Transaction extends React.Component {
 					'Transação não cadastrada',
 					'Erro interno. Tente novamente mais tarde.'
 				)
+				return 'error'
 			})
 	}
 
-	limpaDataState() {
-		let state = this.state
-		if (state.saveExit === true) {
-			state.exit = true
-		}
-		this.setState(state)
-	}
-
 	render() {
-		if (this.state.exit === true) {
-			if (this.state.idToUpdate) {
-				switch (this.state.data.typeTransaction) {
-					case 'contaCorrente':
-						return <Redirect to='/extrato-conta' />
-					case 'cartaoCredito':
-						return <Redirect to='/extrato-cartao' />
-					case 'planejamento':
-						return <Redirect to='/extrato-plano' />
-					default:
-				}
-			} else {
-				return <Redirect to='/dashboard-debit' />
-			}
-		}
-
 		return (
 			<div>
 				<Form
@@ -342,7 +312,6 @@ class Transaction extends React.Component {
 					size={'small'}
 					name='basic'
 					initialValues={{ remember: true }}
-					onFinish={this.submitForm}
 					onFinishFailed={() => {
 						console.log('falhou')
 					}}
@@ -368,15 +337,13 @@ class Transaction extends React.Component {
 							<Col span={8}>
 								<DatePicker
 									format={'DD/MM/YYYY'}
-									name='effectiveDate'
+									name='efectedDate'
 									size='md'
-									defaultValue={formatDateToMoment(
-										this.state.data.effectiveDate
-									)}
+									defaultValue={formatDateToMoment(this.state.data.efectedDate)}
 									onChange={(date, dateString) => {
 										const event = {
 											target: {
-												name: 'effectiveDate',
+												name: 'efectedDate',
 												value: dateString,
 											},
 										}
@@ -488,7 +455,15 @@ class Transaction extends React.Component {
 										size='lg'
 										htmlType='submit'
 										name='salvar'
-										onClick={this.handleChange}
+										onClick={() => {
+											const event = {
+												target: {
+													name: 'salvar',
+													value: true,
+												},
+											}
+											this.handleChange(event)
+										}}
 									>
 										Salvar
 									</Button>
@@ -501,7 +476,15 @@ class Transaction extends React.Component {
 									type='primary'
 									htmlType='submit'
 									name='salvarSair'
-									onClick={this.handleChange}
+									onClick={() => {
+										const event = {
+											target: {
+												name: 'salvarSair',
+												value: true,
+											},
+										}
+										this.handleChange(event)
+									}}
 								>
 									Salvar e Sair
 								</Button>

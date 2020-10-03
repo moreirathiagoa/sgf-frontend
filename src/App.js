@@ -18,9 +18,12 @@ class App extends React.Component {
 		titulo: 'Sistema de Gerenciamento Financeiro',
 		logado: false,
 		loading: false,
-		transactionModalVisible: false,
-		transactionType: null,
-		transactionId: null,
+		transaction: {
+			modalVisible: false,
+			type: null,
+			id: null,
+			fatureId: null,
+		},
 	}
 
 	componentDidMount() {
@@ -59,22 +62,35 @@ class App extends React.Component {
 	showModal = (data) => {
 		const transactionType = data.typeTransaction
 		const transactionId = data.idTransaction
+		const transactionFatureId = data.transactionFatureId
 
-		let state = this.state
+		if (this.state.transaction.fatureId !== transactionFatureId) {
+			let state = this.state
+			state.transaction.fatureId = transactionFatureId
+			this.setState(state)
+		}
 
-		if (state.transactionType !== transactionType) {
-			state.transactionModalVisible = true
+		if (this.state.transaction.id !== transactionId) {
+			let state = this.state
+			state.transaction.id = transactionId
+			this.setState(state)
+		}
+
+		if (this.state.transactionType !== transactionType) {
+			let state = this.state
+			state.transaction.modalVisible = true
 			state.transactionType = transactionType
-			state.transactionId = transactionId
 			this.setState(state)
 		}
 	}
 
-	handleCancel = (e) => {
-		this.setState({
-			transactionModalVisible: false,
-			transactionType: null,
-		})
+	handleClose = (e) => {
+		let state = this.state
+		state.transaction.modalVisible = false
+		state.transactionType = null
+		state.transaction.id = null
+		state.transaction.fatureId = null
+		this.setState(state)
 	}
 
 	render() {
@@ -82,18 +98,23 @@ class App extends React.Component {
 			<div>
 				<Modal
 					title='Nova Transação'
-					visible={this.state.transactionModalVisible}
-					onOk={() => {
-						this.handleOk(this.state.modalContent)
-					}}
-					onCancel={this.handleCancel}
+					visible={this.state.transaction.modalVisible}
+					// onOk={() => {
+					// 	this.handleOk(this.state.modalContent)
+					// }}
+					onCancel={this.handleClose}
+					footer={[]}
+					destroyOnClose={true}
 				>
 					<Transaction
 						loading={this.setLoading}
 						mudaTitulo={this.mudaTitulo}
 						verificaLogin={this.verificaLogin}
 						transactionType={this.state.transactionType}
-						transactionId={this.state.transactionId}
+						transactionId={this.state.transaction.id}
+						transactionModalVisible={this.state.transaction.modalVisible}
+						transactionFatureId={this.state.transaction.fatureId}
+						handleClose={this.handleClose}
 					/>
 				</Modal>
 				<BrowserRouter>
