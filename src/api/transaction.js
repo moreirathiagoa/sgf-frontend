@@ -2,14 +2,17 @@ import axios from 'axios'
 import properties from '../properties'
 import { formatDateToMoment } from '../utils'
 
-const listTransaction = (typeTransaction) => {
+const listTransaction = (typeTransaction, filters) => {
 	const token = localStorage.getItem('token')
 
 	const response = axios({
-		method: 'get',
+		method: 'POST',
 		url: properties.url + 'transaction/list/' + typeTransaction,
 		headers: {
 			auth: token,
+		},
+		data: {
+			filters: filters,
 		},
 	})
 		.then((res) => {
