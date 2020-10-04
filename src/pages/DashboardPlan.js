@@ -107,34 +107,39 @@ class DashboardPlan extends React.Component {
 							element.credit - element.debit * -1 - element.card * -1
 						actualBalance = actualBalance + liquidBalance
 
-						const title = (
-							<>
-								<span>{element.month + '/' + element.year}</span>
-								<span style={{ float: 'right' }}>
-									{'Acumulado: ' + formatMoeda(actualBalance)}
-								</span>
-							</>
-						)
+						if (
+							element.credit + element.debit + element.card + liquidBalance !==
+							0
+						) {
+							const title = (
+								<>
+									<span>{element.month + '/' + element.year}</span>
+									<span style={{ float: 'right' }}>
+										{'Acumulado: ' + formatMoeda(actualBalance)}
+									</span>
+								</>
+							)
 
-						return (
-							<Card
-								size='small'
-								title={title}
-								style={{ width: 370, marginBottom: '5px' }}
-								key={uniqueId()}
-							>
-								<Row>
-									<Col span={4}>Entrada:</Col>
-									<Col span={7}>{formatMoeda(element.credit)}</Col>
-									<Col span={6}>Saída:</Col>
-									<Col span={7}>{formatMoeda(element.debit)}</Col>
-									<Col span={4}>Cartão:</Col>
-									<Col span={7}>{formatMoeda(element.card)}</Col>
-									<Col span={6}>Liquido:</Col>
-									<Col span={7}>{formatMoeda(liquidBalance)}</Col>
-								</Row>
-							</Card>
-						)
+							return (
+								<Card
+									size='small'
+									title={title}
+									style={{ width: 370, marginBottom: '5px' }}
+									key={uniqueId()}
+								>
+									<Row>
+										<Col span={4}>Entrada:</Col>
+										<Col span={7}>{formatMoeda(element.credit)}</Col>
+										<Col span={6}>Saída:</Col>
+										<Col span={7}>{formatMoeda(element.debit)}</Col>
+										<Col span={4}>Cartão:</Col>
+										<Col span={7}>{formatMoeda(element.card)}</Col>
+										<Col span={6}>Liquido:</Col>
+										<Col span={7}>{formatMoeda(liquidBalance)}</Col>
+									</Row>
+								</Card>
+							)
+						}
 					})
 				) : (
 					<Card

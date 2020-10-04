@@ -12,7 +12,7 @@ import {
 	SelectBank,
 	TransactionOptions,
 } from '../components'
-import { PlusCircleOutlined } from '@ant-design/icons'
+import { PlusCircleOutlined, DeleteOutlined } from '@ant-design/icons'
 import {
 	listBanks,
 	listTransaction,
@@ -33,6 +33,7 @@ class ExtractAccount extends React.Component {
 		this.state = {
 			transactions: [],
 			allTransactions: [],
+			checked: [],
 
 			filters: {
 				year: actualYear,
@@ -190,9 +191,72 @@ class ExtractAccount extends React.Component {
 				this.list()
 				break
 
+			case 'checkbox':
+				const id = event.target.value
+				if (this.isChecked(id)) {
+					this.removeChecked(id)
+				} else {
+					state.checked.push(id)
+				}
+				break
+
 			default:
 		}
 		this.setState(state)
+	}
+
+	removeChecked(id) {
+		const state = this.state
+
+		state.checked = state.checked.filter((element) => {
+			return element !== id
+		})
+
+		this.setState(state)
+	}
+
+	isChecked(id) {
+		if (this.state.checked.includes(id)) {
+			return true
+		} else {
+			return false
+		}
+	}
+
+	deleteTransactionChecked() {
+		if (window.confirm('Deseja realmente apagar essa Transação?')) {
+			this.props.loading(true)
+
+			const checked = this.state.checked
+
+			for (let i = 0; i < checked.length; i++) {
+				removeTransaction(checked[i])
+					.then((res) => {
+						if (res.data.code === 202) {
+							openNotification(
+								'success',
+								'Transação removida',
+								'Transação removida com sucesso.'
+							)
+							this.list()
+						} else {
+							openNotification(
+								'error',
+								'Transação não removida',
+								'A Transação não pode ser removida.'
+							)
+						}
+					})
+					.catch((err) => {
+						openNotification(
+							'error',
+							'Transação não removida',
+							'Erro interno. Tente novamente mais tarde.'
+						)
+					})
+			}
+			this.setState({ checked: [] })
+		}
 	}
 
 	remover(id) {
@@ -322,6 +386,12 @@ class ExtractAccount extends React.Component {
 									this.props.showModal({ typeTransaction: 'contaCorrente' })
 								}}
 							/>
+							<DeleteOutlined
+								style={{ paddingLeft: '10px' }}
+								onClick={() => {
+									this.deleteTransactionChecked()
+								}}
+							/>
 						</Title>
 					</div>
 					<Modal
@@ -356,6 +426,20 @@ class ExtractAccount extends React.Component {
 						}
 						const title = (
 							<>
+								<span
+									style={{
+										paddingRight: '10px',
+									}}
+								>
+									<Checkbox
+										checked={this.isChecked(element._id)}
+										onChange={() => {
+											this.handleChange({
+												target: { name: 'checkbox', value: element._id },
+											})
+										}}
+									/>
+								</span>
 								<span>{element.bank_id.name}</span>
 								<span
 									style={{
@@ -375,33 +459,36 @@ class ExtractAccount extends React.Component {
 								size='small'
 								title={title}
 								style={{ width: 370, marginBottom: '5px' }}
-								onClick={() => {
-									this.showMenuModal(element)
-								}}
-								key={'card' + element._id}
+								key={element._id}
 							>
-								<Row>
-									<Col span={24}>Categoria: {element.category_id.name}</Col>
-								</Row>
-								<Row>
-									<Col span={12}>
-										Criação: {formatDateToUser(element.createDate)}
-									</Col>
-									<Col span={12}>
-										Efetivação: {formatDateToUser(element.efectedDate)}
-									</Col>
-								</Row>
-								<Row>
-									<Col span={12}>
-										Recorrência:{' '}
-										{get(element, 'currentRecurrence', '1') +
-											'/' +
-											get(element, 'finalRecurrence', '1')}
-									</Col>
-								</Row>
-								<Row>
-									<Col span={24}>Descrição: {element.description}</Col>
-								</Row>
+								<span
+									onClick={() => {
+										this.showMenuModal(element)
+									}}
+								>
+									<Row>
+										<Col span={24}>Categoria: {element.category_id.name}</Col>
+									</Row>
+									<Row>
+										<Col span={12}>
+											Criação: {formatDateToUser(element.createDate)}
+										</Col>
+										<Col span={12}>
+											Efetivação: {formatDateToUser(element.efectedDate)}
+										</Col>
+									</Row>
+									<Row>
+										<Col span={12}>
+											Recorrência:{' '}
+											{get(element, 'currentRecurrence', '1') +
+												'/' +
+												get(element, 'finalRecurrence', '1')}
+										</Col>
+									</Row>
+									<Row>
+										<Col span={24}>Descrição: {element.description}</Col>
+									</Row>
+								</span>
 							</Card>
 						)
 					})}
