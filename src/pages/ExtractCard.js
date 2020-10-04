@@ -3,7 +3,7 @@ import React from 'react'
 import '../App.css'
 import { get } from 'lodash'
 import { Redirect } from 'react-router-dom'
-import { Input, Typography, Row, Col, Card, Modal } from 'antd'
+import { Input, Typography, Row, Col, Card, Modal, Checkbox } from 'antd'
 import {
 	TitleFilter,
 	SelectCategories,
@@ -11,7 +11,11 @@ import {
 	SelectFacture,
 	TransactionOptions,
 } from '../components'
-import { PlusCircleOutlined, CheckOutlined } from '@ant-design/icons'
+import {
+	PlusCircleOutlined,
+	CheckOutlined,
+	DeleteOutlined,
+} from '@ant-design/icons'
 import {
 	listBanks,
 	listTransaction,
@@ -31,6 +35,8 @@ class ExtractCard extends React.Component {
 			faturePayed: null,
 			transactions: [],
 			allTransactions: [],
+			checked: [],
+
 			bank_id: 'Selecione',
 			category_id: 'Selecione',
 			fature_id: 'Selecione',
@@ -246,9 +252,72 @@ class ExtractCard extends React.Component {
 				this.filterList()
 				break
 
+			case 'checkbox':
+				const id = event.target.value
+				if (this.isChecked(id)) {
+					this.removeChecked(id)
+				} else {
+					state.checked.push(id)
+				}
+				break
+
 			default:
 		}
 		this.setState(state)
+	}
+
+	removeChecked(id) {
+		const state = this.state
+
+		state.checked = state.checked.filter((element) => {
+			return element !== id
+		})
+
+		this.setState(state)
+	}
+
+	isChecked(id) {
+		if (this.state.checked.includes(id)) {
+			return true
+		} else {
+			return false
+		}
+	}
+
+	deleteTransactionChecked() {
+		if (window.confirm('Deseja realmente apagar essa Transação?')) {
+			this.props.loading(true)
+
+			const checked = this.state.checked
+
+			for (let i = 0; i < checked.length; i++) {
+				removeTransaction(checked[i])
+					.then((res) => {
+						if (res.data.code === 202) {
+							openNotification(
+								'success',
+								'Transação removida',
+								'Transação removida com sucesso.'
+							)
+							this.list()
+						} else {
+							openNotification(
+								'error',
+								'Transação não removida',
+								'A Transação não pode ser removida.'
+							)
+						}
+					})
+					.catch((err) => {
+						openNotification(
+							'error',
+							'Transação não removida',
+							'Erro interno. Tente novamente mais tarde.'
+						)
+					})
+			}
+			this.setState({ checked: [] })
+		}
 	}
 
 	payFature() {
@@ -419,6 +488,12 @@ class ExtractCard extends React.Component {
 									<CheckOutlined />
 								</span>
 							)}
+							<DeleteOutlined
+								style={{ paddingLeft: '10px' }}
+								onClick={() => {
+									this.deleteTransactionChecked()
+								}}
+							/>
 						</Title>
 					</div>
 
@@ -454,6 +529,20 @@ class ExtractCard extends React.Component {
 						}
 						const title = (
 							<>
+								<span
+									style={{
+										paddingRight: '10px',
+									}}
+								>
+									<Checkbox
+										checked={this.isChecked(element._id)}
+										onChange={() => {
+											this.handleChange({
+												target: { name: 'checkbox', value: element._id },
+											})
+										}}
+									/>
+								</span>
 								<span>{element.bank_id.name}</span>
 								<span
 									style={{
@@ -473,34 +562,37 @@ class ExtractCard extends React.Component {
 								size='small'
 								title={title}
 								style={{ width: 370, marginBottom: '5px' }}
-								onClick={() => {
-									this.showMenuModal(element)
-								}}
 								key={element._id}
 							>
-								<Row>
-									<Col span={24}>Categoria: {element.category_id.name}</Col>
-								</Row>
-								<Row>
-									<Col span={12}>
-										Criação: {formatDateToUser(element.createDate)}
-									</Col>
-									<Col span={12}>
-										Efetivação: {formatDateToUser(element.efectedDate)}
-									</Col>
-								</Row>
-								<Row>
-									<Col span={12}>Fatura: {element.fature_id.name}</Col>
-									<Col span={12}>
-										Recorrência:{' '}
-										{get(element, 'currentRecurrence', '1') +
-											'/' +
-											get(element, 'finalRecurrence', '1')}
-									</Col>
-								</Row>
-								<Row>
-									<Col span={24}>Descrição: {element.description}</Col>
-								</Row>
+								<span
+									onClick={() => {
+										this.showMenuModal(element)
+									}}
+								>
+									<Row>
+										<Col span={24}>Categoria: {element.category_id.name}</Col>
+									</Row>
+									<Row>
+										<Col span={12}>
+											Criação: {formatDateToUser(element.createDate)}
+										</Col>
+										<Col span={12}>
+											Efetivação: {formatDateToUser(element.efectedDate)}
+										</Col>
+									</Row>
+									<Row>
+										<Col span={12}>Fatura: {element.fature_id.name}</Col>
+										<Col span={12}>
+											Recorrência:{' '}
+											{get(element, 'currentRecurrence', '1') +
+												'/' +
+												get(element, 'finalRecurrence', '1')}
+										</Col>
+									</Row>
+									<Row>
+										<Col span={24}>Descrição: {element.description}</Col>
+									</Row>
+								</span>
 							</Card>
 						)
 					})}
