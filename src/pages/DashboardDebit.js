@@ -31,6 +31,7 @@ class DashboardDebit extends React.Component {
 			tableContent: [],
 		}
 		this.handleChange = this.handleChange.bind(this)
+		this.processUpdate()
 	}
 
 	componentDidUpdate() {
@@ -39,19 +40,21 @@ class DashboardDebit extends React.Component {
 		}
 	}
 
-	componentDidMount() {
-		this.processUpdate()
-	}
+	componentDidMount() {}
 
 	processUpdate() {
+		this.props.loading(true)
 		this.props.mudaTitulo('Dashboard Débito')
-		this.getListBanks()
-		this.initSaldoNaoCompensadoCredit()
-		this.initSaldoNaoCompensadoDebit()
+
+		Promise.all([
+			this.getListBanks(),
+			this.initSaldoNaoCompensadoCredit(),
+			this.initSaldoNaoCompensadoDebit(),
+		]).then(() => this.props.loading(false))
 	}
 
 	getListBanks() {
-		listBanksDashboard()
+		return listBanksDashboard()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -73,7 +76,7 @@ class DashboardDebit extends React.Component {
 	}
 
 	initSaldoNaoCompensadoCredit() {
-		getSaldosNaoCompensadoCredit()
+		return getSaldosNaoCompensadoCredit()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -94,7 +97,7 @@ class DashboardDebit extends React.Component {
 	}
 
 	initSaldoNaoCompensadoDebit() {
-		getSaldosNaoCompensadoDebit()
+		return getSaldosNaoCompensadoDebit()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -212,6 +215,8 @@ class DashboardDebit extends React.Component {
 			manualBalance: e.saldoManual,
 		}
 
+		this.props.loading(true)
+
 		updateBank(bankToUpdate, e.id)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
@@ -220,7 +225,7 @@ class DashboardDebit extends React.Component {
 						'Saldo atualizado',
 						'Saldo atualizado com sucesso.'
 					)
-					this.getListBanks()
+					this.getListBanks().then(() => this.props.loading(false))
 				} else {
 					openNotification(
 						'error',
@@ -297,11 +302,7 @@ class DashboardDebit extends React.Component {
 						/>
 					</Col>
 				</Row>
-				<Row style={{ paddingBottom: '20px' }}>
-					<Col span={12}>
-						<Statistic title='Saldo do dia' value='Indisponível' />
-					</Col>
-				</Row>
+
 				<Title level={4}>Saldo por Banco</Title>
 				<Row>
 					<Table

@@ -14,7 +14,7 @@ class App extends React.Component {
 	state = {
 		titulo: 'Sistema de Gerenciamento Financeiro',
 		logado: false,
-		loading: false,
+		loading: true,
 		transaction: {
 			modalVisible: false,
 			type: null,
@@ -109,6 +109,7 @@ class App extends React.Component {
 	}
 
 	update = () => {
+		this.setLoading(true)
 		this.setState({ forceUpdate: true })
 	}
 

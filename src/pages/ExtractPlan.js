@@ -66,7 +66,7 @@ class ExtractPlan extends React.Component {
 
 	list = () => {
 		this.props.loading(true)
-		listTransaction('planejamento')
+		return listTransaction('planejamento')
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -273,8 +273,9 @@ class ExtractPlan extends React.Component {
 	}
 
 	toAccount() {
+		this.props.loading(true)
 		if (window.confirm('Deseja lançar essas transações em Conta Corrente?')) {
-			planToPrincipal(this.state.transactions)
+			return planToPrincipal(this.state.transactions)
 				.then((res) => {
 					if (res.data.code === 201 || res.data.code === 202) {
 						openNotification(
@@ -290,6 +291,7 @@ class ExtractPlan extends React.Component {
 							res.data.message
 						)
 					}
+					this.props.loading(false)
 				})
 				.catch((err) => {
 					openNotification(
@@ -297,6 +299,7 @@ class ExtractPlan extends React.Component {
 						'Transação não atualizada',
 						'Erro interno. Tente novamente mais tarde.'
 					)
+					this.props.loading(false)
 				})
 		}
 	}

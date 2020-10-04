@@ -71,7 +71,7 @@ class ExtractAccount extends React.Component {
 
 	list = () => {
 		this.props.loading(true)
-		listTransaction('contaCorrente', this.state.filters)
+		return listTransaction('contaCorrente', this.state.filters)
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')

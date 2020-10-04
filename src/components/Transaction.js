@@ -248,6 +248,7 @@ class Transaction extends React.Component {
 	}
 
 	finalizeForm() {
+		this.props.loading(true)
 		if (!this.state.isCredit) {
 			const state = this.state
 			state.data.value = state.data.value * -1
