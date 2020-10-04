@@ -1,27 +1,20 @@
 import React from 'react'
+
 import '../App.css'
-import { Link, Redirect } from 'react-router-dom'
-import {
-	Input,
-	Collapse,
-	Menu,
-	Dropdown,
-	Descriptions,
-	Typography,
-	Row,
-	Col,
-} from 'antd'
+import { get } from 'lodash'
+import { Input, Typography, Row, Col, Card, Modal, Checkbox } from 'antd'
 import {
 	TitleFilter,
 	SelectYear,
 	SelectMonth,
 	SelectCategories,
 	SelectBank,
+	TransactionOptions,
 } from '../components'
 import {
-	MenuOutlined,
 	PlusCircleOutlined,
 	CheckOutlined,
+	DeleteOutlined,
 } from '@ant-design/icons'
 import {
 	listBanks,
@@ -32,12 +25,7 @@ import {
 } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
-const { Panel } = Collapse
 const { Title } = Typography
-
-function callback(key) {
-	//console.log(key);
-}
 
 class ExtractPlan extends React.Component {
 	constructor(props) {
@@ -45,6 +33,7 @@ class ExtractPlan extends React.Component {
 		this.state = {
 			transactions: [],
 			allTransactions: [],
+			checked: [],
 
 			year: '',
 			month: '',
@@ -57,12 +46,22 @@ class ExtractPlan extends React.Component {
 			categories: [],
 			filtro: false,
 			idToEdit: null,
+			menu: {
+				modalVisible: false,
+				transactionToUpdate: null,
+			},
 		}
 		this.handleChange = this.handleChange.bind(this)
 		this.submitForm = this.submitForm.bind(this)
 		this.toAccount = this.toAccount.bind(this)
 		this.getListBanks()
 		this.getListCategories()
+	}
+
+	componentDidUpdate() {
+		if (this.props.update) {
+			this.list()
+		}
 	}
 
 	componentDidMount() {
@@ -72,7 +71,7 @@ class ExtractPlan extends React.Component {
 
 	list = () => {
 		this.props.loading(true)
-		listTransaction('planejamento')
+		return listTransaction('planejamento')
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -186,9 +185,72 @@ class ExtractPlan extends React.Component {
 				this.filterList()
 				break
 
+			case 'checkbox':
+				const id = event.target.value
+				if (this.isChecked(id)) {
+					this.removeChecked(id)
+				} else {
+					state.checked.push(id)
+				}
+				break
+
 			default:
 		}
 		this.setState(state)
+	}
+
+	removeChecked(id) {
+		const state = this.state
+
+		state.checked = state.checked.filter((element) => {
+			return element !== id
+		})
+
+		this.setState(state)
+	}
+
+	isChecked(id) {
+		if (this.state.checked.includes(id)) {
+			return true
+		} else {
+			return false
+		}
+	}
+
+	deleteTransactionChecked() {
+		if (window.confirm('Deseja realmente apagar essa Transação?')) {
+			this.props.loading(true)
+
+			const checked = this.state.checked
+
+			for (let i = 0; i < checked.length; i++) {
+				removeTransaction(checked[i])
+					.then((res) => {
+						if (res.data.code === 202) {
+							openNotification(
+								'success',
+								'Transação removida',
+								'Transação removida com sucesso.'
+							)
+							this.list()
+						} else {
+							openNotification(
+								'error',
+								'Transação não removida',
+								'A Transação não pode ser removida.'
+							)
+						}
+					})
+					.catch((err) => {
+						openNotification(
+							'error',
+							'Transação não removida',
+							'Erro interno. Tente novamente mais tarde.'
+						)
+					})
+			}
+			this.setState({ checked: [] })
+		}
 	}
 
 	filterList() {
@@ -252,7 +314,7 @@ class ExtractPlan extends React.Component {
 
 	remover(id) {
 		if (window.confirm('Deseja realmente apagar essa Transação?')) {
-			removeTransaction(id)
+			return removeTransaction(id)
 				.then((res) => {
 					if (res.data.code === 202) {
 						openNotification(
@@ -260,7 +322,6 @@ class ExtractPlan extends React.Component {
 							'Transação removida',
 							'Transação removida com sucesso.'
 						)
-						this.list()
 					} else {
 						openNotification(
 							'error',
@@ -279,13 +340,10 @@ class ExtractPlan extends React.Component {
 		}
 	}
 
-	editInit(idTransaction) {
-		this.setState({ idToEdit: idTransaction })
-	}
-
 	toAccount() {
+		this.props.loading(true)
 		if (window.confirm('Deseja lançar essas transações em Conta Corrente?')) {
-			planToPrincipal(this.state.transactions)
+			return planToPrincipal(this.state.transactions)
 				.then((res) => {
 					if (res.data.code === 201 || res.data.code === 202) {
 						openNotification(
@@ -301,6 +359,7 @@ class ExtractPlan extends React.Component {
 							res.data.message
 						)
 					}
+					this.props.loading(false)
 				})
 				.catch((err) => {
 					openNotification(
@@ -308,26 +367,29 @@ class ExtractPlan extends React.Component {
 						'Transação não atualizada',
 						'Erro interno. Tente novamente mais tarde.'
 					)
+					this.props.loading(false)
 				})
 		}
 	}
 
 	submitForm(e) {}
 
-	menu = (element) => (
-		<Menu>
-			<Menu.Item onClick={() => this.remover(element._id)}>Apagar</Menu.Item>
-			<Menu.Item onClick={() => this.editInit(element._id)}>Editar</Menu.Item>
-		</Menu>
-	)
+	showMenuModal = (data) => {
+		if (this.state.menu.modalVisible !== data) {
+			let state = this.state
+			state.menu.modalVisible = true
+			state.menu.transactionToUpdate = data
+			this.setState(state)
+		}
+	}
+
+	menuModalClose = (e) => {
+		let state = this.state
+		state.menu.modalVisible = false
+		this.setState(state)
+	}
 
 	render() {
-		if (this.state.idToEdit) {
-			return (
-				<Redirect to={'/transaction/planejamento/' + this.state.idToEdit} />
-			)
-		}
-
 		return (
 			<div>
 				<div>
@@ -384,15 +446,15 @@ class ExtractPlan extends React.Component {
 						</>
 					)}
 					<br />
-					<Row>
+					<div>
 						<Title level={4}>
 							Transações
-							<Link
+							<PlusCircleOutlined
 								style={{ paddingLeft: '10px' }}
-								to='/transaction/planejamento'
-							>
-								<PlusCircleOutlined />
-							</Link>
+								onClick={() => {
+									this.props.showModal({ typeTransaction: 'planejamento' })
+								}}
+							/>
 							<span
 								style={{ paddingLeft: '15px' }}
 								onClick={() => {
@@ -401,91 +463,112 @@ class ExtractPlan extends React.Component {
 							>
 								<CheckOutlined />
 							</span>
+							<DeleteOutlined
+								style={{ paddingLeft: '10px' }}
+								onClick={() => {
+									this.deleteTransactionChecked()
+								}}
+							/>
 						</Title>
-						<Col span={24}>
-							<Collapse onChange={callback} expandIconPosition='left'>
-								{this.state.transactions.map((element) => {
-									const resume = (element, action) => {
-										let color = 'green'
-										let value = element.value
-										if (element.value < 0) {
-											color = 'red'
-											value = -1 * element.value
-										}
-										return (
-											<div style={{ fontSize: '12px' }}>
-												<Row>
-													<Col span={4}>
-														<span>{formatDateToUser(element.efectedDate)}</span>
-													</Col>
-													<Col span={11}>
-														<span style={{ paddingLeft: '22px' }}>
-															{element.bank_id.name}
-														</span>
-													</Col>
-													<Col span={6}>
-														<span
-															style={{
-																paddingLeft: '20px',
-																color: color,
-																alignSelf: 'right',
-															}}
-														>
-															{formatMoeda(value)}
-														</span>
-													</Col>
-													<Col span={3}>
-														<span style={{ float: 'right' }}>
-															<Dropdown
-																overlay={this.menu(element)}
-																placement='bottomRight'
-																onClick={(event) => {
-																	event.stopPropagation()
-																}}
-															>
-																<MenuOutlined />
-															</Dropdown>
-														</span>
-													</Col>
-												</Row>
-											</div>
-										)
-									}
-									return (
-										<Panel
-											header={resume(element, this.genExtra)}
-											key={element._id}
-										>
-											<Descriptions>
-												<Descriptions.Item label='Categoria'>
-													{element.category_id.name}
-												</Descriptions.Item>
-												<Descriptions.Item label='Data Criação'>
-													{formatDateToUser(element.createDate)}
-												</Descriptions.Item>
-												<Descriptions.Item label='Data Efetivação'>
-													{formatDateToUser(element.efectedDate)}
-												</Descriptions.Item>
-												<Descriptions.Item label='Status'>
-													{element.isCompesed ? 'Compensado' : 'Não compensado'}
-												</Descriptions.Item>
-												{element.currentRecurrence && (
-													<Descriptions.Item label='Recorrência'>
-														{element.currentRecurrence +
-															'/' +
-															element.finalRecurrence}
-													</Descriptions.Item>
-												)}
-												<Descriptions.Item label='Descrição'>
-													{element.description}
-												</Descriptions.Item>
-											</Descriptions>
-										</Panel>
-									)
-								})}
-							</Collapse>
-						</Col>
-					</Row>
+					</div>
+					<Modal
+						visible={this.state.menu.modalVisible}
+						onCancel={this.menuModalClose}
+						footer={null}
+						title=''
+						destroyOnClose={true}
+					>
+						<TransactionOptions
+							element={this.state.menu.transactionToUpdate}
+							screenType={'planejamento'}
+							showModal={this.props.showModal}
+							closeModal={this.menuModalClose}
+							remover={this.remover}
+							list={this.list}
+						/>
+					</Modal>
+
+					{this.state.transactions.map((element) => {
+						let color = 'green'
+						let value = element.value
+
+						if (element.value < 0) {
+							color = 'red'
+							value = -1 * element.value
+						}
+						if (!element.isCompesed) {
+							value = `[ ${formatMoeda(value)} ]`
+						} else {
+							value = formatMoeda(value)
+						}
+						const title = (
+							<>
+								<span
+									style={{
+										paddingRight: '10px',
+									}}
+								>
+									<Checkbox
+										checked={this.isChecked(element._id)}
+										onChange={() => {
+											this.handleChange({
+												target: { name: 'checkbox', value: element._id },
+											})
+										}}
+									/>
+								</span>
+								<span>{element.bank_id.name}</span>
+								<span
+									style={{
+										paddingLeft: '20px',
+										color: color,
+										alignSelf: 'right',
+										float: 'right',
+									}}
+								>
+									{value}
+								</span>
+							</>
+						)
+
+						return (
+							<Card
+								size='small'
+								title={title}
+								style={{ width: 370, marginBottom: '5px' }}
+								key={element._id}
+							>
+								<span
+									onClick={() => {
+										this.showMenuModal(element)
+									}}
+								>
+									<Row>
+										<Col span={24}>Categoria: {element.category_id.name}</Col>
+									</Row>
+									<Row>
+										<Col span={12}>
+											Criação: {formatDateToUser(element.createDate)}
+										</Col>
+										<Col span={12}>
+											Efetivação: {formatDateToUser(element.efectedDate)}
+										</Col>
+									</Row>
+									<Row>
+										<Col span={12}>
+											Recorrência:{' '}
+											{get(element, 'currentRecurrence', '1') +
+												'/' +
+												get(element, 'finalRecurrence', '1')}
+										</Col>
+									</Row>
+									<Row>
+										<Col span={24}>Descrição: {element.description}</Col>
+									</Row>
+								</span>
+							</Card>
+						)
+					})}
 				</div>
 			</div>
 		)

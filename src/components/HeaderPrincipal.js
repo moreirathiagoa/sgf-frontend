@@ -1,4 +1,5 @@
 import React from 'react'
+
 import 'antd/dist/antd.css'
 import { Layout } from 'antd'
 import { MenuUnfoldOutlined } from '@ant-design/icons'
@@ -18,10 +19,20 @@ class HeaderPrincipal extends React.Component {
 			>
 				{this.props.logado && (
 					<span className={'trigger'}>
-						<MenuUnfoldOutlined onClick={this.props.toggle} />
+						<MenuUnfoldOutlined
+							onClick={() => {
+								this.props.showModal('abrir')
+							}}
+						/>
 					</span>
 				)}
-				{this.props.titulo}
+				<span
+					onClick={() => {
+						this.props.update()
+					}}
+				>
+					{this.props.titulo}
+				</span>
 			</Header>
 		)
 	}

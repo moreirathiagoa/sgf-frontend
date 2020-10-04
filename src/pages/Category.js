@@ -1,4 +1,5 @@
 import React from 'react'
+
 import '../App.css'
 import {
 	Form,
@@ -27,9 +28,7 @@ import { openNotification, formatDateToUser } from '../utils'
 const { Panel } = Collapse
 const { Title } = Typography
 
-function callback(key) {
-	//console.log(key);
-}
+function callback(key) {}
 
 class Categorias extends React.Component {
 	constructor(props) {
@@ -48,16 +47,23 @@ class Categorias extends React.Component {
 		this.editInit = this.editInit.bind(this)
 		this.remover = this.remover.bind(this)
 		this.actionButtonNew = this.actionButtonNew.bind(this)
+		this.list()
+	}
+
+	componentDidUpdate() {
+		if (this.props.update) {
+			this.list()
+		}
 	}
 
 	componentDidMount() {
 		this.props.mudaTitulo('Categorias')
-		this.list()
+		this.props.loading(false)
 	}
 
 	list = () => {
 		this.props.loading(true)
-		listCategories()
+		return listCategories()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -81,7 +87,14 @@ class Categorias extends React.Component {
 
 	menu = (element) => (
 		<Menu>
-			<Menu.Item onClick={() => this.remover(element._id)}>Apagar</Menu.Item>
+			<Menu.Item
+				onClick={() => {
+					this.props.loading(true)
+					this.remover(element._id)
+				}}
+			>
+				Apagar
+			</Menu.Item>
 			<Menu.Item onClick={() => this.editInit(element)}>Editar</Menu.Item>
 		</Menu>
 	)
@@ -126,7 +139,7 @@ class Categorias extends React.Component {
 
 	remover(id) {
 		if (window.confirm('Deseja realmente apagar essa Categoria?')) {
-			removeCategory(id)
+			return removeCategory(id)
 				.then((res) => {
 					if (res.data.code === 202) {
 						openNotification(
@@ -134,7 +147,7 @@ class Categorias extends React.Component {
 							'Categoria removida',
 							'Categoria removida com sucesso.'
 						)
-						this.list()
+						return this.list()
 					} else {
 						openNotification(
 							'error',
@@ -154,12 +167,16 @@ class Categorias extends React.Component {
 	}
 
 	submitForm(e) {
-		if (this.state.idToUpdate) this.atualizar(e)
-		else this.cadastrar(e)
+		this.props.loading(true)
+		if (this.state.idToUpdate) {
+			this.atualizar(e)
+		} else {
+			this.cadastrar(e)
+		}
 	}
 
 	cadastrar() {
-		createCategory(this.state.data)
+		return createCategory(this.state.data)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
 					openNotification(
@@ -167,8 +184,8 @@ class Categorias extends React.Component {
 						'Categoria cadastrada',
 						'Categoria cadastrada com sucesso.'
 					)
-					this.list()
 					this.limpaDataState()
+					return this.list()
 				} else {
 					openNotification(
 						'error',
@@ -187,7 +204,7 @@ class Categorias extends React.Component {
 	}
 
 	atualizar() {
-		updateCategory(this.state.data, this.state.idToUpdate)
+		return updateCategory(this.state.data, this.state.idToUpdate)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
 					openNotification(
@@ -195,8 +212,8 @@ class Categorias extends React.Component {
 						'Categoria atualizada',
 						'Categoria atualizada com sucesso.'
 					)
-					this.list()
 					this.limpaDataState()
+					return this.list()
 				} else {
 					openNotification(
 						'error',
@@ -276,9 +293,7 @@ class Categorias extends React.Component {
 							name='basic'
 							initialValues={{ remember: true }}
 							onFinish={this.submitForm}
-							onFinishFailed={() => {
-								console.log('falhou')
-							}}
+							onFinishFailed={() => {}}
 						>
 							<Form.Item label='Nome da Categoria'>
 								<Input

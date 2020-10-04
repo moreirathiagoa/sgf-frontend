@@ -1,8 +1,10 @@
 import React from 'react'
+
 import { Row, Col, Card } from 'antd'
 import '../App.css'
 import { listBanksDashboard, futureTransactionBalance } from '../api'
 import { openNotification, formatMoeda } from '../utils'
+import { uniqueId } from 'lodash'
 
 class DashboardPlan extends React.Component {
 	constructor(props) {
@@ -12,20 +14,29 @@ class DashboardPlan extends React.Component {
 			actualBalance: 0,
 		}
 		this.handleChange = this.handleChange.bind(this)
+		this.processUpdate()
 	}
 
 	componentDidUpdate() {
-		//console.log('update')
+		if (this.props.update) {
+			this.processUpdate()
+		}
 	}
 
-	componentDidMount() {
+	componentDidMount() {}
+
+	processUpdate() {
+		this.props.loading(true)
 		this.props.mudaTitulo('Dashboard Plano')
-		this.initFutureTransactionBalance()
-		this.getListBanks()
+
+		Promise.all([
+			this.initFutureTransactionBalance(),
+			this.getListBanks(),
+		]).then(() => this.props.loading(false))
 	}
 
 	initFutureTransactionBalance() {
-		futureTransactionBalance()
+		return futureTransactionBalance()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -46,7 +57,7 @@ class DashboardPlan extends React.Component {
 	}
 
 	getListBanks() {
-		listBanksDashboard()
+		return listBanksDashboard()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -86,6 +97,7 @@ class DashboardPlan extends React.Component {
 
 	render() {
 		let actualBalance = this.state.actualBalance
+
 		return (
 			<>
 				<p>Saldo Liquido Atual: {formatMoeda(actualBalance)}</p>
@@ -95,21 +107,25 @@ class DashboardPlan extends React.Component {
 							element.credit - element.debit * -1 - element.card * -1
 						actualBalance = actualBalance + liquidBalance
 
-						const title = (
-							<>
-								<span>{element.month + '/' + element.year}</span>
-								<span style={{ float: 'right' }}>
-									{'Acumulado: ' + formatMoeda(actualBalance)}
-								</span>
-							</>
-						)
+						if (
+							element.credit + element.debit + element.card + liquidBalance !==
+							0
+						) {
+							const title = (
+								<>
+									<span>{element.month + '/' + element.year}</span>
+									<span style={{ float: 'right' }}>
+										{'Acumulado: ' + formatMoeda(actualBalance)}
+									</span>
+								</>
+							)
 
-						return (
-							<>
+							return (
 								<Card
 									size='small'
 									title={title}
 									style={{ width: 370, marginBottom: '5px' }}
+									key={uniqueId()}
 								>
 									<Row>
 										<Col span={4}>Entrada:</Col>
@@ -122,8 +138,8 @@ class DashboardPlan extends React.Component {
 										<Col span={7}>{formatMoeda(liquidBalance)}</Col>
 									</Row>
 								</Card>
-							</>
-						)
+							)
+						}
 					})
 				) : (
 					<Card

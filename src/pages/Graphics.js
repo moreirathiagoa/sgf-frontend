@@ -1,7 +1,8 @@
 import React from 'react'
+
+import '../App.css'
 import { Statistic, Row, Col } from 'antd'
 import { BarChart, Bar, XAxis, YAxis } from 'recharts'
-import '../App.css'
 import { getSaldosNaoCompensado } from '../api'
 
 const data = [
@@ -63,7 +64,6 @@ class Dashboard extends React.Component {
 					this.props.verificaLogin()
 				} else {
 					let state = this.state
-					console.log(res.data.data)
 					//state.saldoNotCompensated = res.data.data
 					this.setState(state)
 				}

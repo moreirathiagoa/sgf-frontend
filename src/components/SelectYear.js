@@ -1,4 +1,5 @@
 import React from 'react'
+
 import 'antd/dist/antd.css'
 import { Select } from 'antd'
 
@@ -14,8 +15,9 @@ class SelectYear extends React.Component {
 				style={{ width: 80 }}
 				onSelect={(value) => {
 					const event = { target: { name: 'year', value: value } }
-					this.handleChange(event)
+					this.props.handleChange(event)
 				}}
+				value={this.props.year}
 			>
 				<Option value='2019'>2019</Option>
 				<Option value='2020'>2020</Option>

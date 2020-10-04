@@ -1,4 +1,5 @@
 import React from 'react'
+
 import '../App.css'
 import {
 	Form,
@@ -24,9 +25,7 @@ const { Panel } = Collapse
 const { Title } = Typography
 const { Option } = Select
 
-function callback(key) {
-	//console.log(key);
-}
+function callback(key) {}
 
 class Banks extends React.Component {
 	constructor(props) {
@@ -48,16 +47,24 @@ class Banks extends React.Component {
 		this.editInit = this.editInit.bind(this)
 		this.remover = this.remover.bind(this)
 		this.actionButtonNew = this.actionButtonNew.bind(this)
+
+		this.list()
+	}
+
+	componentDidUpdate() {
+		if (this.props.update) {
+			this.list()
+		}
 	}
 
 	componentDidMount() {
 		this.props.mudaTitulo('Bancos')
-		this.list()
+		this.props.loading(false)
 	}
 
 	list = () => {
 		this.props.loading(true)
-		listBanks()
+		return listBanks()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -81,7 +88,14 @@ class Banks extends React.Component {
 
 	menu = (element) => (
 		<Menu>
-			<Menu.Item onClick={() => this.remover(element._id)}>Apagar</Menu.Item>
+			<Menu.Item
+				onClick={() => {
+					this.props.loading(true)
+					this.remover(element._id)
+				}}
+			>
+				Apagar
+			</Menu.Item>
 			<Menu.Item onClick={() => this.editInit(element)}>Editar</Menu.Item>
 		</Menu>
 	)
@@ -131,7 +145,7 @@ class Banks extends React.Component {
 
 	remover(id) {
 		if (window.confirm('Deseja realmente apagar esse Banco?')) {
-			removeBank(id)
+			return removeBank(id)
 				.then((res) => {
 					if (res.data.code === 202) {
 						openNotification(
@@ -139,7 +153,7 @@ class Banks extends React.Component {
 							'Banco removido',
 							'Banco removido com sucesso.'
 						)
-						this.list()
+						return this.list()
 					} else {
 						openNotification(
 							'error',
@@ -159,12 +173,16 @@ class Banks extends React.Component {
 	}
 
 	submitForm(e) {
-		if (this.state.idToUpdate) this.atualizar(e)
-		else this.cadastrar(e)
+		this.props.loading(true)
+		if (this.state.idToUpdate) {
+			this.atualizar(e)
+		} else {
+			this.cadastrar(e)
+		}
 	}
 
 	cadastrar() {
-		createBank(this.state.data)
+		return createBank(this.state.data)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
 					openNotification(
@@ -172,8 +190,8 @@ class Banks extends React.Component {
 						'Banco cadastrado',
 						'Banco cadastrado com sucesso.'
 					)
-					this.list()
 					this.limpaDataState()
+					return this.list()
 				} else {
 					openNotification(
 						'error',
@@ -192,7 +210,7 @@ class Banks extends React.Component {
 	}
 
 	atualizar() {
-		updateBank(this.state.data, this.state.idToUpdate)
+		return updateBank(this.state.data, this.state.idToUpdate)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
 					openNotification(
@@ -200,8 +218,8 @@ class Banks extends React.Component {
 						'Banco atualizado',
 						'Banco atualizado com sucesso.'
 					)
-					this.list()
 					this.limpaDataState()
+					return this.list()
 				} else {
 					openNotification(
 						'error',
@@ -290,9 +308,7 @@ class Banks extends React.Component {
 							name='basic'
 							initialValues={{ remember: true }}
 							onFinish={this.submitForm}
-							onFinishFailed={() => {
-								console.log('falhou')
-							}}
+							onFinishFailed={() => {}}
 						>
 							<Form.Item label='Nome de Banco'>
 								<Input

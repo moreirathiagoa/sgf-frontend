@@ -2,21 +2,23 @@ import axios from 'axios'
 import properties from '../properties'
 import { formatDateToMoment } from '../utils'
 
-const listTransaction = (typeTransaction) => {
+const listTransaction = (typeTransaction, filters) => {
 	const token = localStorage.getItem('token')
 
 	const response = axios({
-		method: 'get',
+		method: 'POST',
 		url: properties.url + 'transaction/list/' + typeTransaction,
 		headers: {
 			auth: token,
+		},
+		data: {
+			filters: filters,
 		},
 	})
 		.then((res) => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ', err)
 			return err.response
 		})
 	return response
@@ -36,7 +38,6 @@ const getTransaction = (idTransaction) => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ', err)
 			return err.response
 		})
 	return response
@@ -59,7 +60,6 @@ const createTransaction = (transaction) => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ', err)
 			return err.response
 		})
 	return response
@@ -79,7 +79,6 @@ const removeTransaction = (id) => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ', err)
 			return err.response
 		})
 	return response
@@ -102,7 +101,6 @@ const updateTransaction = (transaction, idCategory) => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ', err)
 			return err.response
 		})
 	return response
@@ -121,7 +119,6 @@ const getSaldosNaoCompensado = () => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ', err)
 			return err.response
 		})
 	return response
@@ -140,7 +137,6 @@ const getSaldosNaoCompensadoCredit = () => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ', err)
 			return err.response
 		})
 	return response
@@ -159,7 +155,6 @@ const getSaldosNaoCompensadoDebit = () => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ', err)
 			return err.response
 		})
 	return response
@@ -178,7 +173,6 @@ const futureTransationBalance = () => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ', err)
 			return err.response
 		})
 	return response
@@ -199,7 +193,6 @@ const planToPrincipal = (transations) => {
 			return res
 		})
 		.catch((err) => {
-			console.log('error: ', err)
 			return err.response
 		})
 	return response

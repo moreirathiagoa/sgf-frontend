@@ -1,25 +1,18 @@
 import React from 'react'
+
 import '../App.css'
-import { Link, Redirect } from 'react-router-dom'
-import {
-	Input,
-	Checkbox,
-	Collapse,
-	Menu,
-	Dropdown,
-	Descriptions,
-	Typography,
-	Row,
-	Col,
-} from 'antd'
+import { get } from 'lodash'
+
+import { Input, Checkbox, Typography, Row, Col, Card, Modal } from 'antd'
 import {
 	TitleFilter,
 	SelectYear,
 	SelectMonth,
 	SelectCategories,
 	SelectBank,
+	TransactionOptions,
 } from '../components'
-import { MenuOutlined, PlusCircleOutlined } from '@ant-design/icons'
+import { PlusCircleOutlined, DeleteOutlined } from '@ant-design/icons'
 import {
 	listBanks,
 	listTransaction,
@@ -28,46 +21,58 @@ import {
 } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
-const { Panel } = Collapse
 const { Title } = Typography
 
-function callback(key) {
-	//console.log(key);
-}
-
-class ExtractAcount extends React.Component {
+class ExtractAccount extends React.Component {
 	constructor(props) {
+		const today = new Date()
+		const actualYear = today.getFullYear()
+		const actualMonth = today.getMonth() + 1
+
 		super(props)
 		this.state = {
 			transactions: [],
 			allTransactions: [],
+			checked: [],
 
-			year: '',
-			month: '',
-			notCompensated: false,
-			bank_id: 'Selecione',
-			category_id: 'Selecione',
-			description: '',
+			filters: {
+				year: actualYear,
+				month: actualMonth,
+				onlyFuture: false,
+				bank_id: 'Selecione',
+				category_id: 'Selecione',
+				description: '',
+			},
 
 			banks: [],
 			categories: [],
 			filtro: false,
 			idToEdit: null,
+			menu: {
+				modalVisible: false,
+				transactionToUpdate: null,
+			},
 		}
 		this.handleChange = this.handleChange.bind(this)
 		this.submitForm = this.submitForm.bind(this)
-		this.getListBanks()
-		this.getListCategories()
+	}
+
+	componentDidUpdate() {
+		if (this.props.update) {
+			this.list()
+		}
 	}
 
 	componentDidMount() {
 		this.props.mudaTitulo('Extrato Contas Corrente')
+		this.getListBanks()
+		this.getListCategories()
 		this.list()
 	}
 
 	list = () => {
 		this.props.loading(true)
-		listTransaction('contaCorrente')
+		return listTransaction('contaCorrente', this.state.filters)
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -149,42 +154,50 @@ class ExtractAcount extends React.Component {
 				break
 
 			case 'isActive':
-				state.data.isActive = !state.data.isActive
+				state.filters.data.isActive = !state.filters.data.isActive
 				break
 
 			case 'bankType':
-				state.data.bankType = event.target.value
+				state.filters.data.bankType = event.target.value
 				break
 
 			case 'year':
-				state.year = event.target.value
-				this.filterList()
+				state.filters.year = event.target.value
+				this.list()
 				break
 
 			case 'month':
-				state.month = event.target.value
-				this.filterList()
+				state.filters.month = event.target.value
+				this.list()
 				break
 
 			case 'notCompensated':
-				console.log('vai mudar')
-				state.notCompensated = !state.notCompensated
-				this.filterList()
+				state.filters.onlyFuture = !state.filters.onlyFuture
+				this.list()
 				break
 
 			case 'bank_id':
-				state.bank_id = event.target.value
-				this.filterList()
+				state.filters.bank_id = event.target.value
+				this.list()
 				break
 
 			case 'category_id':
-				state.category_id = event.target.value
-				this.filterList()
+				state.filters.category_id = event.target.value
+				this.list()
 				break
 
 			case 'description':
-				state.description = event.target.value
-				this.filterList()
+				state.filters.description = event.target.value
+				this.list()
+				break
+
+			case 'checkbox':
+				const id = event.target.value
+				if (this.isChecked(id)) {
+					this.removeChecked(id)
+				} else {
+					state.checked.push(id)
+				}
 				break
 
 			default:
@@ -192,74 +205,63 @@ class ExtractAcount extends React.Component {
 		this.setState(state)
 	}
 
-	filterList() {
-		let state = this.state
+	removeChecked(id) {
+		const state = this.state
 
-		const transactionFiltered = state.allTransactions.filter((transaction) => {
-			let toReturn = true
-
-			if (this.state.bank_id.toString() !== 'Selecione') {
-				if (
-					transaction.bank_id._id.toString() !== this.state.bank_id.toString()
-				) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.category_id.toString() !== 'Selecione') {
-				if (
-					transaction.category_id._id.toString() !==
-					this.state.category_id.toString()
-				) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.description !== '') {
-				const description = transaction.description.toLowerCase()
-				const filterDescription = this.state.description.toLowerCase()
-				if (!description.includes(filterDescription)) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.notCompensated) {
-				if (transaction.isCompesed) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.year !== '') {
-				let now = new Date(transaction.efectedDate)
-				const ano = now.getFullYear()
-
-				if (ano.toString() !== this.state.year.toString()) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.month !== '') {
-				let now = new Date(transaction.efectedDate)
-				const mes = now.getMonth() + 1
-
-				if (mes.toString() !== this.state.month.toString()) {
-					toReturn = false
-				}
-			}
-
-			if (toReturn) {
-				return transaction
-			}
-			return null
+		state.checked = state.checked.filter((element) => {
+			return element !== id
 		})
 
-		state.transactions = transactionFiltered
 		this.setState(state)
+	}
+
+	isChecked(id) {
+		if (this.state.checked.includes(id)) {
+			return true
+		} else {
+			return false
+		}
+	}
+
+	deleteTransactionChecked() {
+		if (window.confirm('Deseja realmente apagar essa Transação?')) {
+			this.props.loading(true)
+
+			const checked = this.state.checked
+
+			for (let i = 0; i < checked.length; i++) {
+				removeTransaction(checked[i])
+					.then((res) => {
+						if (res.data.code === 202) {
+							openNotification(
+								'success',
+								'Transação removida',
+								'Transação removida com sucesso.'
+							)
+							this.list()
+						} else {
+							openNotification(
+								'error',
+								'Transação não removida',
+								'A Transação não pode ser removida.'
+							)
+						}
+					})
+					.catch((err) => {
+						openNotification(
+							'error',
+							'Transação não removida',
+							'Erro interno. Tente novamente mais tarde.'
+						)
+					})
+			}
+			this.setState({ checked: [] })
+		}
 	}
 
 	remover(id) {
 		if (window.confirm('Deseja realmente apagar essa Transação?')) {
-			removeTransaction(id)
+			return removeTransaction(id)
 				.then((res) => {
 					if (res.data.code === 202) {
 						openNotification(
@@ -267,7 +269,6 @@ class ExtractAcount extends React.Component {
 							'Transação removida',
 							'Transação removida com sucesso.'
 						)
-						this.list()
 					} else {
 						openNotification(
 							'error',
@@ -286,26 +287,24 @@ class ExtractAcount extends React.Component {
 		}
 	}
 
-	editInit(idTransaction) {
-		this.setState({ idToEdit: idTransaction })
-	}
-
 	submitForm(e) {}
 
-	menu = (element) => (
-		<Menu>
-			<Menu.Item onClick={() => this.remover(element._id)}>Apagar</Menu.Item>
-			<Menu.Item onClick={() => this.editInit(element._id)}>Editar</Menu.Item>
-		</Menu>
-	)
+	showMenuModal = (data) => {
+		if (this.state.menu.modalVisible !== data) {
+			let state = this.state
+			state.menu.modalVisible = true
+			state.menu.transactionToUpdate = data
+			this.setState(state)
+		}
+	}
+
+	menuModalClose = (e) => {
+		let state = this.state
+		state.menu.modalVisible = false
+		this.setState(state)
+	}
 
 	render() {
-		if (this.state.idToEdit) {
-			return (
-				<Redirect to={'/transaction/contaCorrente/' + this.state.idToEdit} />
-			)
-		}
-
 		return (
 			<div>
 				<div>
@@ -318,17 +317,23 @@ class ExtractAcount extends React.Component {
 							<Row>
 								<Col span={8}>
 									<span style={{ marginRight: '30px' }}>Ano:</span>
-									<SelectYear handleChange={this.handleChange} />
+									<SelectYear
+										handleChange={this.handleChange}
+										year={this.state.filters.year}
+									/>
 								</Col>
 								<Col span={8}>
 									<span style={{ marginRight: '30px' }}>Nês:</span>
-									<SelectMonth handleChange={this.handleChange} />
+									<SelectMonth
+										handleChange={this.handleChange}
+										month={this.state.filters.month}
+									/>
 								</Col>
 								<Col span={8}>
 									<span style={{ marginRight: '30px' }}>Tipo:</span>
 									<Checkbox
 										name='notCompensated'
-										checked={this.state.notCompensated}
+										checked={this.state.filters.onlyFuture}
 										onClick={this.handleChange}
 									>
 										Futuros
@@ -341,7 +346,7 @@ class ExtractAcount extends React.Component {
 									<span style={{ marginRight: '30px' }}>Banco:</span>
 									<SelectBank
 										handleChange={this.handleChange}
-										bank_id={this.state.bank_id}
+										bank_id={this.state.filters.bank_id}
 										banks={this.state.banks}
 									/>
 								</Col>
@@ -349,7 +354,7 @@ class ExtractAcount extends React.Component {
 									<span style={{ marginRight: '30px' }}>Categoria:</span>
 									<SelectCategories
 										handleChange={this.handleChange}
-										category_id={this.state.category_id}
+										category_id={this.state.filters.category_id}
 										categories={this.state.categories}
 									/>
 								</Col>
@@ -363,7 +368,7 @@ class ExtractAcount extends React.Component {
 										type='text'
 										name='description'
 										size='md'
-										value={this.state.description}
+										value={this.state.filters.description}
 										onChange={this.handleChange}
 										style={{ width: 200 }}
 									/>
@@ -372,103 +377,124 @@ class ExtractAcount extends React.Component {
 						</>
 					)}
 					<br />
-					<Row>
+					<div>
 						<Title level={4}>
 							Transações
-							<Link
+							<PlusCircleOutlined
 								style={{ paddingLeft: '10px' }}
-								to='/transaction/contaCorrente'
-							>
-								<PlusCircleOutlined />
-							</Link>
+								onClick={() => {
+									this.props.showModal({ typeTransaction: 'contaCorrente' })
+								}}
+							/>
+							<DeleteOutlined
+								style={{ paddingLeft: '10px' }}
+								onClick={() => {
+									this.deleteTransactionChecked()
+								}}
+							/>
 						</Title>
-						<Col span={24}>
-							<Collapse onChange={callback} expandIconPosition='left'>
-								{this.state.transactions.map((element) => {
-									const resume = (element, action) => {
-										let color = 'green'
-										let value = element.value
-										if (element.value < 0) {
-											color = 'red'
-											value = -1 * element.value
-										}
-										return (
-											<div style={{ fontSize: '12px' }}>
-												<Row>
-													<Col span={4}>
-														<span>{formatDateToUser(element.efectedDate)}</span>
-													</Col>
-													<Col span={11}>
-														<span style={{ paddingLeft: '22px' }}>
-															{element.bank_id.name}
-														</span>
-													</Col>
-													<Col span={6}>
-														<span
-															style={{
-																paddingLeft: '20px',
-																color: color,
-																alignSelf: 'right',
-															}}
-														>
-															{formatMoeda(value)}
-														</span>
-													</Col>
-													<Col span={3}>
-														<span style={{ float: 'right' }}>
-															<Dropdown
-																overlay={this.menu(element)}
-																placement='bottomRight'
-																onClick={(event) => {
-																	event.stopPropagation()
-																}}
-															>
-																<MenuOutlined />
-															</Dropdown>
-														</span>
-													</Col>
-												</Row>
-											</div>
-										)
-									}
-									return (
-										<Panel
-											header={resume(element, this.genExtra)}
-											key={element._id}
-										>
-											<Descriptions>
-												<Descriptions.Item label='Categoria'>
-													{element.category_id.name}
-												</Descriptions.Item>
-												<Descriptions.Item label='Data Criação'>
-													{formatDateToUser(element.createDate)}
-												</Descriptions.Item>
-												<Descriptions.Item label='Data Efetivação'>
-													{formatDateToUser(element.efectedDate)}
-												</Descriptions.Item>
-												<Descriptions.Item label='Status'>
-													{element.isCompesed ? 'Compensado' : 'Não compensado'}
-												</Descriptions.Item>
-												{element.currentRecurrence && (
-													<Descriptions.Item label='Recorrência'>
-														{element.currentRecurrence +
-															'/' +
-															element.finalRecurrence}
-													</Descriptions.Item>
-												)}
-												<Descriptions.Item label='Descrição'>
-													{element.description}
-												</Descriptions.Item>
-											</Descriptions>
-										</Panel>
-									)
-								})}
-							</Collapse>
-						</Col>
-					</Row>
+					</div>
+					<Modal
+						visible={this.state.menu.modalVisible}
+						onCancel={this.menuModalClose}
+						footer={null}
+						title=''
+						destroyOnClose={true}
+					>
+						<TransactionOptions
+							element={this.state.menu.transactionToUpdate}
+							screenType={'contaCorrente'}
+							showModal={this.props.showModal}
+							closeModal={this.menuModalClose}
+							remover={this.remover}
+							list={this.list}
+						/>
+					</Modal>
+
+					{this.state.transactions.map((element) => {
+						let color = 'green'
+						let value = element.value
+
+						if (element.value < 0) {
+							color = 'red'
+							value = -1 * element.value
+						}
+						if (!element.onlyFuture) {
+							value = `[ ${formatMoeda(value)} ]`
+						} else {
+							value = formatMoeda(value)
+						}
+						const title = (
+							<>
+								<span
+									style={{
+										paddingRight: '10px',
+									}}
+								>
+									<Checkbox
+										checked={this.isChecked(element._id)}
+										onChange={() => {
+											this.handleChange({
+												target: { name: 'checkbox', value: element._id },
+											})
+										}}
+									/>
+								</span>
+								<span>{element.bank_id.name}</span>
+								<span
+									style={{
+										paddingLeft: '20px',
+										color: color,
+										alignSelf: 'right',
+										float: 'right',
+									}}
+								>
+									{value}
+								</span>
+							</>
+						)
+
+						return (
+							<Card
+								size='small'
+								title={title}
+								style={{ width: 370, marginBottom: '5px' }}
+								key={element._id}
+							>
+								<span
+									onClick={() => {
+										this.showMenuModal(element)
+									}}
+								>
+									<Row>
+										<Col span={24}>Categoria: {element.category_id.name}</Col>
+									</Row>
+									<Row>
+										<Col span={12}>
+											Criação: {formatDateToUser(element.createDate)}
+										</Col>
+										<Col span={12}>
+											Efetivação: {formatDateToUser(element.efectedDate)}
+										</Col>
+									</Row>
+									<Row>
+										<Col span={12}>
+											Recorrência:{' '}
+											{get(element, 'currentRecurrence', '1') +
+												'/' +
+												get(element, 'finalRecurrence', '1')}
+										</Col>
+									</Row>
+									<Row>
+										<Col span={24}>Descrição: {element.description}</Col>
+									</Row>
+								</span>
+							</Card>
+						)
+					})}
 				</div>
 			</div>
 		)
 	}
 }
-export default ExtractAcount
+export default ExtractAccount
