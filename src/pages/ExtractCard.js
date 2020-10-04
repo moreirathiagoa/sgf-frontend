@@ -65,7 +65,7 @@ class ExtractCard extends React.Component {
 
 	list = () => {
 		this.props.loading(true)
-		listTransaction('cartaoCredito')
+		return listTransaction('cartaoCredito')
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')

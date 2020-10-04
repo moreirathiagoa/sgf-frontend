@@ -14,6 +14,7 @@ class DashboardPlan extends React.Component {
 			actualBalance: 0,
 		}
 		this.handleChange = this.handleChange.bind(this)
+		this.processUpdate()
 	}
 
 	componentDidUpdate() {
@@ -22,18 +23,20 @@ class DashboardPlan extends React.Component {
 		}
 	}
 
-	componentDidMount() {
-		this.processUpdate()
-	}
+	componentDidMount() {}
 
 	processUpdate() {
+		this.props.loading(true)
 		this.props.mudaTitulo('Dashboard Plano')
-		this.initFutureTransactionBalance()
-		this.getListBanks()
+
+		Promise.all([
+			this.initFutureTransactionBalance(),
+			this.getListBanks(),
+		]).then(() => this.props.loading(false))
 	}
 
 	initFutureTransactionBalance() {
-		futureTransactionBalance()
+		return futureTransactionBalance()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -54,7 +57,7 @@ class DashboardPlan extends React.Component {
 	}
 
 	getListBanks() {
-		listBanksDashboard()
+		return listBanksDashboard()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')

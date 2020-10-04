@@ -15,7 +15,7 @@ const tailLayout = {
 
 class Login extends React.Component {
 	componentDidMount() {
-		this.verifyServer()
+		this.verifyServer().then(() => this.props.loading(false))
 
 		this.props.mudaTitulo('')
 
@@ -28,16 +28,25 @@ class Login extends React.Component {
 	verifyServer = () => {
 		const online = startServer()
 			.then((res) => {
+				let response
 				if (res) {
 					console.log('Server Online')
-					return true
+					response = true
 				} else {
+					openNotification(
+						'error',
+						'Servidor Offline',
+						'Servidor indisponível. Tente novamente mais tarde.'
+					)
 					console.log('Server Offline')
-					return false
+					response = false
 				}
+
+				return response
 			})
 			.catch((err) => {
 				console.log('Server Offline')
+
 				return false
 			})
 		return online
@@ -45,10 +54,9 @@ class Login extends React.Component {
 
 	onFinish = (values) => {
 		this.props.loading(true)
-		this.verifyServer()
+		return this.verifyServer()
 			.then((res) => {
 				if (!res) {
-					this.props.loading(false)
 					openNotification(
 						'error',
 						'Login não efetuado',
@@ -74,7 +82,6 @@ class Login extends React.Component {
 								'Usuário ou senha inválido.'
 							)
 						}
-						this.props.loading(false)
 					})
 					.catch((err) => {
 						openNotification(
@@ -84,7 +91,6 @@ class Login extends React.Component {
 						)
 						localStorage.removeItem('token')
 						this.props.verificaLogin()
-						this.props.loading(false)
 					})
 			})
 			.catch((err) => {
