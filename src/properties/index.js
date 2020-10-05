@@ -9,7 +9,8 @@ switch (env) {
 		//url = "http://192.168.43.174:4000/"
 		break
 	case 'prod':
-		url = 'https://sgf-backend.herokuapp.com/'
+		//url = 'https://sgf-backend.herokuapp.com/'
+		url = 'http://sgfth.us-east-1.elasticbeanstalk.com/'
 		break
 	default:
 }
