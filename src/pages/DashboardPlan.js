@@ -101,6 +101,7 @@ class DashboardPlan extends React.Component {
 		return (
 			<>
 				<p>Saldo Liquido Atual: {formatMoeda(actualBalance)}</p>
+
 				{this.state.principalContent ? (
 					this.state.principalContent.map((element) => {
 						const liquidBalance =
@@ -139,6 +140,8 @@ class DashboardPlan extends React.Component {
 									</Row>
 								</Card>
 							)
+						} else {
+							return ''
 						}
 					})
 				) : (
