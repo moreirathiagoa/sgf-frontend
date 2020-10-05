@@ -9,7 +9,7 @@ import {
 	listBanksDashboard,
 } from '../api'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
-import { openNotification, formatMoeda } from '../utils'
+import { openNotification, formatMoeda, prepareValue } from '../utils'
 
 const { Title } = Typography
 
@@ -145,11 +145,12 @@ class DashboardDebit extends React.Component {
 				dataIndex: 'saldoManual',
 				render: (data) => (
 					<span
+						style={{ color: data.saldoManual.color }}
 						onClick={() => {
 							this.showModal(data)
 						}}
 					>
-						{formatMoeda(data.saldoManual)}
+						{data.saldoManual.value}
 					</span>
 				),
 			},
@@ -174,16 +175,27 @@ class DashboardDebit extends React.Component {
 				saldoReal += bank.saldoSistemaDeduzido
 			}
 
+			const saldoSistema = prepareValue(bank.saldoSistemaDeduzido, true)
+			const saldoManual = prepareValue(bank.saldoManual, true)
+			const diference = prepareValue(bank.diference, true)
+
 			const content = {
 				key: bank.id,
 				banco: bank.name,
-				saldoSistema: formatMoeda(bank.saldoSistemaDeduzido),
+				saldoSistema: (
+					<span style={{ color: saldoSistema.color }}>
+						{saldoSistema.value}
+					</span>
+				),
 				saldoManual: {
 					id: bank.id,
 					banco: bank.name,
-					saldoManual: bank.saldoManual,
+					saldoManual: saldoManual,
+					saldoManualModal: bank.saldoManual,
 				},
-				diference: formatMoeda(bank.diference),
+				diference: (
+					<span style={{ color: diference.color }}>{diference.value}</span>
+				),
 				status: bank.diference ? (
 					<CloseCircleOutlined style={{ color: 'red' }} />
 				) : (
@@ -205,7 +217,7 @@ class DashboardDebit extends React.Component {
 		let state = this.state
 		state.modalContent.id = data.id
 		state.modalContent.banco = data.banco
-		state.modalContent.saldoManual = data.saldoManual
+		state.modalContent.saldoManual = data.saldoManualModal
 		state.visible = true
 		this.setState(state)
 	}
@@ -266,7 +278,6 @@ class DashboardDebit extends React.Component {
 				>
 					<Input
 						placeholder=''
-						type='number'
 						name='saldoManualModal'
 						size='md'
 						value={this.state.modalContent.saldoManual}
