@@ -160,7 +160,7 @@ const getSaldosNaoCompensadoDebit = () => {
 	return response
 }
 
-const futureTransationBalance = () => {
+const futureTransactionBalance = () => {
 	const token = localStorage.getItem('token')
 	const response = axios({
 		method: 'get',
@@ -178,13 +178,13 @@ const futureTransationBalance = () => {
 	return response
 }
 
-const planToPrincipal = (transations) => {
+const planToPrincipal = (transaction) => {
 	const token = localStorage.getItem('token')
 
 	const response = axios({
 		method: 'post',
 		url: properties.url + 'transaction/planToPrincipal',
-		data: transations,
+		data: transaction,
 		headers: {
 			auth: token,
 		},
@@ -208,5 +208,5 @@ export {
 	getSaldosNaoCompensadoCredit,
 	getSaldosNaoCompensadoDebit,
 	planToPrincipal,
-	futureTransationBalance as futureTransactionBalance,
+	futureTransactionBalance,
 }
