@@ -337,6 +337,12 @@ class ExtractPlan extends React.Component {
 						'Erro interno. Tente novamente mais tarde.'
 					)
 				})
+		} else {
+			const promise = new Promise((resolve, reject) => {
+				resolve()
+			})
+
+			return promise
 		}
 	}
 

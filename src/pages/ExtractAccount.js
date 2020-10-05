@@ -284,6 +284,12 @@ class ExtractAccount extends React.Component {
 						'Erro interno. Tente novamente mais tarde.'
 					)
 				})
+		} else {
+			const promise = new Promise((resolve, reject) => {
+				resolve()
+			})
+
+			return promise
 		}
 	}
 
@@ -419,7 +425,7 @@ class ExtractAccount extends React.Component {
 							color = 'red'
 							value = -1 * element.value
 						}
-						if (!element.onlyFuture) {
+						if (!element.isCompesed) {
 							value = `[ ${formatMoeda(value)} ]`
 						} else {
 							value = formatMoeda(value)
