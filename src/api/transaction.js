@@ -65,6 +65,26 @@ const createTransaction = (transaction) => {
 	return response
 }
 
+const bankTransference = (data) => {
+	const token = localStorage.getItem('token')
+
+	const response = axios({
+		method: 'post',
+		url: properties.url + 'transaction/bank-transfer',
+		data: data,
+		headers: {
+			auth: token,
+		},
+	})
+		.then((res) => {
+			return res
+		})
+		.catch((err) => {
+			return err.response
+		})
+	return response
+}
+
 const removeTransaction = (id) => {
 	const token = localStorage.getItem('token')
 
@@ -202,6 +222,7 @@ export {
 	listTransaction,
 	getTransaction,
 	createTransaction,
+	bankTransference,
 	removeTransaction,
 	updateTransaction,
 	getSaldosNaoCompensado,

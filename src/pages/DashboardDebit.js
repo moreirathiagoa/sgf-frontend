@@ -1,32 +1,54 @@
 import React from 'react'
 
-import { Table, Statistic, Modal, Input, Row, Col, Typography } from 'antd'
+import {
+	Table,
+	Statistic,
+	Modal,
+	Input,
+	Row,
+	Col,
+	Typography,
+	Select,
+} from 'antd'
 import '../App.css'
 import {
 	updateBank,
 	getSaldosNaoCompensadoCredit,
 	getSaldosNaoCompensadoDebit,
 	listBanksDashboard,
+	bankTransference,
+	listCategories,
 } from '../api'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { openNotification, prepareValue } from '../utils'
 
 const { Title } = Typography
+const { Option } = Select
 
 class DashboardDebit extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			visible: false,
 			banks: [],
+			categories: [],
 			saldoNotCompensatedCredit: 'Aguarde...',
 			saldoNotCompensatedDebit: 'Aguarde...',
 			saldoReal: 'Aguarde...',
 			saldoLiquido: 'Aguarde...',
-			modalContent: {
+			modalSaldoContent: {
+				visible: false,
 				id: null,
 				banco: null,
 				saldoManual: null,
+			},
+			modalTransferenceContent: {
+				visible: false,
+				originalBankId: null,
+				finalBankId: null,
+
+				//TODO: Verificar uma forma melhor de fixar uma categoria
+				categoryId: '5ed678b44ccebd0017598daf',
+				value: null,
 			},
 			tableContent: [],
 		}
@@ -48,6 +70,7 @@ class DashboardDebit extends React.Component {
 
 		Promise.all([
 			this.getListBanks(),
+			this.getListCategories(),
 			this.initSaldoNaoCompensadoCredit(),
 			this.initSaldoNaoCompensadoDebit(),
 		]).then(() => this.props.loading(false))
@@ -71,6 +94,27 @@ class DashboardDebit extends React.Component {
 					'error',
 					'Erro interno',
 					'Erro ao obter a listagem de Bancos.'
+				)
+			})
+	}
+
+	getListCategories() {
+		listCategories()
+			.then((res) => {
+				if (res.status === 401) {
+					localStorage.removeItem('token')
+					this.props.verificaLogin()
+				} else {
+					let state = this.state
+					state.categories = res.data.data
+					this.setState(state)
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Erro ao listar',
+					'Erro interno. Tente novamente mais tarde.'
 				)
 			})
 	}
@@ -122,7 +166,15 @@ class DashboardDebit extends React.Component {
 
 		switch (event.target.name) {
 			case 'saldoManualModal':
-				state.modalContent.saldoManual = event.target.value
+				state.modalSaldoContent.saldoManual = event.target.value
+				break
+
+			case 'transferenceValue':
+				state.modalTransferenceContent.value = event.target.value
+				break
+
+			case 'categoryId':
+				state.modalTransferenceContent.categoryId = event.target.value
 				break
 
 			default:
@@ -147,7 +199,7 @@ class DashboardDebit extends React.Component {
 					<span
 						style={{ color: data.saldoManual.color }}
 						onClick={() => {
-							this.showModal(data)
+							this.showModalSaldo(data)
 						}}
 					>
 						{data.saldoManual.value}
@@ -213,16 +265,66 @@ class DashboardDebit extends React.Component {
 		this.setState(state)
 	}
 
-	showModal = (data) => {
+	showModalTransference = (data) => {
 		let state = this.state
-		state.modalContent.id = data.id
-		state.modalContent.banco = data.banco
-		state.modalContent.saldoManual = data.saldoManualModal
-		state.visible = true
+		state.modalTransferenceContent.originalBankId = data.originalBankId
+		state.modalTransferenceContent.finalBankId = data.finalBankId
+		state.modalTransferenceContent.visible = true
 		this.setState(state)
 	}
 
-	handleOk = (e) => {
+	handleOkTransfer = () => {
+		this.props.loading(true)
+
+		bankTransference(this.state.modalTransferenceContent)
+			.then((res) => {
+				if (res.data.code === 201 || res.data.code === 202) {
+					openNotification(
+						'success',
+						'Transação cadastrada',
+						'Transação cadastrada com sucesso.'
+					)
+					this.getListBanks().then(() => {
+						this.props.loading(false)
+						this.handleCancelTransfer()
+					})
+				} else {
+					openNotification(
+						'error',
+						'Transação não cadastrada',
+						res.data.message
+					)
+					this.props.loading(false)
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Transação não cadastrada',
+					'Erro interno. Tente novamente mais tarde.'
+				)
+			})
+	}
+
+	handleCancelTransfer = () => {
+		let state = this.state
+		state.modalTransferenceContent.originalBankId = null
+		state.modalTransferenceContent.finalBankId = null
+		state.modalTransferenceContent.visible = false
+		state.modalTransferenceContent.value = null
+		this.setState(state)
+	}
+
+	showModalSaldo = (data) => {
+		let state = this.state
+		state.modalSaldoContent.id = data.id
+		state.modalSaldoContent.banco = data.banco
+		state.modalSaldoContent.saldoManual = data.saldoManualModal
+		state.modalSaldoContent.visible = true
+		this.setState(state)
+	}
+
+	handleOkSaldo = (e) => {
 		const bankToUpdate = {
 			manualBalance: e.saldoManual,
 		}
@@ -254,15 +356,16 @@ class DashboardDebit extends React.Component {
 				)
 			})
 
-		this.setState({
-			visible: false,
-		})
+		this.handleCancelSaldo()
 	}
 
-	handleCancel = (e) => {
-		this.setState({
-			visible: false,
-		})
+	handleCancelSaldo = (e) => {
+		let state = this.state
+		state.modalSaldoContent.id = null
+		state.modalSaldoContent.banco = null
+		state.modalSaldoContent.saldoManual = null
+		state.modalSaldoContent.visible = false
+		this.setState(state)
 	}
 
 	render() {
@@ -278,57 +381,116 @@ class DashboardDebit extends React.Component {
 		return (
 			<>
 				<Modal
-					title={this.state.modalContent.banco}
-					visible={this.state.visible}
+					title={this.state.modalSaldoContent.banco}
+					visible={this.state.modalSaldoContent.visible}
 					onOk={() => {
-						this.handleOk(this.state.modalContent)
+						this.handleOkSaldo(this.state.modalSaldoContent)
 					}}
-					onCancel={this.handleCancel}
+					onCancel={this.handleCancelSaldo}
 				>
-					<Input
-						placeholder=''
-						name='saldoManualModal'
-						size='md'
-						value={this.state.modalContent.saldoManual}
-						onChange={this.handleChange}
-						style={{ width: 100 }}
-					/>
+					<Row>
+						<span style={{ paddingRight: '5px', paddingTop: '3px' }}>
+							Informe o saldo atual no Banco:
+						</span>
+						<Input
+							placeholder=''
+							name='saldoManualModal'
+							size='md'
+							type='number'
+							value={this.state.modalSaldoContent.saldoManual}
+							onChange={this.handleChange}
+							style={{ width: 100 }}
+						/>
+					</Row>
 				</Modal>
-				<Row style={{ paddingBottom: '10px' }}>
-					<Col span={12}>
-						<Statistic
-							valueStyle={{ color: saldoNotCompensatedCredit.color }}
-							title='Previsão de entrada'
-							value={saldoNotCompensatedCredit.value}
-						/>
-					</Col>
-					<Col span={12}>
-						<Statistic
-							valueStyle={{ color: saldoNotCompensatedDebit.color }}
-							title='Previsão Saída'
-							value={saldoNotCompensatedDebit.value}
-						/>
-					</Col>
-				</Row>
-				<Row style={{ paddingBottom: '10px' }}>
-					<Col span={12}>
-						<Statistic
-							valueStyle={{ color: saldoReal.color }}
-							title='Saldo Real'
-							value={saldoReal.value}
-						/>
-					</Col>
-					<Col span={12}>
-						<Statistic
-							valueStyle={{ color: saldoLiquido.color }}
-							title='Saldo Líquido'
-							value={saldoLiquido.value}
-						/>
-					</Col>
-				</Row>
+				<Col style={{ width: '320px' }}>
+					<Row style={{ paddingBottom: '10px' }}>
+						<Col span={15}>
+							<Statistic
+								valueStyle={{ color: saldoNotCompensatedCredit.color }}
+								title='Previsão de entrada'
+								value={saldoNotCompensatedCredit.value}
+							/>
+						</Col>
+						<Col span={8}>
+							<Statistic
+								valueStyle={{ color: saldoNotCompensatedDebit.color }}
+								title='Previsão Saída'
+								value={saldoNotCompensatedDebit.value}
+							/>
+						</Col>
+					</Row>
+					<Row style={{ paddingBottom: '10px' }}>
+						<Col span={15}>
+							<Statistic
+								valueStyle={{ color: saldoReal.color }}
+								title='Saldo Real'
+								value={saldoReal.value}
+							/>
+						</Col>
+						<Col span={8}>
+							<Statistic
+								valueStyle={{ color: saldoLiquido.color }}
+								title='Saldo Líquido'
+								value={saldoLiquido.value}
+							/>
+						</Col>
+					</Row>
+				</Col>
 
 				<Title level={4}>Saldo por Banco</Title>
 				<Row>
+					<Modal
+						title='Transferência entre Bancos'
+						visible={this.state.modalTransferenceContent.visible}
+						onOk={() => {
+							this.handleOkTransfer(this.state.modalTransferenceContent)
+						}}
+						onCancel={this.handleCancelTransfer}
+					>
+						<Row>
+							<span style={{ paddingRight: '5px', paddingTop: '3px' }}>
+								Informe o valor a ser transferido:
+							</span>
+							<Input
+								placeholder=''
+								name='transferenceValue'
+								size='md'
+								type='number'
+								value={this.state.modalTransferenceContent.value}
+								onChange={this.handleChange}
+								style={{ width: 100 }}
+							/>
+						</Row>
+						<Row style={{ padding: '10px' }}>
+							<span style={{ paddingRight: '5px', paddingTop: '3px' }}>
+								Selecione a Categoria:
+							</span>
+							<Select
+								name='categoryId'
+								size='md'
+								style={{ width: 150 }}
+								value={this.state.modalTransferenceContent.categoryId}
+								onSelect={(value) => {
+									const event = {
+										target: {
+											name: 'categoryId',
+											value: value,
+										},
+									}
+									this.handleChange(event)
+								}}
+							>
+								{this.state.categories.map((element) => {
+									return (
+										<Option key={element._id} value={element._id}>
+											{element.name}
+										</Option>
+									)
+								})}
+							</Select>
+						</Row>
+					</Modal>
 					<Table
 						pagination={false}
 						columns={this.columns()}
@@ -336,7 +498,34 @@ class DashboardDebit extends React.Component {
 						size='small'
 						expandable={{
 							expandedRowRender: (record) => (
-								<p style={{ margin: 0 }}>Diferença: {record.diference}</p>
+								<div>
+									<p style={{ margin: 0, paddingBottom: '4px' }}>
+										Diferença: {record.diference}
+									</p>
+									<Select
+										name='bank_id'
+										size='md'
+										style={{ width: 280 }}
+										value='Transferência interna entre Bancos'
+										onSelect={(value) => {
+											const event = {
+												originalBankId: record.key,
+												finalBankId: value,
+											}
+											this.showModalTransference(event)
+										}}
+									>
+										{this.state.banks.map((element) => {
+											return element.id !== record.key ? (
+												<Option key={element.id} value={element.id}>
+													{element.name}
+												</Option>
+											) : (
+												''
+											)
+										})}
+									</Select>
+								</div>
 							),
 						}}
 					/>
