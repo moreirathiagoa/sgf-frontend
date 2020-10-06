@@ -62,6 +62,8 @@ function formatMoeda(entrada) {
 }
 
 function prepareValue(value, isCompensated) {
+	if (isCompensated === undefined) isCompensated = true
+
 	let color = 'green'
 
 	if (value < 0) {

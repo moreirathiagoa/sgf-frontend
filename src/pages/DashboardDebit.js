@@ -9,7 +9,7 @@ import {
 	listBanksDashboard,
 } from '../api'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
-import { openNotification, formatMoeda, prepareValue } from '../utils'
+import { openNotification, prepareValue } from '../utils'
 
 const { Title } = Typography
 
@@ -175,9 +175,9 @@ class DashboardDebit extends React.Component {
 				saldoReal += bank.saldoSistemaDeduzido
 			}
 
-			const saldoSistema = prepareValue(bank.saldoSistemaDeduzido, true)
-			const saldoManual = prepareValue(bank.saldoManual, true)
-			const diference = prepareValue(bank.diference, true)
+			const saldoSistema = prepareValue(bank.saldoSistemaDeduzido)
+			const saldoManual = prepareValue(bank.saldoManual)
+			const diference = prepareValue(bank.diference)
 
 			const content = {
 				key: bank.id,
@@ -266,6 +266,15 @@ class DashboardDebit extends React.Component {
 	}
 
 	render() {
+		const saldoNotCompensatedCredit = prepareValue(
+			this.state.saldoNotCompensatedCredit
+		)
+		const saldoNotCompensatedDebit = prepareValue(
+			this.state.saldoNotCompensatedDebit
+		)
+		const saldoReal = prepareValue(this.state.saldoReal)
+		const saldoLiquido = prepareValue(this.state.saldoLiquido)
+
 		return (
 			<>
 				<Modal
@@ -288,28 +297,32 @@ class DashboardDebit extends React.Component {
 				<Row style={{ paddingBottom: '10px' }}>
 					<Col span={12}>
 						<Statistic
+							valueStyle={{ color: saldoNotCompensatedCredit.color }}
 							title='Previsão de entrada'
-							value={formatMoeda(this.state.saldoNotCompensatedCredit)}
+							value={saldoNotCompensatedCredit.value}
 						/>
 					</Col>
 					<Col span={12}>
 						<Statistic
+							valueStyle={{ color: saldoNotCompensatedDebit.color }}
 							title='Previsão Saída'
-							value={formatMoeda(this.state.saldoNotCompensatedDebit)}
+							value={saldoNotCompensatedDebit.value}
 						/>
 					</Col>
 				</Row>
 				<Row style={{ paddingBottom: '10px' }}>
 					<Col span={12}>
 						<Statistic
+							valueStyle={{ color: saldoReal.color }}
 							title='Saldo Real'
-							value={formatMoeda(this.state.saldoReal)}
+							value={saldoReal.value}
 						/>
 					</Col>
 					<Col span={12}>
 						<Statistic
+							valueStyle={{ color: saldoLiquido.color }}
 							title='Saldo Líquido'
-							value={formatMoeda(this.state.saldoLiquido)}
+							value={saldoLiquido.value}
 						/>
 					</Col>
 				</Row>

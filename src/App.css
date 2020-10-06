@@ -72,7 +72,7 @@ h3.ant-typography {
 }
 
 label {
-	color: #333 !important;
+	color: #666 !important;
 }
 
 .ant-collapse-content-box {
@@ -97,7 +97,4 @@ label {
 
 .ant-statistic-content {
 	color: #ccc;
-}
-
-.ant-col {
 }

@@ -3,7 +3,7 @@ import React from 'react'
 import { Row, Col, Card } from 'antd'
 import '../App.css'
 import { listBanksDashboard, futureTransactionBalance } from '../api'
-import { openNotification, formatMoeda } from '../utils'
+import { openNotification, prepareValue } from '../utils'
 import { uniqueId } from 'lodash'
 
 class DashboardPlan extends React.Component {
@@ -97,10 +97,15 @@ class DashboardPlan extends React.Component {
 
 	render() {
 		let actualBalance = this.state.actualBalance
-
+		const inicialBalanceFormatted = prepareValue(actualBalance)
 		return (
 			<>
-				<p>Saldo Liquido Atual: {formatMoeda(actualBalance)}</p>
+				<p>
+					Saldo Liquido Atual:{' '}
+					<span style={{ color: inicialBalanceFormatted.color }}>
+						{inicialBalanceFormatted.value}
+					</span>
+				</p>
 
 				{this.state.principalContent ? (
 					this.state.principalContent.map((element) => {
@@ -112,11 +117,20 @@ class DashboardPlan extends React.Component {
 							element.credit + element.debit + element.card + liquidBalance !==
 							0
 						) {
+							const actualBalanceFormatted = prepareValue(actualBalance)
+							const creditFormatted = prepareValue(element.credit)
+							const debitFormatted = prepareValue(element.debit)
+							const cardFormatted = prepareValue(element.card)
+							const liquidBalanceFormatted = prepareValue(liquidBalance)
+
 							const title = (
 								<>
 									<span>{element.month + '/' + element.year}</span>
 									<span style={{ float: 'right' }}>
-										{'Acumulado: ' + formatMoeda(actualBalance)}
+										{'Acumulado: '}{' '}
+										<span style={{ color: actualBalanceFormatted.color }}>
+											{actualBalanceFormatted.value}
+										</span>
 									</span>
 								</>
 							)
@@ -130,13 +144,29 @@ class DashboardPlan extends React.Component {
 								>
 									<Row>
 										<Col span={4}>Entrada:</Col>
-										<Col span={7}>{formatMoeda(element.credit)}</Col>
+										<Col span={7}>
+											<span style={{ color: creditFormatted.color }}>
+												{creditFormatted.value}
+											</span>
+										</Col>
 										<Col span={6}>Saída:</Col>
-										<Col span={7}>{formatMoeda(element.debit)}</Col>
+										<Col span={7}>
+											<span style={{ color: debitFormatted.color }}>
+												{debitFormatted.value}
+											</span>
+										</Col>
 										<Col span={4}>Cartão:</Col>
-										<Col span={7}>{formatMoeda(element.card)}</Col>
+										<Col span={7}>
+											<span style={{ color: cardFormatted.color }}>
+												{cardFormatted.value}
+											</span>
+										</Col>
 										<Col span={6}>Liquido:</Col>
-										<Col span={7}>{formatMoeda(liquidBalance)}</Col>
+										<Col span={7}>
+											<span style={{ color: liquidBalanceFormatted.color }}>
+												{liquidBalanceFormatted.value}
+											</span>
+										</Col>
 									</Row>
 								</Card>
 							)
