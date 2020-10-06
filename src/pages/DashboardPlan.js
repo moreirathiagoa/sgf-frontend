@@ -96,8 +96,11 @@ class DashboardPlan extends React.Component {
 	}
 
 	render() {
-		let actualBalance = this.state.actualBalance
-		const inicialBalanceFormatted = prepareValue(actualBalance)
+		const inicialBalance = this.state.actualBalance
+		let actualBalance = inicialBalance > 0 ? 0 : inicialBalance
+
+		const inicialBalanceFormatted = prepareValue(inicialBalance)
+
 		return (
 			<>
 				<p>
@@ -127,7 +130,7 @@ class DashboardPlan extends React.Component {
 								<>
 									<span>{element.month + '/' + element.year}</span>
 									<span style={{ float: 'right' }}>
-										{'Acumulado: '}{' '}
+										{'Acumulado: '}
 										<span style={{ color: actualBalanceFormatted.color }}>
 											{actualBalanceFormatted.value}
 										</span>

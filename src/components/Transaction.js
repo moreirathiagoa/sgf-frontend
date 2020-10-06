@@ -122,8 +122,11 @@ class Transaction extends React.Component {
 					localStorage.removeItem('token')
 					this.props.verificaLogin()
 				} else {
+					const banks = res.data.data.filter((bank) => {
+						return bank.isActive
+					})
 					let state = this.state
-					state.banks = res.data.data
+					state.banks = banks
 					this.setState(state)
 				}
 			})

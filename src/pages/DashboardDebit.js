@@ -220,7 +220,11 @@ class DashboardDebit extends React.Component {
 		let saldoLiquido = 0
 		let saldoReal = 0
 
-		state.banks.forEach((bank) => {
+		const banks = state.banks.filter((bank) => {
+			return bank.isActive
+		})
+
+		banks.forEach((bank) => {
 			saldoLiquido += bank.saldoSistema
 
 			if (bank.bankType === 'Conta Corrente') {
@@ -516,7 +520,7 @@ class DashboardDebit extends React.Component {
 										}}
 									>
 										{this.state.banks.map((element) => {
-											return element.id !== record.key ? (
+											return element.id !== record.key && element.isActive ? (
 												<Option key={element.id} value={element.id}>
 													{element.name}
 												</Option>
