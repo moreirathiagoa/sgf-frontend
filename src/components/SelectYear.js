@@ -5,6 +5,14 @@ import { Select } from 'antd'
 
 const { Option } = Select
 
+const beginYear = 2019
+const actualYear = new Date().getFullYear()
+const finalYear = actualYear + 3
+let years = []
+for (let i = beginYear; i < finalYear; i++) {
+	years.push(i)
+}
+
 class SelectYear extends React.Component {
 	render() {
 		return (
@@ -19,9 +27,13 @@ class SelectYear extends React.Component {
 				}}
 				value={this.props.year}
 			>
-				<Option value='2019'>2019</Option>
-				<Option value='2020'>2020</Option>
-				<Option value='2021'>2021</Option>
+				{years.map((year) => {
+					return (
+						<Option key={year} value={year}>
+							{year}
+						</Option>
+					)
+				})}
 			</Select>
 		)
 	}
