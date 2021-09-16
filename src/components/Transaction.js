@@ -18,63 +18,57 @@ import {
 } from '../utils'
 import { SelectCategories, SelectBank, SelectFacture } from '.'
 
+function getFatures() {
+	let fatures = []
+	let now = new Date()
+	now.setDate('10')
+	now.setDate(now.getDate() - 30)
+	for (let i = 0; i <= 12; i++) {
+		const mes = now.getMonth() + 1
+		const ano = now.getFullYear()
+		let mesFinal = '00' + mes
+		mesFinal = mesFinal.substr(mesFinal.length - 2)
+		let fatura = {
+			_id: ano + '/' + mesFinal,
+			name: ano + '/' + mesFinal,
+		}
+
+		fatures.push(fatura)
+		now.setDate(now.getDate() + 30)
+	}
+	return fatures
+}
+
 class Transaction extends React.Component {
 	constructor(props) {
 		const transactionType = props.transactionType
 		const transactionId = props.transactionId
+		const transactionFatureId = props.transactionFatureId
+		const fatures = getFatures()
+		const todayDate = actualDateToUser()
+		const isCompesed = transactionType === 'contaCorrente' ? true : undefined
 
 		super(props)
-
 		this.state = {
 			idToUpdate: transactionId,
 			data: {
-				efectedDate: actualDateToUser(),
+				efectedDate: todayDate,
 				bank_id: 'Selecione',
 				category_id: 'Selecione',
 				isSimples: false,
 				value: null,
-				isCompesed: transactionType === 'contaCorrente' ? true : undefined,
+				isCompesed: isCompesed,
 				typeTransaction: transactionType,
 			},
 			isCredit: false,
 			banks: [],
 			categories: [],
-			fatures: [],
+			fatures: fatures,
 			saveExit: null,
 			exit: false,
 		}
 
-		this.handleChange = this.handleChange.bind(this)
-	}
-
-	componentDidMount() {
-		const transactionType = this.props.transactionType
-		const transactionId = this.props.transactionId
-		const transactionFatureId = this.props.transactionFatureId
-
-		let now = new Date()
-
-		let state = this.state
-
-		now.setDate('10')
-		now.setDate(now.getDate() - 30)
-		for (let i = 0; i <= 12; i++) {
-			const mes = now.getMonth() + 1
-			const ano = now.getFullYear()
-			let mesFinal = '00' + mes
-			mesFinal = mesFinal.substr(mesFinal.length - 2)
-			let fatura = {
-				_id: ano + '/' + mesFinal,
-				name: ano + '/' + mesFinal,
-			}
-
-			state.fatures.push(fatura)
-			now.setDate(now.getDate() + 30)
-		}
-		this.setState(state)
-
 		this.getListCategories()
-
 		this.getListBanks(transactionType)
 
 		if (transactionId) {
@@ -84,10 +78,12 @@ class Transaction extends React.Component {
 		if (transactionFatureId) {
 			this.getDataFromFature(transactionFatureId)
 		}
+
+		this.handleChange = this.handleChange.bind(this)
 	}
 
 	getTransactionToUpdate(idTransaction) {
-		getTransaction(idTransaction)
+		return getTransaction(idTransaction)
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -126,8 +122,11 @@ class Transaction extends React.Component {
 					localStorage.removeItem('token')
 					this.props.verificaLogin()
 				} else {
+					const banks = res.data.data.filter((bank) => {
+						return bank.isActive
+					})
 					let state = this.state
-					state.banks = res.data.data
+					state.banks = banks
 					this.setState(state)
 				}
 			})
@@ -355,7 +354,7 @@ class Transaction extends React.Component {
 									format={'DD/MM/YYYY'}
 									name='efectedDate'
 									size='md'
-									defaultValue={formatDateToMoment(this.state.data.efectedDate)}
+									value={formatDateToMoment(this.state.data.efectedDate)}
 									onChange={(date, dateString) => {
 										const event = {
 											target: {

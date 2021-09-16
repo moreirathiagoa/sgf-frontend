@@ -65,6 +65,26 @@ const createTransaction = (transaction) => {
 	return response
 }
 
+const bankTransference = (data) => {
+	const token = localStorage.getItem('token')
+
+	const response = axios({
+		method: 'post',
+		url: properties.url + 'transaction/bank-transfer',
+		data: data,
+		headers: {
+			auth: token,
+		},
+	})
+		.then((res) => {
+			return res
+		})
+		.catch((err) => {
+			return err.response
+		})
+	return response
+}
+
 const removeTransaction = (id) => {
 	const token = localStorage.getItem('token')
 
@@ -160,7 +180,7 @@ const getSaldosNaoCompensadoDebit = () => {
 	return response
 }
 
-const futureTransationBalance = () => {
+const futureTransactionBalance = () => {
 	const token = localStorage.getItem('token')
 	const response = axios({
 		method: 'get',
@@ -178,13 +198,13 @@ const futureTransationBalance = () => {
 	return response
 }
 
-const planToPrincipal = (transations) => {
+const planToPrincipal = (transaction) => {
 	const token = localStorage.getItem('token')
 
 	const response = axios({
 		method: 'post',
 		url: properties.url + 'transaction/planToPrincipal',
-		data: transations,
+		data: transaction,
 		headers: {
 			auth: token,
 		},
@@ -202,11 +222,12 @@ export {
 	listTransaction,
 	getTransaction,
 	createTransaction,
+	bankTransference,
 	removeTransaction,
 	updateTransaction,
 	getSaldosNaoCompensado,
 	getSaldosNaoCompensadoCredit,
 	getSaldosNaoCompensadoDebit,
 	planToPrincipal,
-	futureTransationBalance as futureTransactionBalance,
+	futureTransactionBalance,
 }

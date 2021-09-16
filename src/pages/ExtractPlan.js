@@ -23,7 +23,7 @@ import {
 	listCategories,
 	planToPrincipal,
 } from '../api'
-import { openNotification, formatDateToUser, formatMoeda } from '../utils'
+import { openNotification, formatDateToUser, prepareValue } from '../utils'
 
 const { Title } = Typography
 
@@ -337,6 +337,12 @@ class ExtractPlan extends React.Component {
 						'Erro interno. Tente novamente mais tarde.'
 					)
 				})
+		} else {
+			const promise = new Promise((resolve, reject) => {
+				resolve()
+			})
+
+			return promise
 		}
 	}
 
@@ -489,18 +495,11 @@ class ExtractPlan extends React.Component {
 					</Modal>
 
 					{this.state.transactions.map((element) => {
-						let color = 'green'
-						let value = element.value
+						const transactionValue = prepareValue(
+							element.value,
+							element.isCompesed
+						)
 
-						if (element.value < 0) {
-							color = 'red'
-							value = -1 * element.value
-						}
-						if (!element.isCompesed) {
-							value = `[ ${formatMoeda(value)} ]`
-						} else {
-							value = formatMoeda(value)
-						}
 						const title = (
 							<>
 								<span
@@ -521,12 +520,12 @@ class ExtractPlan extends React.Component {
 								<span
 									style={{
 										paddingLeft: '20px',
-										color: color,
+										color: transactionValue.color,
 										alignSelf: 'right',
 										float: 'right',
 									}}
 								>
-									{value}
+									{transactionValue.value}
 								</span>
 							</>
 						)

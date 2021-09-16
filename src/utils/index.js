@@ -61,6 +61,26 @@ function formatMoeda(entrada) {
 	return entrada.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
+function prepareValue(value, isCompensated) {
+	if (isCompensated === undefined) isCompensated = true
+
+	let color = 'green'
+
+	if (value < 0) {
+		color = 'red'
+		value = -1 * value
+	}
+	value = formatMoeda(value)
+	if (!isCompensated) {
+		value = `[ ${value} ]`
+	}
+
+	return {
+		value: value,
+		color: color,
+	}
+}
+
 export {
 	openNotification,
 	actualDateToUser,
@@ -71,4 +91,5 @@ export {
 	formatDateToBataBase,
 	formatDateToMoment,
 	formatMoeda,
+	prepareValue,
 }

@@ -38,8 +38,6 @@ class Banks extends React.Component {
 				name: '',
 				isActive: true,
 				bankType: '',
-				systemBalance: 0,
-				manualBalance: 0,
 			},
 		}
 		this.handleChange = this.handleChange.bind(this)
@@ -160,6 +158,7 @@ class Banks extends React.Component {
 							'Banco não removido',
 							'O Banco não pode ser removido.'
 						)
+						this.props.loading(false)
 					}
 				})
 				.catch((err) => {
@@ -168,6 +167,7 @@ class Banks extends React.Component {
 						'Banco não removido',
 						'Erro interno. Tente novamente mais tarde.'
 					)
+					this.props.loading(false)
 				})
 		}
 	}
@@ -324,7 +324,7 @@ class Banks extends React.Component {
 							<Form.Item label='Tipo de Banco'>
 								<Select
 									name='bankType'
-									defaultValue='Selecione'
+									defaultValue={this.state.data.bankType}
 									size='md'
 									style={{ width: 200 }}
 									onSelect={(value) => {

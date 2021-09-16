@@ -16,6 +16,7 @@ export { listFatures, getFature, payFature } from './fature'
 export {
 	listTransaction,
 	createTransaction,
+	bankTransference,
 	removeTransaction,
 	updateTransaction,
 	getTransaction,
