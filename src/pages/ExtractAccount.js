@@ -70,9 +70,9 @@ class ExtractAccount extends React.Component {
 		this.list()
 	}
 
-	list = () => {
+	list = (state = this.state) => {
 		this.props.loading(true)
-		return listTransaction('contaCorrente', this.state.filters)
+		return listTransaction('contaCorrente', state.filters)
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -146,7 +146,14 @@ class ExtractAccount extends React.Component {
 				break
 
 			case 'clearFilter':
+				const now = new Date()
 				state.transactions = state.allTransactions
+				state.filters.year = now.getFullYear()
+				state.filters.month = now.getMonth() + 1
+				state.filters.bank_id = 'Selecione'
+				state.filters.description = ''
+				state.filters.category_id = 'Selecione'
+				this.list(state)
 				break
 
 			case 'name':

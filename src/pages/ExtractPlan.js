@@ -27,16 +27,22 @@ import { openNotification, formatDateToUser, prepareValue } from '../utils'
 
 const { Title } = Typography
 
+const now = new Date()
+const nextMonthDate = new Date(now.setMonth(new Date().getMonth() + 1))
+const nextMonthYear = nextMonthDate.getFullYear()
+const nextMonthMonth = nextMonthDate.getMonth() + 1
+
 class ExtractPlan extends React.Component {
 	constructor(props) {
 		super(props)
+
 		this.state = {
 			transactions: [],
 			allTransactions: [],
 			checked: [],
 
-			year: '',
-			month: '',
+			year: nextMonthYear,
+			month: nextMonthMonth,
 			notCompensated: false,
 			bank_id: 'Selecione',
 			category_id: 'Selecione',
@@ -82,6 +88,7 @@ class ExtractPlan extends React.Component {
 					state.allTransactions = res.data.data
 					this.setState(state)
 				}
+				this.filterList()
 				this.props.loading(false)
 			})
 			.catch((err) => {
@@ -146,6 +153,12 @@ class ExtractPlan extends React.Component {
 
 			case 'clearFilter':
 				state.transactions = state.allTransactions
+				state.year = nextMonthYear
+				state.month = nextMonthMonth
+				state.bank_id = 'Selecione'
+				state.description = ''
+				state.category_id = 'Selecione'
+				this.filterList(state)
 				break
 
 			case 'name':
@@ -253,9 +266,7 @@ class ExtractPlan extends React.Component {
 		}
 	}
 
-	filterList() {
-		let state = this.state
-
+	filterList(state = this.state) {
 		const transactionFiltered = state.allTransactions.filter((transaction) => {
 			let toReturn = true
 
@@ -408,11 +419,17 @@ class ExtractPlan extends React.Component {
 							<Row>
 								<Col span={8}>
 									<span style={{ marginRight: '30px' }}>Ano:</span>
-									<SelectYear handleChange={this.handleChange} />
+									<SelectYear
+										handleChange={this.handleChange}
+										year={this.state.year}
+									/>
 								</Col>
 								<Col span={8}>
 									<span style={{ marginRight: '30px' }}>Nês:</span>
-									<SelectMonth handleChange={this.handleChange} />
+									<SelectMonth
+										handleChange={this.handleChange}
+										month={this.state.month}
+									/>
 								</Col>
 							</Row>
 							<br />
