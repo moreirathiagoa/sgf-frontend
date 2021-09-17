@@ -118,7 +118,7 @@ class Login extends React.Component {
 		}
 
 		if (this.props.logado) {
-			return <Redirect to='/home' />
+			return <Redirect to='/saldos' />
 		}
 
 		return (
