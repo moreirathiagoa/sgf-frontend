@@ -2,6 +2,7 @@ import React from 'react'
 
 import 'antd/dist/antd.css'
 import { Layout } from 'antd'
+import { Link } from 'react-router-dom'
 import { MenuUnfoldOutlined } from '@ant-design/icons'
 const { Header } = Layout
 
@@ -26,12 +27,18 @@ class HeaderPrincipal extends React.Component {
 						/>
 					</span>
 				)}
+				<Link to='/saldos'>
+					<span style={{ paddingLeft: '10px', color: '#ccc' }}>{'Home >'}</span>
+				</Link>
 				<span
+					style={{
+						paddingLeft: '7px',
+					}}
 					onClick={() => {
 						this.props.update()
 					}}
 				>
-					{this.props.titulo}
+					<span>{this.props.titulo}</span>
 				</span>
 			</Header>
 		)

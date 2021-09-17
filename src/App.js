@@ -135,6 +135,7 @@ class App extends React.Component {
 						transactionId={this.state.transaction.id}
 						transactionFatureId={this.state.transaction.fatureId}
 						handleClose={this.transactionModalClose}
+						update={this.update}
 					/>
 				</Modal>
 

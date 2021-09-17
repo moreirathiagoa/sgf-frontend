@@ -270,6 +270,8 @@ class Transaction extends React.Component {
 						'Transação cadastrada',
 						'Transação cadastrada com sucesso.'
 					)
+					this.props.update()
+					this.props.loading(false)
 					return 'success'
 				} else {
 					openNotification(
@@ -277,6 +279,8 @@ class Transaction extends React.Component {
 						'Transação não cadastrada',
 						res.data.message
 					)
+					this.props.update()
+					this.props.loading(false)
 					return 'error'
 				}
 			})
@@ -286,6 +290,8 @@ class Transaction extends React.Component {
 					'Transação não cadastrada',
 					'Erro interno. Tente novamente mais tarde.'
 				)
+				this.props.update()
+				this.props.loading(false)
 				return 'error'
 			})
 	}

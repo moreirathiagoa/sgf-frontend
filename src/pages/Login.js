@@ -81,6 +81,7 @@ class Login extends React.Component {
 								'Login não efetuado',
 								'Usuário ou senha inválido.'
 							)
+							this.props.loading(false)
 						}
 					})
 					.catch((err) => {
@@ -117,7 +118,7 @@ class Login extends React.Component {
 		}
 
 		if (this.props.logado) {
-			return <Redirect to='/dashboard-debit' />
+			return <Redirect to='/home' />
 		}
 
 		return (
