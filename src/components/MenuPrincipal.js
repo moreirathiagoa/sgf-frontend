@@ -25,9 +25,9 @@ class MenuPrincipal extends React.Component {
 					}}
 				>
 					<Menu.Item key='1'>
-						<Link to='/dashboard-debit'>
+						<Link to='/saldos'>
 							<AppstoreOutlined />
-							<span>Dashboard Bancos</span>
+							<span>Saldos</span>
 						</Link>
 					</Menu.Item>
 					<Menu.Item key='2'>

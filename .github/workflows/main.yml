@@ -17,12 +17,15 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+
       - name: Npm Install
         run: |
           npm install
+
       - name: Production Build
         run: |
           npm run build
+
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@master
         with:
