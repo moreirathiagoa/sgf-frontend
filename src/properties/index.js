@@ -14,6 +14,8 @@ switch (env) {
 }
 console.log('Iniciado em ambiente ' + env.toLocaleUpperCase())
 
-export default {
+const properties = {
 	url: url,
 }
+
+export default properties

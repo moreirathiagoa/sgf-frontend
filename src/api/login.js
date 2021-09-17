@@ -1,7 +1,7 @@
 import axios from 'axios'
 import properties from '../properties'
 
-export default (user) => {
+const login = (user) => {
 	const response = axios({
 		method: 'post',
 		url: properties.url + 'login',
@@ -15,3 +15,5 @@ export default (user) => {
 		})
 	return response
 }
+
+export default login
