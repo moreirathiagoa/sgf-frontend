@@ -20,10 +20,10 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Yarn Install
         run: |
-          yarn install
+          npm install
       - name: Production Build
         run: |
-          yarn build
+          npm run build
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@master
         with:
