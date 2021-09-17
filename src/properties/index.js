@@ -7,7 +7,7 @@ switch (env) {
 		//url = 'http://192.168.1.6:4000/'
 
 		break
-	case 'prod':
+	case 'prd':
 		url = 'https://ijh3l22gke.execute-api.us-east-1.amazonaws.com/'
 		break
 	default:
