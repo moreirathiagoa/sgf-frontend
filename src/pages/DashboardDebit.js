@@ -66,7 +66,7 @@ class DashboardDebit extends React.Component {
 
 	processUpdate() {
 		this.props.loading(true)
-		this.props.mudaTitulo('Dashboard Débito')
+		this.props.mudaTitulo('Home - Resumo Saldos')
 
 		Promise.all([
 			this.getListBanks(),
