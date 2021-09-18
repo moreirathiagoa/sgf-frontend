@@ -238,7 +238,13 @@ class Transaction extends React.Component {
 				break
 
 			case 'salvar':
-				this.finalizeForm()
+				this.finalizeForm().then(() => {
+					if (!this.state.isCredit) {
+						const state = this.state
+						state.data.value = state.data.value * -1
+						this.setState(state)
+					}
+				})
 				break
 
 			default:
