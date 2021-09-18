@@ -27,7 +27,7 @@ class DashboardPlan extends React.Component {
 
 	processUpdate() {
 		this.props.loading(true)
-		this.props.mudaTitulo('Plano')
+		this.props.mudaTitulo('Planejamento')
 
 		Promise.all([
 			this.initFutureTransactionBalance(),

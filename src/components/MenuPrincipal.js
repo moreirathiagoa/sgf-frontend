@@ -52,7 +52,7 @@ class MenuPrincipal extends React.Component {
 
 					<SubMenu key='sub2' title='Planejamento'>
 						<Menu.Item key='item4'>
-							<Link to='/dashboard-plan'>
+							<Link to='/planning'>
 								<AppstoreOutlined />
 								<span>Resumo</span>
 							</Link>
