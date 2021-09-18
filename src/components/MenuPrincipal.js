@@ -12,6 +12,8 @@ import {
 	LogoutOutlined,
 } from '@ant-design/icons'
 
+const { SubMenu } = Menu
+
 class MenuPrincipal extends React.Component {
 	render() {
 		return (
@@ -19,89 +21,75 @@ class MenuPrincipal extends React.Component {
 				<Menu
 					theme='dark'
 					mode='inline'
-					defaultSelectedKeys={['1']}
+					defaultOpenKeys={['sub1', 'sub2']}
 					onClick={() => {
 						this.props.handleClose()
 					}}
 				>
-					<Menu.Item key='1'>
-						<Link to='/saldos'>
-							<AppstoreOutlined />
-							<span>Saldos</span>
-						</Link>
-					</Menu.Item>
-					<Menu.Item key='2'>
-						<Link to='/xpto'>
-							<AppstoreOutlined />
-							<span>Dashboard Cartão</span>
-						</Link>
-					</Menu.Item>
-					<Menu.Item key='3'>
-						<Link to='/dashboard-plan'>
-							<AppstoreOutlined />
-							<span>Projeção Futuro</span>
-						</Link>
-					</Menu.Item>
+					<SubMenu key='sub1' title='Débito'>
+						<Menu.Item key='item1'>
+							<Link to='/saldos'>
+								<AppstoreOutlined />
+								<span>Resumo</span>
+							</Link>
+						</Menu.Item>
+						<Menu.Item key='item2'>
+							<Link to='/extrato-conta'>
+								<FileSearchOutlined />
+								<span>Extrato</span>
+							</Link>
+						</Menu.Item>
+						<Menu.Item
+							key='item3'
+							onClick={() => {
+								this.props.showModal({ typeTransaction: 'contaCorrente' })
+							}}
+						>
+							<WalletOutlined />
+							<span>Novo</span>
+						</Menu.Item>
+					</SubMenu>
 
-					<Menu.Item
-						key='4'
-						onClick={() => {
-							this.props.showModal({ typeTransaction: 'contaCorrente' })
-						}}
-					>
-						<WalletOutlined />
-						<span>Novo Conta</span>
-					</Menu.Item>
-					<Menu.Item
-						key='5'
-						onClick={() => {
-							this.props.showModal({ typeTransaction: 'cartaoCredito' })
-						}}
-					>
-						<WalletOutlined />
-						<span>Novo Crédito</span>
-					</Menu.Item>
-					<Menu.Item
-						key='6'
-						onClick={() => {
-							this.props.showModal({ typeTransaction: 'planejamento' })
-						}}
-					>
-						<WalletOutlined />
-						<span>Novo Plano</span>
-					</Menu.Item>
+					<SubMenu key='sub2' title='Planejamento'>
+						<Menu.Item key='item4'>
+							<Link to='/dashboard-plan'>
+								<AppstoreOutlined />
+								<span>Resumo</span>
+							</Link>
+						</Menu.Item>
+						<Menu.Item key='item5'>
+							<Link to='/extrato-plano'>
+								<FileSearchOutlined />
+								<span>Extrato</span>
+							</Link>
+						</Menu.Item>
+						<Menu.Item
+							key='item6'
+							onClick={() => {
+								this.props.showModal({ typeTransaction: 'planejamento' })
+							}}
+						>
+							<WalletOutlined />
+							<span>Novo</span>
+						</Menu.Item>
+					</SubMenu>
 
-					<Menu.Item key='7'>
-						<Link to='/extrato-conta'>
-							<FileSearchOutlined />
-							<span>Extrato Conta</span>
-						</Link>
-					</Menu.Item>
-					<Menu.Item key='8'>
-						<Link to='/extrato-cartao'>
-							<FileSearchOutlined />
-							<span>Extrato Cartão</span>
-						</Link>
-					</Menu.Item>
-					<Menu.Item key='9'>
-						<Link to='/extrato-plano'>
-							<FileSearchOutlined />
-							<span>Extrato Plano</span>
-						</Link>
-					</Menu.Item>
-					<Menu.Item key='10'>
-						<Link to='/banks'>
-							<BankOutlined />
-							<span>Cad. Bancos</span>
-						</Link>
-					</Menu.Item>
-					<Menu.Item key='11'>
-						<Link to='/category'>
-							<ProfileOutlined />
-							<span>Cad. Categorias</span>
-						</Link>
-					</Menu.Item>
-					<Menu.Item key='12'>
+					<SubMenu key='sub3' title='Cadastros'>
+						<Menu.Item key='item7'>
+							<Link to='/banks'>
+								<BankOutlined />
+								<span>Bancos</span>
+							</Link>
+						</Menu.Item>
+						<Menu.Item key='item8'>
+							<Link to='/category'>
+								<ProfileOutlined />
+								<span>Categorias</span>
+							</Link>
+						</Menu.Item>
+					</SubMenu>
+
+					<Menu.Item key='item9'>
 						<Link to='/logout'>
 							<LogoutOutlined />
 							<span>Logout</span>
