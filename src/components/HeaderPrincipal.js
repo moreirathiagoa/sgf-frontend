@@ -27,19 +27,25 @@ class HeaderPrincipal extends React.Component {
 						/>
 					</span>
 				)}
-				<Link to='/saldos'>
-					<span style={{ paddingLeft: '10px', color: '#ccc' }}>{'Home >'}</span>
-				</Link>
-				<span
-					style={{
-						paddingLeft: '7px',
-					}}
-					onClick={() => {
-						this.props.update()
-					}}
-				>
-					<span>{this.props.titulo}</span>
-				</span>
+				{this.props.titulo && (
+					<>
+						<Link to='/saldos'>
+							<span style={{ paddingLeft: '10px', color: '#ccc' }}>
+								{'Home >'}
+							</span>
+						</Link>
+						<span
+							style={{
+								paddingLeft: '5px',
+							}}
+							onClick={() => {
+								this.props.update()
+							}}
+						>
+							{this.props.titulo}
+						</span>
+					</>
+				)}
 			</Header>
 		)
 	}
