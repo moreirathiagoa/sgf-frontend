@@ -65,7 +65,7 @@ class ExtractCard extends React.Component {
 	}
 
 	componentDidMount() {
-		this.props.mudaTitulo('Extrato Cartões de Crédito')
+		this.props.mudaTitulo('Extrato > Cartões de Crédito')
 		this.list()
 	}
 

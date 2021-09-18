@@ -247,7 +247,7 @@ class DashboardDebit extends React.Component {
 					id: bank.id,
 					banco: bank.name,
 					saldoManual: saldoManual,
-					saldoManualModal: bank.saldoManual,
+					saldoManualModal: bank.saldoSistemaDeduzido,
 				},
 				diference: (
 					<span style={{ color: diference.color }}>{diference.value}</span>

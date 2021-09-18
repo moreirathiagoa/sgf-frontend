@@ -52,7 +52,7 @@ class MenuPrincipal extends React.Component {
 
 					<SubMenu key='sub2' title='Planejamento'>
 						<Menu.Item key='item4'>
-							<Link to='/dashboard-plan'>
+							<Link to='/planning'>
 								<AppstoreOutlined />
 								<span>Resumo</span>
 							</Link>
@@ -74,7 +74,25 @@ class MenuPrincipal extends React.Component {
 						</Menu.Item>
 					</SubMenu>
 
-					<SubMenu key='sub3' title='Cadastros'>
+					<SubMenu key='sub3' title='Cartão de Crédito'>
+						<Menu.Item key='8'>
+							<Link to='/extrato-cartao'>
+								<FileSearchOutlined />
+								<span>Extrato</span>
+							</Link>
+						</Menu.Item>
+						<Menu.Item
+							key='5'
+							onClick={() => {
+								this.props.showModal({ typeTransaction: 'cartaoCredito' })
+							}}
+						>
+							<WalletOutlined />
+							<span>Novo</span>
+						</Menu.Item>
+					</SubMenu>
+
+					<SubMenu key='sub4' title='Cadastros'>
 						<Menu.Item key='item7'>
 							<Link to='/banks'>
 								<BankOutlined />

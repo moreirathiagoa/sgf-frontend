@@ -71,7 +71,7 @@ class ExtractPlan extends React.Component {
 	}
 
 	componentDidMount() {
-		this.props.mudaTitulo('Extrato Planejamentos Futuros')
+		this.props.mudaTitulo('Extrato > Planejamentos Futuros')
 		this.list()
 	}
 

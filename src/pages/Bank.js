@@ -56,7 +56,7 @@ class Banks extends React.Component {
 	}
 
 	componentDidMount() {
-		this.props.mudaTitulo('Bancos')
+		this.props.mudaTitulo('Cadastros > Bancos')
 		this.props.loading(false)
 	}
 

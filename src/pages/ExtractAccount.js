@@ -64,7 +64,7 @@ class ExtractAccount extends React.Component {
 	}
 
 	componentDidMount() {
-		this.props.mudaTitulo('Extrato Contas Corrente')
+		this.props.mudaTitulo('Extrato > Contas Corrente')
 		this.getListBanks()
 		this.getListCategories()
 		this.list()

@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Switch, Route } from 'react-router-dom'
 import Saldos from './pages/Saldos'
-import DashboardPlan from './pages/DashboardPlan'
+import Planning from './pages/Planning'
 import Category from './pages/Category'
 import ExtractAccount from './pages/ExtractAccount'
 import ExtractCard from './pages/ExtractCard'
@@ -41,8 +41,8 @@ class Router extends React.Component {
 						update={this.props.update}
 					/>
 				</Route>
-				<Route path='/dashboard-plan'>
-					<DashboardPlan
+				<Route path='/planning'>
+					<Planning
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}

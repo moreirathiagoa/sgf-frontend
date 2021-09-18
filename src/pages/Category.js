@@ -57,7 +57,7 @@ class Categorias extends React.Component {
 	}
 
 	componentDidMount() {
-		this.props.mudaTitulo('Categorias')
+		this.props.mudaTitulo('Cadastros > Categorias')
 		this.props.loading(false)
 	}
 
