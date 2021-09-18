@@ -30,19 +30,12 @@ class MenuPrincipal extends React.Component {
 							<span>Saldos</span>
 						</Link>
 					</Menu.Item>
-					<Menu.Item key='2'>
-						<Link to='/xpto'>
-							<AppstoreOutlined />
-							<span>Dashboard Cartão</span>
+					<Menu.Item key='7'>
+						<Link to='/extrato-conta'>
+							<FileSearchOutlined />
+							<span>Extrato Conta</span>
 						</Link>
 					</Menu.Item>
-					<Menu.Item key='3'>
-						<Link to='/dashboard-plan'>
-							<AppstoreOutlined />
-							<span>Projeção Futuro</span>
-						</Link>
-					</Menu.Item>
-
 					<Menu.Item
 						key='4'
 						onClick={() => {
@@ -50,37 +43,13 @@ class MenuPrincipal extends React.Component {
 						}}
 					>
 						<WalletOutlined />
-						<span>Novo Conta</span>
-					</Menu.Item>
-					<Menu.Item
-						key='5'
-						onClick={() => {
-							this.props.showModal({ typeTransaction: 'cartaoCredito' })
-						}}
-					>
-						<WalletOutlined />
-						<span>Novo Crédito</span>
-					</Menu.Item>
-					<Menu.Item
-						key='6'
-						onClick={() => {
-							this.props.showModal({ typeTransaction: 'planejamento' })
-						}}
-					>
-						<WalletOutlined />
-						<span>Novo Plano</span>
+						<span>Transação Conta</span>
 					</Menu.Item>
 
-					<Menu.Item key='7'>
-						<Link to='/extrato-conta'>
-							<FileSearchOutlined />
-							<span>Extrato Conta</span>
-						</Link>
-					</Menu.Item>
-					<Menu.Item key='8'>
-						<Link to='/extrato-cartao'>
-							<FileSearchOutlined />
-							<span>Extrato Cartão</span>
+					<Menu.Item key='3'>
+						<Link to='/dashboard-plan'>
+							<AppstoreOutlined />
+							<span>Planejamento</span>
 						</Link>
 					</Menu.Item>
 					<Menu.Item key='9'>
@@ -89,6 +58,16 @@ class MenuPrincipal extends React.Component {
 							<span>Extrato Plano</span>
 						</Link>
 					</Menu.Item>
+					<Menu.Item
+						key='6'
+						onClick={() => {
+							this.props.showModal({ typeTransaction: 'planejamento' })
+						}}
+					>
+						<WalletOutlined />
+						<span>Transação Plano</span>
+					</Menu.Item>
+
 					<Menu.Item key='10'>
 						<Link to='/banks'>
 							<BankOutlined />
