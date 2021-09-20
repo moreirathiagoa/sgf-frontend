@@ -26,7 +26,7 @@ class MenuPrincipal extends React.Component {
 						this.props.handleClose()
 					}}
 				>
-					<SubMenu key='sub1' title='Débito'>
+					<SubMenu key='sub1' title='Conta Corrente'>
 						<Menu.Item key='item1'>
 							<Link to='/saldos'>
 								<AppstoreOutlined />
