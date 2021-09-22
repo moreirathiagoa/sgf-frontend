@@ -1,10 +1,16 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# SGFP - Sistema de Gerenciamento Financeiro Pessoal
 
-## Available Scripts
+<p align="center">Sistema para gestão dos gastos mensais e futuros, elaborado para uso pessoal, permitindo o usuário ter um controle melhor dos seus gastos.</p>
 
-In the project directory, you can run:
+## Instalando
 
-### `npm start`
+`npm install`
+
+## Executando
+
+- Execute o comando `npm run dev` para iniciar em modo desenvolvimento (apontando para localhost).
+- Execute o comando `npm run prd` para iniciar em modo desenvolvimento (apontando para servidor produtivo).
+- Execute o comando `npm start` para iniciar em modo produtivo (apontando para servidor produtivo).
 
 Runs the app in the development mode.<br />
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
