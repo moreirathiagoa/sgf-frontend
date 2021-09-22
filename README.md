@@ -2,8 +2,6 @@
 
 <p align="center">Sistema para gestão dos gastos mensais e futuros, elaborado para uso pessoal, permitindo o usuário ter um controle melhor dos seus gastos.</p>
 
----
-
 ## Instalando
 
 - Execute o comando `npm install` para instalar as dependencias.
