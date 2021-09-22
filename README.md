@@ -1,6 +1,10 @@
 # SGFP - Sistema de Gerenciamento Financeiro Pessoal
 
-<p align="center">Sistema para gestão dos gastos mensais e futuros, elaborado para uso pessoal, permitindo o usuário ter um controle melhor dos seus gastos.</p>
+Sistema para gestão dos gastos mensais e futuros, elaborado para uso pessoal, permitindo o usuário ter um controle melhor dos seus gastos
+
+## Modulo
+
+- **Frontend**
 
 ## Instalando
 
@@ -8,9 +12,9 @@
 
 ## Executando
 
-- Execute o comando `npm run dev` para iniciar em modo desenvolvimento (apontando para localhost).
-- Execute o comando `npm run prd` para iniciar em modo desenvolvimento (apontando para servidor produtivo).
-- Execute o comando `npm start` para iniciar em modo produtivo (apontando para servidor produtivo).
+- Execute o comando `npm run dev` para iniciar em modo desenvolvimento (apontando para servidor **backend local**).
+- Execute o comando `npm run prd` para iniciar em modo desenvolvimento (apontando para servidor **backend produtivo**).
+- Execute o comando `npm start` para iniciar em modo produtivo (apontando para servidor **backend produtivo**).
 
 ## Rodando os Testes
 
