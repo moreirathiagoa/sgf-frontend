@@ -22,7 +22,7 @@
 
 ## Status do Projeto
 
-- 🚀 Em construção | MPV Operacional 🚀
+- 🚀 Em construção | MVP Operacional 🚀
 
 ## Autor
 
