@@ -90,11 +90,7 @@ class DashboardDebit extends React.Component {
 				}
 			})
 			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro interno',
-					'Erro ao obter a listagem de Bancos.'
-				)
+				openNotification('error', 'Erro ao listar os bancos', err.message)
 			})
 	}
 
@@ -113,8 +109,8 @@ class DashboardDebit extends React.Component {
 			.catch((err) => {
 				openNotification(
 					'error',
-					'Erro ao listar',
-					'Erro interno. Tente novamente mais tarde.'
+					'Erro ao obter a lista de categorias',
+					err.message
 				)
 			})
 	}
@@ -134,8 +130,8 @@ class DashboardDebit extends React.Component {
 			.catch((err) => {
 				openNotification(
 					'error',
-					'Erro interno',
-					'Erro ao obter saldo dos Bancos.'
+					'Erro ao obter saldo não compensado (Crédito)',
+					err.message
 				)
 			})
 	}
@@ -155,8 +151,8 @@ class DashboardDebit extends React.Component {
 			.catch((err) => {
 				openNotification(
 					'error',
-					'Erro interno',
-					'Erro ao obter saldo dos Bancos.'
+					'Erro ao obter saldo não compensado (Débito)',
+					err.message
 				)
 			})
 	}
@@ -286,7 +282,7 @@ class DashboardDebit extends React.Component {
 					openNotification(
 						'success',
 						'Transação cadastrada',
-						'Transação cadastrada com sucesso.'
+						'Transferência exexutada com sucesso'
 					)
 					this.getListBanks().then(() => {
 						this.props.loading(false)
@@ -302,11 +298,7 @@ class DashboardDebit extends React.Component {
 				}
 			})
 			.catch((err) => {
-				openNotification(
-					'error',
-					'Transação não cadastrada',
-					'Erro interno. Tente novamente mais tarde.'
-				)
+				openNotification('error', 'Transação não cadastrada', err.message)
 			})
 	}
 
@@ -355,8 +347,8 @@ class DashboardDebit extends React.Component {
 			.catch((err) => {
 				openNotification(
 					'error',
-					'Saldo não cadastrado',
-					'Erro interno. Tente novamente mais tarde.'
+					'Erro ao atualizar saldo do banco',
+					err.message
 				)
 			})
 
