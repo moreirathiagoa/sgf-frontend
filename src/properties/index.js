@@ -8,8 +8,7 @@ switch (env) {
 
 		break
 	case 'prd':
-		url =
-			'https://zcfmqtxww3zrvso2foujel7ka40lyqty.lambda-url.us-east-1.on.aws/'
+		url = 'https://ijh3l22gke.execute-api.us-east-1.amazonaws.com/'
 		break
 	default:
 }
