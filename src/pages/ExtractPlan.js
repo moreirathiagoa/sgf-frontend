@@ -153,8 +153,8 @@ class ExtractPlan extends React.Component {
 
 			case 'clearFilter':
 				state.transactions = state.allTransactions
-				state.year = nextMonthYear
-				state.month = nextMonthMonth
+				state.year = 'Selecione'
+				state.month = 'Selecione'
 				state.bank_id = 'Selecione'
 				state.description = ''
 				state.category_id = 'Selecione'
@@ -295,7 +295,7 @@ class ExtractPlan extends React.Component {
 				}
 			}
 
-			if (this.state.year !== '') {
+			if (this.state.year !== 'Selecione') {
 				let now = new Date(transaction.efectedDate)
 				const ano = now.getFullYear()
 
@@ -304,7 +304,7 @@ class ExtractPlan extends React.Component {
 				}
 			}
 
-			if (this.state.month !== '') {
+			if (this.state.month !== 'Selecione') {
 				let now = new Date(transaction.efectedDate)
 				const mes = now.getMonth() + 1
 
