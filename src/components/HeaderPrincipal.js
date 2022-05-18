@@ -1,6 +1,6 @@
 import React from 'react'
 
-import 'antd/dist/antd.css'
+import 'antd/dist/antd.min.css'
 import { Layout } from 'antd'
 import { Link } from 'react-router-dom'
 import { MenuUnfoldOutlined } from '@ant-design/icons'
