@@ -23,7 +23,7 @@
 		"dev": "react-scripts start",
 		"prd": "REACT_APP_NODE_ENV=prd react-scripts start",
 		"build": "REACT_APP_NODE_ENV=prd react-scripts build",
-		"build-hml": "REACT_APP_NODE_ENV=dev react-scripts build",
+		"build-hml": "REACT_APP_NODE_ENV=hml react-scripts build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject"
 	},
