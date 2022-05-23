@@ -40,7 +40,7 @@ class DashboardDebit extends React.Component {
 				finalBankId: null,
 
 				//TODO: Verificar uma forma melhor de fixar uma categoria
-				categoryId: '5ed678b44ccebd0017598daf',
+				categoryId: null, //'5ed678b44ccebd0017598daf',
 				value: null,
 			},
 			tableContent: [],
@@ -61,7 +61,7 @@ class DashboardDebit extends React.Component {
 		this.props.loading(true)
 		this.props.mudaTitulo('Saldos')
 
-		getDashboardData()
+		return getDashboardData()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -213,8 +213,7 @@ class DashboardDebit extends React.Component {
 						'Transação cadastrada',
 						'Transferência exexutada com sucesso'
 					)
-					this.getListBanks().then(() => {
-						this.props.loading(false)
+					this.processUpdate().then(() => {
 						this.handleCancelTransfer()
 					})
 				} else {
@@ -264,7 +263,7 @@ class DashboardDebit extends React.Component {
 						'Saldo atualizado',
 						'Saldo atualizado com sucesso.'
 					)
-					this.getListBanks().then(() => this.props.loading(false))
+					this.processUpdate()
 				} else {
 					openNotification(
 						'error',
