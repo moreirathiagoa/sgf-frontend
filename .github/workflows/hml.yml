@@ -1,4 +1,4 @@
-name: Homologation Build
+name: Homologation Deploy
 on:
   push:
     branches:
