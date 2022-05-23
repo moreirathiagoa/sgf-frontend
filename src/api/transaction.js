@@ -144,42 +144,6 @@ const getSaldosNaoCompensado = () => {
 	return response
 }
 
-const getSaldosNaoCompensadoCredit = () => {
-	const token = localStorage.getItem('token')
-	const response = axios({
-		method: 'get',
-		url: properties.url + 'transaction/not-compensated-credit',
-		headers: {
-			auth: token,
-		},
-	})
-		.then((res) => {
-			return res
-		})
-		.catch((err) => {
-			return err.response
-		})
-	return response
-}
-
-const getSaldosNaoCompensadoDebit = () => {
-	const token = localStorage.getItem('token')
-	const response = axios({
-		method: 'get',
-		url: properties.url + 'transaction/not-compensated-debit',
-		headers: {
-			auth: token,
-		},
-	})
-		.then((res) => {
-			return res
-		})
-		.catch((err) => {
-			return err.response
-		})
-	return response
-}
-
 const futureTransactionBalance = () => {
 	const token = localStorage.getItem('token')
 	const response = axios({
@@ -226,8 +190,6 @@ export {
 	removeTransaction,
 	updateTransaction,
 	getSaldosNaoCompensado,
-	getSaldosNaoCompensadoCredit,
-	getSaldosNaoCompensadoDebit,
 	planToPrincipal,
 	futureTransactionBalance,
 }

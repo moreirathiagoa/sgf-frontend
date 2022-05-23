@@ -11,14 +11,7 @@ import {
 	Select,
 } from 'antd'
 import '../App.css'
-import {
-	updateBank,
-	getSaldosNaoCompensadoCredit,
-	getSaldosNaoCompensadoDebit,
-	listBanksDashboard,
-	bankTransference,
-	listCategories,
-} from '../api'
+import { getDashboardData, updateBank, bankTransference } from '../api'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { openNotification, prepareValue } from '../utils'
 
@@ -68,92 +61,28 @@ class DashboardDebit extends React.Component {
 		this.props.loading(true)
 		this.props.mudaTitulo('Saldos')
 
-		Promise.all([
-			this.getListBanks(),
-			this.getListCategories(),
-			this.initSaldoNaoCompensadoCredit(),
-			this.initSaldoNaoCompensadoDebit(),
-		]).then(() => this.props.loading(false))
-	}
-
-	getListBanks() {
-		return listBanksDashboard()
+		getDashboardData()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
 					this.props.verificaLogin()
 				} else {
+					const dashboardData = res.data
+
 					let state = this.state
-					state.banks = res.data.data
+					state.banks = dashboardData.banksList
+					state.categories = dashboardData.categoryList
+					state.saldoNotCompensatedCredit =
+						dashboardData.balanceNotCompensatedCredit
+					state.saldoNotCompensatedDebit =
+						dashboardData.balanceNotCompensatedDebit
 					this.setState(state)
 					this.getSaldosGerais()
+					this.props.loading(false)
 				}
 			})
 			.catch((err) => {
 				openNotification('error', 'Erro ao listar os bancos', err.message)
-			})
-	}
-
-	getListCategories() {
-		listCategories()
-			.then((res) => {
-				if (res.status === 401) {
-					localStorage.removeItem('token')
-					this.props.verificaLogin()
-				} else {
-					let state = this.state
-					state.categories = res.data.data
-					this.setState(state)
-				}
-			})
-			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro ao obter a lista de categorias',
-					err.message
-				)
-			})
-	}
-
-	initSaldoNaoCompensadoCredit() {
-		return getSaldosNaoCompensadoCredit()
-			.then((res) => {
-				if (res.status === 401) {
-					localStorage.removeItem('token')
-					this.props.verificaLogin()
-				} else {
-					let state = this.state
-					state.saldoNotCompensatedCredit = res.data.data
-					this.setState(state)
-				}
-			})
-			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro ao obter saldo não compensado (Crédito)',
-					err.message
-				)
-			})
-	}
-
-	initSaldoNaoCompensadoDebit() {
-		return getSaldosNaoCompensadoDebit()
-			.then((res) => {
-				if (res.status === 401) {
-					localStorage.removeItem('token')
-					this.props.verificaLogin()
-				} else {
-					let state = this.state
-					state.saldoNotCompensatedDebit = res.data.data
-					this.setState(state)
-				}
-			})
-			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro ao obter saldo não compensado (Débito)',
-					err.message
-				)
 			})
 	}
 
