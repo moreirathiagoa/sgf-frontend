@@ -1,4 +1,5 @@
 export { default as login } from './login'
+export { getDashboardData } from './balanceDashboard'
 export {
 	listCategories,
 	createCategory,
@@ -21,8 +22,6 @@ export {
 	updateTransaction,
 	getTransaction,
 	getSaldosNaoCompensado,
-	getSaldosNaoCompensadoCredit,
-	getSaldosNaoCompensadoDebit,
 	planToPrincipal,
 	futureTransactionBalance,
 } from './transaction'
