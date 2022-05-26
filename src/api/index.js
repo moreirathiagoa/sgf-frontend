@@ -1,5 +1,6 @@
 export { default as login } from './login'
 export { getDashboardData } from './balanceDashboard'
+export { getExtractData } from './extractPage'
 export {
 	listCategories,
 	createCategory,
