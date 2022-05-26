@@ -13,12 +13,7 @@ import {
 	TransactionOptions,
 } from '../components'
 import { PlusCircleOutlined, DeleteOutlined } from '@ant-design/icons'
-import {
-	listBanks,
-	listTransaction,
-	removeTransaction,
-	listCategories,
-} from '../api'
+import { getExtractData, removeTransaction } from '../api'
 import { openNotification, formatDateToUser, prepareValue } from '../utils'
 
 const { Title } = Typography
@@ -55,85 +50,44 @@ class ExtractAccount extends React.Component {
 		}
 		this.handleChange = this.handleChange.bind(this)
 		this.submitForm = this.submitForm.bind(this)
+		this.processExtractData = this.processExtractData.bind(this)
 	}
 
 	componentDidUpdate() {
 		if (this.props.update) {
-			this.list()
+			this.processExtractData()
 		}
 	}
 
 	componentDidMount() {
 		this.props.mudaTitulo('Extrato > Contas Corrente')
-		this.getListBanks()
-		this.getListCategories()
-		this.list()
+		this.processExtractData()
 	}
 
-	list = (state = this.state) => {
+	processExtractData(state = this.state) {
 		this.props.loading(true)
-		return listTransaction('contaCorrente', state.filters)
+		return getExtractData('contaCorrente', state.filters)
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
 					this.props.verificaLogin()
 				} else {
+					const extractData = res.data
+
 					let state = this.state
-					state.transactions = res.data.data
-					state.allTransactions = res.data.data
+
+					state.banks = extractData.banksList
+					state.categories = extractData.categoryList
+					state.transactions = extractData.transactionList
+					state.allTransactions = extractData.transactionList
+
 					this.setState(state)
 				}
 				this.props.loading(false)
 			})
 			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro ao listar',
-					'Erro interno. Tente novamente mais tarde.'
-				)
+				openNotification('error', 'Erro ao listar os bancos', err.message)
 				this.props.loading(false)
-			})
-	}
-
-	getListBanks() {
-		listBanks()
-			.then((res) => {
-				if (res.status === 401) {
-					localStorage.removeItem('token')
-					this.props.verificaLogin()
-				} else {
-					let state = this.state
-					state.banks = res.data.data
-					this.setState(state)
-				}
-			})
-			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro interno',
-					'Erro ao obter a listagem de Bancos.'
-				)
-			})
-	}
-
-	getListCategories() {
-		listCategories()
-			.then((res) => {
-				if (res.status === 401) {
-					localStorage.removeItem('token')
-					this.props.verificaLogin()
-				} else {
-					let state = this.state
-					state.categories = res.data.data
-					this.setState(state)
-				}
-			})
-			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro ao listar',
-					'Erro interno. Tente novamente mais tarde.'
-				)
 			})
 	}
 
@@ -153,7 +107,7 @@ class ExtractAccount extends React.Component {
 				state.filters.bank_id = 'Selecione'
 				state.filters.description = ''
 				state.filters.category_id = 'Selecione'
-				this.list(state)
+				this.processExtractData(state)
 				break
 
 			case 'name':
@@ -170,32 +124,32 @@ class ExtractAccount extends React.Component {
 
 			case 'year':
 				state.filters.year = event.target.value
-				this.list()
+				this.processExtractData()
 				break
 
 			case 'month':
 				state.filters.month = event.target.value
-				this.list()
+				this.processExtractData()
 				break
 
 			case 'notCompensated':
 				state.filters.onlyFuture = !state.filters.onlyFuture
-				this.list()
+				this.processExtractData()
 				break
 
 			case 'bank_id':
 				state.filters.bank_id = event.target.value
-				this.list()
+				this.processExtractData()
 				break
 
 			case 'category_id':
 				state.filters.category_id = event.target.value
-				this.list()
+				this.processExtractData()
 				break
 
 			case 'description':
 				state.filters.description = event.target.value
-				this.list()
+				this.processExtractData()
 				break
 
 			case 'checkbox':
@@ -245,7 +199,8 @@ class ExtractAccount extends React.Component {
 								'Transação removida',
 								'Transação removida com sucesso.'
 							)
-							this.list()
+							//TODO: chamar essa função apenas ao finalizar o loop
+							this.processExtractData()
 						} else {
 							openNotification(
 								'error',
@@ -420,7 +375,7 @@ class ExtractAccount extends React.Component {
 							showModal={this.props.showModal}
 							closeModal={this.menuModalClose}
 							remover={this.remover}
-							list={this.list}
+							list={this.processExtractData}
 						/>
 					</Modal>
 

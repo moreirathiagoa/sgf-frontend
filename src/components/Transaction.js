@@ -8,7 +8,6 @@ import {
 	listBanks,
 	listCategories,
 	getTransaction,
-	getFature,
 } from '../api'
 import {
 	openNotification,
@@ -16,35 +15,12 @@ import {
 	formatDateToMoment,
 	formatDateToUser,
 } from '../utils'
-import { SelectCategories, SelectBank, SelectFacture } from '.'
-
-function getFatures() {
-	let fatures = []
-	let now = new Date()
-	now.setDate('10')
-	now.setDate(now.getDate() - 30)
-	for (let i = 0; i <= 12; i++) {
-		const mes = now.getMonth() + 1
-		const ano = now.getFullYear()
-		let mesFinal = '00' + mes
-		mesFinal = mesFinal.substr(mesFinal.length - 2)
-		let fatura = {
-			_id: ano + '/' + mesFinal,
-			name: ano + '/' + mesFinal,
-		}
-
-		fatures.push(fatura)
-		now.setDate(now.getDate() + 30)
-	}
-	return fatures
-}
+import { SelectCategories, SelectBank } from '.'
 
 class Transaction extends React.Component {
 	constructor(props) {
 		const transactionType = props.transactionType
 		const transactionId = props.transactionId
-		const transactionFatureId = props.transactionFatureId
-		const fatures = getFatures()
 		const todayDate = actualDateToUser()
 		const isCompesed = transactionType === 'contaCorrente' ? true : undefined
 
@@ -63,7 +39,6 @@ class Transaction extends React.Component {
 			isCredit: false,
 			banks: [],
 			categories: [],
-			fatures: fatures,
 			saveExit: null,
 			exit: false,
 		}
@@ -73,10 +48,6 @@ class Transaction extends React.Component {
 
 		if (transactionId) {
 			this.getTransactionToUpdate(transactionId)
-		}
-
-		if (transactionFatureId) {
-			this.getDataFromFature(transactionFatureId)
 		}
 
 		this.handleChange = this.handleChange.bind(this)
@@ -156,29 +127,6 @@ class Transaction extends React.Component {
 					'error',
 					'Erro ao listar',
 					'Erro interno. Tente novamente mais tarde.'
-				)
-			})
-	}
-
-	getDataFromFature(fatureId) {
-		getFature(fatureId)
-			.then((res) => {
-				if (res.status === 401) {
-					localStorage.removeItem('token')
-					this.props.verificaLogin()
-				} else {
-					const fatureInformation = res.data.data
-					let state = this.state
-					state.data.description = `Pg. Fatura ${fatureInformation.name} - ${fatureInformation.bank_id.name}`
-					state.data.value = fatureInformation.fatureBalance
-					this.setState(state)
-				}
-			})
-			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro interno',
-					'Erro ao obter a listagem de Bancos.'
 				)
 			})
 	}
@@ -444,15 +392,6 @@ class Transaction extends React.Component {
 							style={{ width: 350 }}
 						/>
 					</Form.Item>
-					{this.state.data.typeTransaction === 'cartaoCredito' && (
-						<Form.Item label='Fatura'>
-							<SelectFacture
-								handleChange={this.handleChange}
-								fature_id={this.state.data.fature}
-								fatures={this.state.fatures}
-							/>
-						</Form.Item>
-					)}
 					<Form.Item label='Recorrência'>
 						<Row>
 							{this.state.idToUpdate && (

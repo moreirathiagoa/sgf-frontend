@@ -1,13 +1,16 @@
 import axios from 'axios'
 import properties from '../properties'
 
-const getDashboardData = () => {
+const getExtractData = (typeTransaction, filters) => {
 	const token = localStorage.getItem('token')
 	const response = axios({
-		method: 'get',
-		url: properties.url + 'balances-dashboard/get-balances',
+		method: 'POST',
+		url: properties.url + 'extract-page/get-extract-data/' + typeTransaction,
 		headers: {
 			auth: token,
+		},
+		data: {
+			filters: filters,
 		},
 	})
 		.then((res) => {
@@ -19,4 +22,4 @@ const getDashboardData = () => {
 	return response
 }
 
-export { getDashboardData }
+export { getExtractData }

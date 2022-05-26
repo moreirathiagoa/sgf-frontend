@@ -16,13 +16,7 @@ import {
 	CheckOutlined,
 	DeleteOutlined,
 } from '@ant-design/icons'
-import {
-	listBanks,
-	listTransaction,
-	removeTransaction,
-	listCategories,
-	planToPrincipal,
-} from '../api'
+import { getExtractData, removeTransaction, planToPrincipal } from '../api'
 import { openNotification, formatDateToUser, prepareValue } from '../utils'
 
 const { Title } = Typography
@@ -60,86 +54,44 @@ class ExtractPlan extends React.Component {
 		this.handleChange = this.handleChange.bind(this)
 		this.submitForm = this.submitForm.bind(this)
 		this.toAccount = this.toAccount.bind(this)
-		this.getListBanks()
-		this.getListCategories()
+		this.processExtractData = this.processExtractData.bind(this)
 	}
 
 	componentDidUpdate() {
 		if (this.props.update) {
-			this.list()
+			this.processExtractData()
 		}
 	}
 
 	componentDidMount() {
 		this.props.mudaTitulo('Extrato > Planejamentos Futuros')
-		this.list()
+		this.processExtractData()
 	}
 
-	list = () => {
+	processExtractData() {
 		this.props.loading(true)
-		return listTransaction('planejamento')
+		return getExtractData('planejamento')
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
 					this.props.verificaLogin()
 				} else {
+					const extractData = res.data
+
 					let state = this.state
-					state.transactions = res.data.data
-					state.allTransactions = res.data.data
+
+					state.banks = extractData.banksList
+					state.categories = extractData.categoryList
+					state.transactions = extractData.transactionList
+					state.allTransactions = extractData.transactionList
+
 					this.setState(state)
 				}
 				this.filterList()
 				this.props.loading(false)
 			})
 			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro ao listar',
-					'Erro interno. Tente novamente mais tarde.'
-				)
-				this.props.loading(false)
-			})
-	}
-
-	getListBanks() {
-		listBanks()
-			.then((res) => {
-				if (res.status === 401) {
-					localStorage.removeItem('token')
-					this.props.verificaLogin()
-				} else {
-					let state = this.state
-					state.banks = res.data.data
-					this.setState(state)
-				}
-			})
-			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro interno',
-					'Erro ao obter a listagem de Bancos.'
-				)
-			})
-	}
-
-	getListCategories() {
-		listCategories()
-			.then((res) => {
-				if (res.status === 401) {
-					localStorage.removeItem('token')
-					this.props.verificaLogin()
-				} else {
-					let state = this.state
-					state.categories = res.data.data
-					this.setState(state)
-				}
-			})
-			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro ao listar',
-					'Erro interno. Tente novamente mais tarde.'
-				)
+				openNotification('error', 'Erro ao listar os bancos', err.message)
 			})
 	}
 
@@ -245,7 +197,7 @@ class ExtractPlan extends React.Component {
 								'Transação removida',
 								'Transação removida com sucesso.'
 							)
-							this.list()
+							this.processExtractData()
 						} else {
 							openNotification(
 								'error',
@@ -368,7 +320,7 @@ class ExtractPlan extends React.Component {
 							'Transação atualizadas',
 							'Transação atualizadas com sucesso.'
 						)
-						this.list()
+						this.processExtractData()
 					} else {
 						openNotification(
 							'error',
@@ -507,7 +459,7 @@ class ExtractPlan extends React.Component {
 							showModal={this.props.showModal}
 							closeModal={this.menuModalClose}
 							remover={this.remover}
-							list={this.list}
+							list={this.processExtractData}
 						/>
 					</Modal>
 

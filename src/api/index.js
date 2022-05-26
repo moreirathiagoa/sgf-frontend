@@ -1,5 +1,6 @@
 export { default as login } from './login'
 export { getDashboardData } from './balanceDashboard'
+export { getExtractData } from './extractPage'
 export {
 	listCategories,
 	createCategory,
@@ -13,7 +14,6 @@ export {
 	updateBank,
 	listBanksDashboard,
 } from './bank'
-export { listFatures, getFature, payFature } from './fature'
 export {
 	listTransaction,
 	createTransaction,
