@@ -1,11 +1,10 @@
 import React from 'react'
 
 import { Switch, Route } from 'react-router-dom'
-import Saldos from './pages/Saldos'
+import Saldos from './pages/dasboardBalance'
 import Planning from './pages/Planning'
 import Category from './pages/Category'
 import ExtractAccount from './pages/ExtractAccount'
-import ExtractCard from './pages/ExtractCard'
 import ExtractPlan from './pages/ExtractPlan'
 import Bank from './pages/Bank'
 import NotFound from './pages/NotFound'
@@ -51,15 +50,6 @@ class Router extends React.Component {
 				</Route>
 				<Route path='/extrato-conta'>
 					<ExtractAccount
-						loading={this.props.loading}
-						mudaTitulo={this.props.mudaTitulo}
-						verificaLogin={this.props.verificaLogin}
-						showModal={this.props.showModal}
-						update={this.props.update}
-					/>
-				</Route>
-				<Route path='/extrato-cartao'>
-					<ExtractCard
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}

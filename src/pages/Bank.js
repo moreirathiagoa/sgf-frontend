@@ -334,8 +334,6 @@ class Banks extends React.Component {
 								>
 									<Option value='Conta Corrente'>Conta Corrente</Option>
 									<Option value='Conta Cartão'>Conta Cartão</Option>
-									<Option value='Cartão de Crédito'>Cartão de Crédito</Option>
-									<Option value='Poupança'>Poupança</Option>
 								</Select>
 							</Form.Item>
 

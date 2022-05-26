@@ -14,7 +14,6 @@ export {
 	updateBank,
 	listBanksDashboard,
 } from './bank'
-export { listFatures, getFature, payFature } from './fature'
 export {
 	listTransaction,
 	createTransaction,
