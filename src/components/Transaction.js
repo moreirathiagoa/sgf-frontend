@@ -124,10 +124,6 @@ class Transaction extends React.Component {
 				state.data.category_id = event.target.value
 				break
 
-			case 'fature_id':
-				state.data.fature = event.target.value
-				break
-
 			case 'isSimples':
 				state.data.isSimples = !state.data.isSimples
 				break
