@@ -2,28 +2,6 @@ import axios from 'axios'
 import properties from '../properties'
 import { formatDateToMoment } from '../utils'
 
-const listTransaction = (typeTransaction, filters) => {
-	const token = localStorage.getItem('token')
-
-	const response = axios({
-		method: 'POST',
-		url: properties.url + 'transaction/list/' + typeTransaction,
-		headers: {
-			auth: token,
-		},
-		data: {
-			filters: filters,
-		},
-	})
-		.then((res) => {
-			return res
-		})
-		.catch((err) => {
-			return err.response
-		})
-	return response
-}
-
 const getTransaction = (idTransaction) => {
 	const token = localStorage.getItem('token')
 
@@ -126,24 +104,6 @@ const updateTransaction = (transaction, idCategory) => {
 	return response
 }
 
-const getSaldosNaoCompensado = () => {
-	const token = localStorage.getItem('token')
-	const response = axios({
-		method: 'get',
-		url: properties.url + 'transaction/not-compensated-by-bank',
-		headers: {
-			auth: token,
-		},
-	})
-		.then((res) => {
-			return res
-		})
-		.catch((err) => {
-			return err.response
-		})
-	return response
-}
-
 const futureTransactionBalance = () => {
 	const token = localStorage.getItem('token')
 	const response = axios({
@@ -183,13 +143,11 @@ const planToPrincipal = (transaction) => {
 }
 
 export {
-	listTransaction,
 	getTransaction,
 	createTransaction,
 	bankTransference,
 	removeTransaction,
 	updateTransaction,
-	getSaldosNaoCompensado,
 	planToPrincipal,
 	futureTransactionBalance,
 }
