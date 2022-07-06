@@ -1,6 +1,7 @@
 export { default as login } from './login'
 export { getDashboardData } from './balanceDashboard'
 export { getExtractData } from './extractPage'
+export { getTransactionData } from './newTransaction'
 export {
 	listCategories,
 	createCategory,
@@ -15,13 +16,11 @@ export {
 	listBanksDashboard,
 } from './bank'
 export {
-	listTransaction,
 	createTransaction,
 	bankTransference,
 	removeTransaction,
 	updateTransaction,
 	getTransaction,
-	getSaldosNaoCompensado,
 	planToPrincipal,
 	futureTransactionBalance,
 } from './transaction'

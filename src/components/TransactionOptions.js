@@ -33,7 +33,6 @@ class TransactionOptions extends React.Component {
 						)
 						return 'success'
 					} else {
-						console.log('res :>> ', res)
 						openNotification(
 							'error',
 							'Transação não atualizada',
@@ -43,7 +42,6 @@ class TransactionOptions extends React.Component {
 					}
 				})
 				.catch((err) => {
-					console.log('err :>> ', err)
 					openNotification(
 						'error',
 						'Transação não atualizada',

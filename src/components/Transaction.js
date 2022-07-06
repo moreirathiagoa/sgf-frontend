@@ -5,9 +5,7 @@ import { Form, Input, Button, Switch, Row, Col, DatePicker } from 'antd'
 import {
 	createTransaction,
 	updateTransaction,
-	listBanks,
-	listCategories,
-	getTransaction,
+	getTransactionData,
 } from '../api'
 import {
 	openNotification,
@@ -42,62 +40,42 @@ class Transaction extends React.Component {
 			saveExit: null,
 			exit: false,
 		}
-
-		this.getListCategories()
-		this.getListBanks(transactionType)
-
-		if (transactionId) {
-			this.getTransactionToUpdate(transactionId)
-		}
+		this.getTransactionData(transactionType, transactionId)
 
 		this.handleChange = this.handleChange.bind(this)
 	}
 
-	getTransactionToUpdate(idTransaction) {
-		return getTransaction(idTransaction)
+	getTransactionData(transactionType, idTransaction) {
+		return getTransactionData(transactionType, idTransaction)
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
 					this.props.verificaLogin()
 				} else {
+					const transactionData = res.data
 					let state = this.state
-					state.data = res.data.data
 
-					if (res.data.data.fature_id)
-						state.data.fature = res.data.data.fature_id.name
-
-					if (res.data.data.value >= 0) {
-						state.isCredit = true
-					} else {
-						state.data.value = -1 * state.data.value
-					}
-
-					state.data.efectedDate = formatDateToUser(res.data.data.efectedDate)
-
-					this.setState(state)
-				}
-			})
-			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro interno',
-					'Erro ao obter a listagem de Bancos.'
-				)
-			})
-	}
-
-	getListBanks(typeTransaction) {
-		return listBanks(typeTransaction)
-			.then((res) => {
-				if (res.status === 401) {
-					localStorage.removeItem('token')
-					this.props.verificaLogin()
-				} else {
-					const banks = res.data.data.filter((bank) => {
+					const banks = transactionData.banksList.filter((bank) => {
 						return bank.isActive
 					})
-					let state = this.state
+
 					state.banks = banks
+					state.categories = transactionData.categoryList
+
+					if (transactionData.transactionData) {
+						state.data = transactionData.transactionData
+
+						if (transactionData.transactionData.value >= 0) {
+							state.isCredit = true
+						} else {
+							state.data.value = -1 * state.data.value
+						}
+
+						state.data.efectedDate = formatDateToUser(
+							transactionData.transactionData.efectedDate
+						)
+					}
+
 					this.setState(state)
 				}
 			})
@@ -105,28 +83,7 @@ class Transaction extends React.Component {
 				openNotification(
 					'error',
 					'Erro interno',
-					'Erro ao obter a listagem de Transações.'
-				)
-			})
-	}
-
-	getListCategories() {
-		listCategories()
-			.then((res) => {
-				if (res.status === 401) {
-					localStorage.removeItem('token')
-					this.props.verificaLogin()
-				} else {
-					let state = this.state
-					state.categories = res.data.data
-					this.setState(state)
-				}
-			})
-			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro ao listar',
-					'Erro interno. Tente novamente mais tarde.'
+					'Erro ao obter dados da transação.'
 				)
 			})
 	}
