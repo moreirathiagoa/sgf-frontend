@@ -19,7 +19,6 @@ class App extends React.Component {
 			modalVisible: false,
 			type: null,
 			id: null,
-			fatureId: null,
 		},
 		menu: {
 			modalVisible: false,
@@ -77,13 +76,6 @@ class App extends React.Component {
 	showTransactionModal = (data) => {
 		const transactionType = data.typeTransaction
 		const transactionId = data.idTransaction
-		const transactionFatureId = data.transactionFatureId
-
-		if (this.state.transaction.fatureId !== transactionFatureId) {
-			let state = this.state
-			state.transaction.fatureId = transactionFatureId
-			this.setState(state)
-		}
 
 		if (this.state.transaction.id !== transactionId) {
 			let state = this.state
@@ -104,7 +96,6 @@ class App extends React.Component {
 		state.transaction.modalVisible = false
 		state.transaction.type = null
 		state.transaction.id = null
-		state.transaction.fatureId = null
 		this.setState(state)
 	}
 
@@ -133,7 +124,6 @@ class App extends React.Component {
 						verificaLogin={this.verificaLogin}
 						transactionType={this.state.transaction.type}
 						transactionId={this.state.transaction.id}
-						transactionFatureId={this.state.transaction.fatureId}
 						handleClose={this.transactionModalClose}
 						update={this.update}
 					/>
