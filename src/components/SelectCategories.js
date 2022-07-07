@@ -10,7 +10,7 @@ class SelectCategories extends React.Component {
 		return (
 			<Select
 				name='category_id'
-				value={this.props.category_id}
+				value={this.props.category_id || 'Selecione'}
 				size='md'
 				style={{ width: 150 }}
 				onSelect={(value) => {

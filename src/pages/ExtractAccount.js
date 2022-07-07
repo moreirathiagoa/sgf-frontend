@@ -34,8 +34,8 @@ class ExtractAccount extends React.Component {
 				year: actualYear,
 				month: actualMonth,
 				onlyFuture: false,
-				bank_id: 'Selecione',
-				category_id: 'Selecione',
+				bank_id: null,
+				category_id: null,
 				description: '',
 			},
 
@@ -51,6 +51,9 @@ class ExtractAccount extends React.Component {
 		this.handleChange = this.handleChange.bind(this)
 		this.submitForm = this.submitForm.bind(this)
 		this.processExtractData = this.processExtractData.bind(this)
+		this.deleteTransactionChecked = this.deleteTransactionChecked.bind(this)
+		this.isChecked = this.isChecked.bind(this)
+		this.remover = this.remover.bind(this)
 	}
 
 	componentDidUpdate() {
@@ -64,9 +67,9 @@ class ExtractAccount extends React.Component {
 		this.processExtractData()
 	}
 
-	processExtractData(state = this.state) {
+	processExtractData() {
 		this.props.loading(true)
-		return getExtractData('contaCorrente', state.filters)
+		return getExtractData('contaCorrente', this.state.filters)
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
@@ -74,14 +77,14 @@ class ExtractAccount extends React.Component {
 				} else {
 					const extractData = res.data
 
-					let state = this.state
+					this.setState((state) => {
+						state.banks = extractData.banksList
+						state.categories = extractData.categoryList
+						state.transactions = extractData.transactionList
+						state.allTransactions = extractData.transactionList
 
-					state.banks = extractData.banksList
-					state.categories = extractData.categoryList
-					state.transactions = extractData.transactionList
-					state.allTransactions = extractData.transactionList
-
-					this.setState(state)
+						return state
+					})
 				}
 				this.props.loading(false)
 			})
@@ -92,88 +95,88 @@ class ExtractAccount extends React.Component {
 	}
 
 	handleChange(event) {
-		let state = this.state
+		this.setState((state) => {
+			switch (event.target.name) {
+				case 'filtro':
+					state.filtro = !state.filtro
+					break
 
-		switch (event.target.name) {
-			case 'filtro':
-				state.filtro = !state.filtro
-				break
+				case 'clearFilter':
+					const now = new Date()
+					state.transactions = state.allTransactions
+					state.filters.year = now.getFullYear()
+					state.filters.month = now.getMonth() + 1
+					state.filters.bank_id = null
+					state.filters.description = ''
+					state.filters.category_id = null
+					this.processExtractData()
+					break
 
-			case 'clearFilter':
-				const now = new Date()
-				state.transactions = state.allTransactions
-				state.filters.year = now.getFullYear()
-				state.filters.month = now.getMonth() + 1
-				state.filters.bank_id = 'Selecione'
-				state.filters.description = ''
-				state.filters.category_id = 'Selecione'
-				this.processExtractData(state)
-				break
+				case 'name':
+					state.name = event.target.value
+					break
 
-			case 'name':
-				state.name = event.target.value
-				break
+				case 'isActive':
+					state.filters.data.isActive = !state.filters.data.isActive
+					break
 
-			case 'isActive':
-				state.filters.data.isActive = !state.filters.data.isActive
-				break
+				case 'bankType':
+					state.filters.data.bankType = event.target.value
+					break
 
-			case 'bankType':
-				state.filters.data.bankType = event.target.value
-				break
+				case 'year':
+					state.filters.year = event.target.value
+					this.processExtractData()
+					break
 
-			case 'year':
-				state.filters.year = event.target.value
-				this.processExtractData()
-				break
+				case 'month':
+					state.filters.month = event.target.value
+					this.processExtractData()
+					break
 
-			case 'month':
-				state.filters.month = event.target.value
-				this.processExtractData()
-				break
+				case 'notCompensated':
+					state.filters.onlyFuture = !state.filters.onlyFuture
+					this.processExtractData()
+					break
 
-			case 'notCompensated':
-				state.filters.onlyFuture = !state.filters.onlyFuture
-				this.processExtractData()
-				break
+				case 'bank_id':
+					state.filters.bank_id = event.target.value
+					this.processExtractData()
+					break
 
-			case 'bank_id':
-				state.filters.bank_id = event.target.value
-				this.processExtractData()
-				break
+				case 'category_id':
+					state.filters.category_id = event.target.value
+					this.processExtractData()
+					break
 
-			case 'category_id':
-				state.filters.category_id = event.target.value
-				this.processExtractData()
-				break
+				case 'description':
+					state.filters.description = event.target.value
+					this.processExtractData()
+					break
 
-			case 'description':
-				state.filters.description = event.target.value
-				this.processExtractData()
-				break
+				case 'checkbox':
+					const id = event.target.value
+					if (this.isChecked(id)) {
+						this.removeChecked(id)
+					} else {
+						state.checked.push(id)
+					}
+					break
 
-			case 'checkbox':
-				const id = event.target.value
-				if (this.isChecked(id)) {
-					this.removeChecked(id)
-				} else {
-					state.checked.push(id)
-				}
-				break
-
-			default:
-		}
-		this.setState(state)
+				default:
+			}
+			return state
+		})
 	}
 
 	removeChecked(id) {
-		const state = this.state
+		this.setState((state) => {
+			state.checked = state.checked.filter((element) => {
+				return element !== id
+			})
 
-		state.checked = state.checked.filter((element) => {
-			return element !== id
+			return state
 		})
-
-		this.setState(state)
 	}
 
 	isChecked(id) {
@@ -259,17 +262,19 @@ class ExtractAccount extends React.Component {
 
 	showMenuModal = (data) => {
 		if (this.state.menu.modalVisible !== data) {
-			let state = this.state
-			state.menu.modalVisible = true
-			state.menu.transactionToUpdate = data
-			this.setState(state)
+			this.setState((state) => {
+				state.menu.modalVisible = true
+				state.menu.transactionToUpdate = data
+				return state
+			})
 		}
 	}
 
 	menuModalClose = (e) => {
-		let state = this.state
-		state.menu.modalVisible = false
-		this.setState(state)
+		this.setState((state) => {
+			state.menu.modalVisible = false
+			return state
+		})
 	}
 
 	render() {

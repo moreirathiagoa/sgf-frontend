@@ -36,17 +36,17 @@ class DashboardPlan extends React.Component {
 					this.props.verificaLogin()
 				} else {
 					const planingData = res.data
-					let state = this.state
+					this.setState((state) => {
+						state.principalContent = planingData.futureTransactionBalance
 
-					state.principalContent = planingData.futureTransactionBalance
+						let saldoLiquido = 0
+						planingData.banksList.forEach((bank) => {
+							saldoLiquido += bank.saldoSistema
+						})
+						state.actualBalance = saldoLiquido
 
-					let saldoLiquido = 0
-					planingData.banksList.forEach((bank) => {
-						saldoLiquido += bank.saldoSistema
+						return state
 					})
-					state.actualBalance = saldoLiquido
-
-					this.setState(state)
 					this.props.loading(false)
 				}
 			})
@@ -56,16 +56,16 @@ class DashboardPlan extends React.Component {
 	}
 
 	handleChange(event) {
-		let state = this.state
+		this.setState((state) => {
+			switch (event.target.name) {
+				case 'saldoManualModal':
+					state.modalContent.saldoManual = event.target.value
+					break
 
-		switch (event.target.name) {
-			case 'saldoManualModal':
-				state.modalContent.saldoManual = event.target.value
-				break
-
-			default:
-		}
-		this.setState(state)
+				default:
+			}
+			return state
+		})
 	}
 
 	render() {

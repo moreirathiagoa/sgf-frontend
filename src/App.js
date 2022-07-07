@@ -4,8 +4,9 @@ import 'antd/dist/antd.min.css'
 import './App.css'
 import { BrowserRouter } from 'react-router-dom'
 import { Layout, Spin, Modal } from 'antd'
+import Transaction from './pages/Transaction'
 import Routes from './routes'
-import { MenuPrincipal, HeaderPrincipal, Transaction } from './components'
+import { MenuPrincipal, HeaderPrincipal } from './components'
 import { openNotification } from './utils'
 
 const { Content } = Layout
@@ -61,16 +62,18 @@ class App extends React.Component {
 
 	showMenuModal = (data) => {
 		if (this.state.menu.modalVisible !== data) {
-			let state = this.state
-			state.menu.modalVisible = true
-			this.setState(state)
+			this.setState((state) => {
+				state.menu.modalVisible = true
+				return state
+			})
 		}
 	}
 
 	menuModalClose = (e) => {
-		let state = this.state
-		state.menu.modalVisible = false
-		this.setState(state)
+		this.setState((state) => {
+			state.menu.modalVisible = false
+			return state
+		})
 	}
 
 	showTransactionModal = (data) => {
@@ -78,25 +81,28 @@ class App extends React.Component {
 		const transactionId = data.idTransaction
 
 		if (this.state.transaction.id !== transactionId) {
-			let state = this.state
-			state.transaction.id = transactionId
-			this.setState(state)
+			this.setState((state) => {
+				state.transaction.id = transactionId
+				return state
+			})
 		}
 
 		if (this.state.transaction.type !== transactionType) {
-			let state = this.state
-			state.transaction.modalVisible = true
-			state.transaction.type = transactionType
-			this.setState(state)
+			this.setState((state) => {
+				state.transaction.modalVisible = true
+				state.transaction.type = transactionType
+				return state
+			})
 		}
 	}
 
 	transactionModalClose = (e) => {
-		let state = this.state
-		state.transaction.modalVisible = false
-		state.transaction.type = null
-		state.transaction.id = null
-		this.setState(state)
+		this.setState((state) => {
+			state.transaction.modalVisible = false
+			state.transaction.type = null
+			state.transaction.id = null
+			return state
+		})
 	}
 
 	update = () => {
