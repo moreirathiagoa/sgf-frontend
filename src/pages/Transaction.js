@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { clone } from 'lodash'
 import '../App.css'
 import { Form, Input, Button, Switch, Row, Col, DatePicker } from 'antd'
 import {
@@ -131,20 +132,6 @@ class Transaction extends React.Component {
 					state.isCredit = !state.isCredit
 					break
 
-				case 'salvarSair':
-					this.finalizeForm().then((res) => {
-						if (res === 'success') this.props.handleClose()
-					})
-					break
-
-				case 'salvar':
-					this.finalizeForm().then(() => {
-						if (!this.state.isCredit) {
-							state.data.value = state.data.value * -1
-						}
-					})
-					break
-
 				default:
 			}
 
@@ -152,24 +139,28 @@ class Transaction extends React.Component {
 		})
 	}
 
-	finalizeForm() {
+	finalizeForm(type) {
 		this.props.loading(true)
+
+		let data = clone(this.state.data)
+
 		if (!this.state.isCredit) {
-			this.setState((state) => {
-				state.data.value = state.data.value * -1
-				return state
-			})
+			data.value = data.value * -1
 		}
 
 		if (this.state.idToUpdate) {
-			return this.atualizar()
+			this.atualizar(data).then((res) => {
+				if (res === 'success' && type === 'salvarSair') this.props.handleClose()
+			})
 		} else {
-			return this.cadastrar()
+			this.cadastrar(data).then((res) => {
+				if (res === 'success' && type === 'salvarSair') this.props.handleClose()
+			})
 		}
 	}
 
-	cadastrar() {
-		return createTransaction(this.state.data)
+	cadastrar(data) {
+		return createTransaction(data)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
 					openNotification(
@@ -203,8 +194,8 @@ class Transaction extends React.Component {
 			})
 	}
 
-	atualizar() {
-		return updateTransaction(this.state.data, this.state.idToUpdate)
+	atualizar(data) {
+		return updateTransaction(data, this.state.idToUpdate)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
 					openNotification(
@@ -395,15 +386,7 @@ class Transaction extends React.Component {
 										size='lg'
 										htmlType='submit'
 										name='salvar'
-										onClick={() => {
-											const event = {
-												target: {
-													name: 'salvar',
-													value: true,
-												},
-											}
-											this.handleChange(event)
-										}}
+										onClick={() => this.finalizeForm('salvar')}
 									>
 										Salvar
 									</Button>
@@ -416,15 +399,7 @@ class Transaction extends React.Component {
 									type='primary'
 									htmlType='submit'
 									name='salvarSair'
-									onClick={() => {
-										const event = {
-											target: {
-												name: 'salvarSair',
-												value: true,
-											},
-										}
-										this.handleChange(event)
-									}}
+									onClick={() => this.finalizeForm('salvarSair')}
 								>
 									Salvar e Sair
 								</Button>

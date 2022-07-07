@@ -96,7 +96,6 @@ const updateTransaction = (transaction, idCategory) => {
 		},
 	}
 
-	console.log('params: ', params)
 	const response = axios(params)
 		.then((res) => {
 			return res
