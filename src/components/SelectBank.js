@@ -10,7 +10,7 @@ class SelectBank extends React.Component {
 		return (
 			<Select
 				name='bank_id'
-				value={this.props.bank_id}
+				value={this.props.bank_id || 'Selecione'}
 				size='md'
 				style={{ width: 150 }}
 				onSelect={(value) => {

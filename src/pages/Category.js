@@ -69,9 +69,10 @@ class Categorias extends React.Component {
 					localStorage.removeItem('token')
 					this.props.verificaLogin()
 				} else {
-					let state = this.state
-					state.categories = res.data.data
-					this.setState(state)
+					this.setState((state) => {
+						state.categories = res.data.data
+						return state
+					})
 				}
 				this.props.loading(false)
 			})
@@ -112,29 +113,30 @@ class Categorias extends React.Component {
 	)
 
 	editInit(element) {
-		let state = this.state
-		state.list = false
-		state.idToUpdate = element._id
-		state.data.name = element.name
-		state.data.isActive = element.isActive
-		this.setState(state)
+		this.setState((state) => {
+			state.list = false
+			state.idToUpdate = element._id
+			state.data.name = element.name
+			state.data.isActive = element.isActive
+			return state
+		})
 	}
 
 	handleChange(event) {
-		let state = this.state
+		this.setState((state) => {
+			switch (event.target.name) {
+				case 'name':
+					state.data.name = event.target.value
+					break
 
-		switch (event.target.name) {
-			case 'name':
-				state.data.name = event.target.value
-				break
+				case 'isActive':
+					state.data.isActive = !state.data.isActive
+					break
 
-			case 'isActive':
-				state.data.isActive = !state.data.isActive
-				break
-
-			default:
-		}
-		this.setState(state)
+				default:
+			}
+			return state
+		})
 	}
 
 	remover(id) {
@@ -169,9 +171,9 @@ class Categorias extends React.Component {
 	submitForm(e) {
 		this.props.loading(true)
 		if (this.state.idToUpdate) {
-			this.atualizar(e)
+			this.atualizar()
 		} else {
-			this.cadastrar(e)
+			this.cadastrar()
 		}
 	}
 
@@ -232,16 +234,21 @@ class Categorias extends React.Component {
 	}
 
 	limpaDataState() {
-		let state = this.state
-		state.list = true
-		state.data.name = ''
-		state.data.isActive = true
-		state.idToUpdate = undefined
-		this.setState(state)
+		this.setState((state) => {
+			state.list = true
+			state.data.name = ''
+			state.data.isActive = true
+			state.idToUpdate = undefined
+			return state
+		})
 	}
 
 	actionButtonNew() {
-		this.setState({ list: !this.state.list })
+		this.setState((state) => {
+			state.list = !state.list
+			return state
+		})
+
 		if (!this.state.list) this.limpaDataState()
 	}
 
