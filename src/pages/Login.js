@@ -15,7 +15,7 @@ const tailLayout = {
 
 class Login extends React.Component {
 	componentDidMount() {
-		this.verifyServer().then(() => this.props.loading(false))
+		this.verifyServer().finally(() => this.props.loading(false))
 
 		this.props.mudaTitulo('')
 

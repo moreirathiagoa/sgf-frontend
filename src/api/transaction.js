@@ -87,14 +87,17 @@ const updateTransaction = (transaction, idCategory) => {
 
 	transaction.efectedDate = formatDateToMoment(transaction.efectedDate)
 
-	const response = axios({
+	const params = {
 		method: 'put',
 		url: properties.url + 'transaction/update/' + idCategory,
 		data: transaction,
 		headers: {
 			auth: token,
 		},
-	})
+	}
+
+	console.log('params: ', params)
+	const response = axios(params)
 		.then((res) => {
 			return res
 		})

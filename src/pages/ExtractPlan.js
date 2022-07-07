@@ -38,8 +38,8 @@ class ExtractPlan extends React.Component {
 			year: nextMonthYear,
 			month: nextMonthMonth,
 			notCompensated: false,
-			bank_id: 'Selecione',
-			category_id: 'Selecione',
+			bank_id: null,
+			category_id: null,
 			description: '',
 
 			banks: [],
@@ -54,6 +54,9 @@ class ExtractPlan extends React.Component {
 		this.handleChange = this.handleChange.bind(this)
 		this.submitForm = this.submitForm.bind(this)
 		this.toAccount = this.toAccount.bind(this)
+		this.deleteTransactionChecked = this.deleteTransactionChecked.bind(this)
+		this.isChecked = this.isChecked.bind(this)
+		this.remover = this.remover.bind(this)
 		this.processExtractData = this.processExtractData.bind(this)
 	}
 
@@ -78,14 +81,14 @@ class ExtractPlan extends React.Component {
 				} else {
 					const extractData = res.data
 
-					let state = this.state
+					this.setState((state) => {
+						state.banks = extractData.banksList
+						state.categories = extractData.categoryList
+						state.transactions = extractData.transactionList
+						state.allTransactions = extractData.transactionList
 
-					state.banks = extractData.banksList
-					state.categories = extractData.categoryList
-					state.transactions = extractData.transactionList
-					state.allTransactions = extractData.transactionList
-
-					this.setState(state)
+						return state
+					})
 				}
 				this.filterList()
 				this.props.loading(false)
@@ -96,82 +99,82 @@ class ExtractPlan extends React.Component {
 	}
 
 	handleChange(event) {
-		let state = this.state
+		this.setState((state) => {
+			switch (event.target.name) {
+				case 'filtro':
+					state.filtro = !state.filtro
+					break
 
-		switch (event.target.name) {
-			case 'filtro':
-				state.filtro = !state.filtro
-				break
+				case 'clearFilter':
+					state.transactions = state.allTransactions
+					state.year = 'Selecione'
+					state.month = 'Selecione'
+					state.bank_id = null
+					state.description = ''
+					state.category_id = null
+					this.filterList()
+					break
 
-			case 'clearFilter':
-				state.transactions = state.allTransactions
-				state.year = 'Selecione'
-				state.month = 'Selecione'
-				state.bank_id = 'Selecione'
-				state.description = ''
-				state.category_id = 'Selecione'
-				this.filterList(state)
-				break
+				case 'name':
+					state.name = event.target.value
+					break
 
-			case 'name':
-				state.name = event.target.value
-				break
+				case 'isActive':
+					state.data.isActive = !state.data.isActive
+					break
 
-			case 'isActive':
-				state.data.isActive = !state.data.isActive
-				break
+				case 'bankType':
+					state.data.bankType = event.target.value
+					break
 
-			case 'bankType':
-				state.data.bankType = event.target.value
-				break
+				case 'year':
+					state.year = event.target.value
+					this.filterList()
+					break
 
-			case 'year':
-				state.year = event.target.value
-				this.filterList()
-				break
+				case 'month':
+					state.month = event.target.value
+					this.filterList()
+					break
 
-			case 'month':
-				state.month = event.target.value
-				this.filterList()
-				break
+				case 'bank_id':
+					state.bank_id = event.target.value
+					this.filterList()
+					break
 
-			case 'bank_id':
-				state.bank_id = event.target.value
-				this.filterList()
-				break
+				case 'category_id':
+					state.category_id = event.target.value
+					this.filterList()
+					break
 
-			case 'category_id':
-				state.category_id = event.target.value
-				this.filterList()
-				break
+				case 'description':
+					state.description = event.target.value
+					this.filterList()
+					break
 
-			case 'description':
-				state.description = event.target.value
-				this.filterList()
-				break
+				case 'checkbox':
+					const id = event.target.value
+					if (this.isChecked(id)) {
+						this.removeChecked(id)
+					} else {
+						state.checked.push(id)
+					}
+					break
 
-			case 'checkbox':
-				const id = event.target.value
-				if (this.isChecked(id)) {
-					this.removeChecked(id)
-				} else {
-					state.checked.push(id)
-				}
-				break
-
-			default:
-		}
-		this.setState(state)
+				default:
+			}
+			return state
+		})
 	}
 
 	removeChecked(id) {
-		const state = this.state
+		this.setState((state) => {
+			state.checked = state.checked.filter((element) => {
+				return element !== id
+			})
 
-		state.checked = state.checked.filter((element) => {
-			return element !== id
+			return state
 		})
-
-		this.setState(state)
 	}
 
 	isChecked(id) {
@@ -218,61 +221,66 @@ class ExtractPlan extends React.Component {
 		}
 	}
 
-	filterList(state = this.state) {
-		const transactionFiltered = state.allTransactions.filter((transaction) => {
-			let toReturn = true
+	filterList() {
+		this.setState((state) => {
+			const transactionFiltered = state.allTransactions.filter(
+				(transaction) => {
+					let toReturn = true
 
-			if (this.state.bank_id.toString() !== 'Selecione') {
-				if (
-					transaction.bank_id._id.toString() !== this.state.bank_id.toString()
-				) {
-					toReturn = false
+					if (this.state.bank_id !== null) {
+						if (
+							transaction.bank_id._id.toString() !==
+							this.state.bank_id.toString()
+						) {
+							toReturn = false
+						}
+					}
+
+					if (this.state.category_id !== null) {
+						if (
+							transaction.category_id._id.toString() !==
+							this.state.category_id.toString()
+						) {
+							toReturn = false
+						}
+					}
+
+					if (this.state.description !== '') {
+						const description = transaction.description.toLowerCase()
+						const filterDescription = this.state.description.toLowerCase()
+						if (!description.includes(filterDescription)) {
+							toReturn = false
+						}
+					}
+
+					if (this.state.year.toString() !== 'Selecione') {
+						let now = new Date(transaction.efectedDate)
+						const ano = now.getFullYear()
+
+						if (ano.toString() !== this.state.year.toString()) {
+							toReturn = false
+						}
+					}
+
+					if (this.state.month.toString() !== 'Selecione') {
+						let now = new Date(transaction.efectedDate)
+						const mes = now.getMonth() + 1
+
+						if (mes.toString() !== this.state.month.toString()) {
+							toReturn = false
+						}
+					}
+
+					if (toReturn) {
+						return transaction
+					}
+					return null
 				}
-			}
+			)
 
-			if (this.state.category_id.toString() !== 'Selecione') {
-				if (
-					transaction.category_id._id.toString() !==
-					this.state.category_id.toString()
-				) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.description !== '') {
-				const description = transaction.description.toLowerCase()
-				const filterDescription = this.state.description.toLowerCase()
-				if (!description.includes(filterDescription)) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.year !== 'Selecione') {
-				let now = new Date(transaction.efectedDate)
-				const ano = now.getFullYear()
-
-				if (ano.toString() !== this.state.year.toString()) {
-					toReturn = false
-				}
-			}
-
-			if (this.state.month !== 'Selecione') {
-				let now = new Date(transaction.efectedDate)
-				const mes = now.getMonth() + 1
-
-				if (mes.toString() !== this.state.month.toString()) {
-					toReturn = false
-				}
-			}
-
-			if (toReturn) {
-				return transaction
-			}
-			return null
+			state.transactions = transactionFiltered
+			return state
 		})
-
-		state.transactions = transactionFiltered
-		this.setState(state)
 	}
 
 	remover(id) {
@@ -345,17 +353,19 @@ class ExtractPlan extends React.Component {
 
 	showMenuModal = (data) => {
 		if (this.state.menu.modalVisible !== data) {
-			let state = this.state
-			state.menu.modalVisible = true
-			state.menu.transactionToUpdate = data
-			this.setState(state)
+			this.setState((state) => {
+				state.menu.modalVisible = true
+				state.menu.transactionToUpdate = data
+				return state
+			})
 		}
 	}
 
 	menuModalClose = (e) => {
-		let state = this.state
-		state.menu.modalVisible = false
-		this.setState(state)
+		this.setState((state) => {
+			state.menu.modalVisible = false
+			return state
+		})
 	}
 
 	render() {

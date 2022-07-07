@@ -69,14 +69,15 @@ class DashboardDebit extends React.Component {
 				} else {
 					const dashboardData = res.data
 
-					let state = this.state
-					state.banks = dashboardData.banksList
-					state.categories = dashboardData.categoryList
-					state.saldoNotCompensatedCredit =
-						dashboardData.balanceNotCompensatedCredit
-					state.saldoNotCompensatedDebit =
-						dashboardData.balanceNotCompensatedDebit
-					this.setState(state)
+					this.setState((state) => {
+						state.banks = dashboardData.banksList
+						state.categories = dashboardData.categoryList
+						state.saldoNotCompensatedCredit =
+							dashboardData.balanceNotCompensatedCredit
+						state.saldoNotCompensatedDebit =
+							dashboardData.balanceNotCompensatedDebit
+						return state
+					})
 					this.getSaldosGerais()
 					this.props.loading(false)
 				}
@@ -87,24 +88,24 @@ class DashboardDebit extends React.Component {
 	}
 
 	handleChange(event) {
-		let state = this.state
+		this.setState((state) => {
+			switch (event.target.name) {
+				case 'saldoManualModal':
+					state.modalSaldoContent.saldoManual = event.target.value
+					break
 
-		switch (event.target.name) {
-			case 'saldoManualModal':
-				state.modalSaldoContent.saldoManual = event.target.value
-				break
+				case 'transferenceValue':
+					state.modalTransferenceContent.value = event.target.value
+					break
 
-			case 'transferenceValue':
-				state.modalTransferenceContent.value = event.target.value
-				break
+				case 'categoryId':
+					state.modalTransferenceContent.categoryId = event.target.value
+					break
 
-			case 'categoryId':
-				state.modalTransferenceContent.categoryId = event.target.value
-				break
-
-			default:
-		}
-		this.setState(state)
+				default:
+			}
+			return state
+		})
 	}
 
 	columns = () => {
@@ -139,67 +140,68 @@ class DashboardDebit extends React.Component {
 	}
 
 	getSaldosGerais() {
-		let state = this.state
+		this.setState((state) => {
+			let tableContent = []
+			let saldoLiquido = 0
+			let saldoReal = 0
 
-		let tableContent = []
-		let saldoLiquido = 0
-		let saldoReal = 0
+			const banks = state.banks.filter((bank) => {
+				return bank.isActive
+			})
 
-		const banks = state.banks.filter((bank) => {
-			return bank.isActive
-		})
+			banks.forEach((bank) => {
+				saldoLiquido += bank.saldoSistema
 
-		banks.forEach((bank) => {
-			saldoLiquido += bank.saldoSistema
+				if (bank.bankType === 'Conta Corrente') {
+					saldoReal += bank.saldoSistemaDeduzido
+				}
 
-			if (bank.bankType === 'Conta Corrente') {
-				saldoReal += bank.saldoSistemaDeduzido
-			}
+				const saldoSistema = prepareValue(bank.saldoSistemaDeduzido)
+				const saldoManual = prepareValue(bank.saldoManual)
+				const diference = prepareValue(bank.diference)
 
-			const saldoSistema = prepareValue(bank.saldoSistemaDeduzido)
-			const saldoManual = prepareValue(bank.saldoManual)
-			const diference = prepareValue(bank.diference)
-
-			const content = {
-				key: bank.id,
-				banco: bank.name,
-				saldoSistema: (
-					<span style={{ color: saldoSistema.color }}>
-						{saldoSistema.value}
-					</span>
-				),
-				saldoManual: {
-					id: bank.id,
+				const content = {
+					key: bank.id,
 					banco: bank.name,
-					saldoManual: saldoManual,
-					saldoManualModal: bank.saldoSistemaDeduzido,
-				},
-				diference: (
-					<span style={{ color: diference.color }}>{diference.value}</span>
-				),
-				status: bank.diference ? (
-					<CloseCircleOutlined style={{ color: 'red' }} />
-				) : (
-					<CheckCircleOutlined style={{ color: 'green' }} />
-				),
-			}
+					saldoSistema: (
+						<span style={{ color: saldoSistema.color }}>
+							{saldoSistema.value}
+						</span>
+					),
+					saldoManual: {
+						id: bank.id,
+						banco: bank.name,
+						saldoManual: saldoManual,
+						saldoManualModal: bank.saldoSistemaDeduzido,
+					},
+					diference: (
+						<span style={{ color: diference.color }}>{diference.value}</span>
+					),
+					status: bank.diference ? (
+						<CloseCircleOutlined style={{ color: 'red' }} />
+					) : (
+						<CheckCircleOutlined style={{ color: 'green' }} />
+					),
+				}
 
-			tableContent.push(content)
+				tableContent.push(content)
+			})
+
+			state.saldoReal = saldoReal
+			state.saldoLiquido = saldoLiquido
+			state.tableContent = tableContent
+
+			return state
 		})
-
-		state.saldoReal = saldoReal
-		state.saldoLiquido = saldoLiquido
-		state.tableContent = tableContent
-
-		this.setState(state)
 	}
 
 	showModalTransference = (data) => {
-		let state = this.state
-		state.modalTransferenceContent.originalBankId = data.originalBankId
-		state.modalTransferenceContent.finalBankId = data.finalBankId
-		state.modalTransferenceContent.visible = true
-		this.setState(state)
+		this.setState((state) => {
+			state.modalTransferenceContent.originalBankId = data.originalBankId
+			state.modalTransferenceContent.finalBankId = data.finalBankId
+			state.modalTransferenceContent.visible = true
+			return state
+		})
 	}
 
 	handleOkTransfer = () => {
@@ -231,21 +233,23 @@ class DashboardDebit extends React.Component {
 	}
 
 	handleCancelTransfer = () => {
-		let state = this.state
-		state.modalTransferenceContent.originalBankId = null
-		state.modalTransferenceContent.finalBankId = null
-		state.modalTransferenceContent.visible = false
-		state.modalTransferenceContent.value = null
-		this.setState(state)
+		this.setState((state) => {
+			state.modalTransferenceContent.originalBankId = null
+			state.modalTransferenceContent.finalBankId = null
+			state.modalTransferenceContent.visible = false
+			state.modalTransferenceContent.value = null
+			return state
+		})
 	}
 
 	showModalSaldo = (data) => {
-		let state = this.state
-		state.modalSaldoContent.id = data.id
-		state.modalSaldoContent.banco = data.banco
-		state.modalSaldoContent.saldoManual = data.saldoManualModal
-		state.modalSaldoContent.visible = true
-		this.setState(state)
+		this.setState((state) => {
+			state.modalSaldoContent.id = data.id
+			state.modalSaldoContent.banco = data.banco
+			state.modalSaldoContent.saldoManual = data.saldoManualModal
+			state.modalSaldoContent.visible = true
+			return state
+		})
 	}
 
 	handleOkSaldo = (e) => {
@@ -284,12 +288,13 @@ class DashboardDebit extends React.Component {
 	}
 
 	handleCancelSaldo = (e) => {
-		let state = this.state
-		state.modalSaldoContent.id = null
-		state.modalSaldoContent.banco = null
-		state.modalSaldoContent.saldoManual = null
-		state.modalSaldoContent.visible = false
-		this.setState(state)
+		this.setState((state) => {
+			state.modalSaldoContent.id = null
+			state.modalSaldoContent.banco = null
+			state.modalSaldoContent.saldoManual = null
+			state.modalSaldoContent.visible = false
+			return state
+		})
 	}
 
 	render() {

@@ -13,16 +13,17 @@ import {
 	formatDateToMoment,
 	formatDateToUser,
 } from '../utils'
-import { SelectCategories, SelectBank } from '.'
+import { SelectCategories, SelectBank } from '../components'
 
 class Transaction extends React.Component {
 	constructor(props) {
+		super(props)
 		const transactionType = props.transactionType
 		const transactionId = props.transactionId
 		const todayDate = actualDateToUser()
 		const isCompesed = transactionType === 'contaCorrente' ? true : undefined
 
-		super(props)
+		// deepcode ignore ReactStateFromProps: the suggestion use an deprecated method
 		this.state = {
 			idToUpdate: transactionId,
 			data: {
@@ -40,9 +41,8 @@ class Transaction extends React.Component {
 			saveExit: null,
 			exit: false,
 		}
-		this.getTransactionData(transactionType, transactionId)
-
 		this.handleChange = this.handleChange.bind(this)
+		this.getTransactionData(transactionType, transactionId)
 	}
 
 	getTransactionData(transactionType, idTransaction) {
@@ -53,30 +53,30 @@ class Transaction extends React.Component {
 					this.props.verificaLogin()
 				} else {
 					const transactionData = res.data
-					let state = this.state
+					this.setState((state) => {
+						const banks = transactionData.banksList.filter((bank) => {
+							return bank.isActive
+						})
 
-					const banks = transactionData.banksList.filter((bank) => {
-						return bank.isActive
-					})
+						state.banks = banks
+						state.categories = transactionData.categoryList
 
-					state.banks = banks
-					state.categories = transactionData.categoryList
+						if (transactionData.transactionData) {
+							state.data = transactionData.transactionData
 
-					if (transactionData.transactionData) {
-						state.data = transactionData.transactionData
+							if (transactionData.transactionData.value >= 0) {
+								state.isCredit = true
+							} else {
+								state.data.value = -1 * state.data.value
+							}
 
-						if (transactionData.transactionData.value >= 0) {
-							state.isCredit = true
-						} else {
-							state.data.value = -1 * state.data.value
+							state.data.efectedDate = formatDateToUser(
+								transactionData.transactionData.efectedDate
+							)
 						}
 
-						state.data.efectedDate = formatDateToUser(
-							transactionData.transactionData.efectedDate
-						)
-					}
-
-					this.setState(state)
+						return state
+					})
 				}
 			})
 			.catch((err) => {
@@ -89,76 +89,76 @@ class Transaction extends React.Component {
 	}
 
 	handleChange(event) {
-		let state = this.state
+		this.setState((state) => {
+			switch (event.target.name) {
+				case 'isCompensated':
+					state.data.isCompesed = !state.data.isCompesed
+					break
 
-		switch (event.target.name) {
-			case 'isCompensated':
-				state.data.isCompesed = !state.data.isCompesed
-				break
+				case 'efectedDate':
+					state.data.efectedDate = event.target.value
+					break
 
-			case 'efectedDate':
-				state.data.efectedDate = event.target.value
-				break
+				case 'description':
+					state.data.description = event.target.value
+					break
 
-			case 'description':
-				state.data.description = event.target.value
-				break
+				case 'value':
+					state.data.value = event.target.value
+					break
 
-			case 'value':
-				state.data.value = event.target.value
-				break
+				case 'currentRecurrence':
+					state.data.currentRecurrence = event.target.value
+					break
 
-			case 'currentRecurrence':
-				state.data.currentRecurrence = event.target.value
-				break
+				case 'finalRecurrence':
+					state.data.finalRecurrence = event.target.value
+					break
 
-			case 'finalRecurrence':
-				state.data.finalRecurrence = event.target.value
-				break
+				case 'bank_id':
+					state.data.bank_id = event.target.value
+					break
 
-			case 'bank_id':
-				state.data.bank_id = event.target.value
-				break
+				case 'category_id':
+					state.data.category_id = event.target.value
+					break
 
-			case 'category_id':
-				state.data.category_id = event.target.value
-				break
+				case 'isSimples':
+					state.data.isSimples = !state.data.isSimples
+					break
 
-			case 'isSimples':
-				state.data.isSimples = !state.data.isSimples
-				break
+				case 'isCredit':
+					state.isCredit = !state.isCredit
+					break
 
-			case 'isCredit':
-				state.isCredit = !state.isCredit
-				break
+				case 'salvarSair':
+					this.finalizeForm().then((res) => {
+						if (res === 'success') this.props.handleClose()
+					})
+					break
 
-			case 'salvarSair':
-				this.finalizeForm().then((res) => {
-					if (res === 'success') this.props.handleClose()
-				})
-				break
+				case 'salvar':
+					this.finalizeForm().then(() => {
+						if (!this.state.isCredit) {
+							state.data.value = state.data.value * -1
+						}
+					})
+					break
 
-			case 'salvar':
-				this.finalizeForm().then(() => {
-					if (!this.state.isCredit) {
-						const state = this.state
-						state.data.value = state.data.value * -1
-						this.setState(state)
-					}
-				})
-				break
+				default:
+			}
 
-			default:
-		}
-		this.setState(state)
+			return state
+		})
 	}
 
 	finalizeForm() {
 		this.props.loading(true)
 		if (!this.state.isCredit) {
-			const state = this.state
-			state.data.value = state.data.value * -1
-			this.setState(state)
+			this.setState((state) => {
+				state.data.value = state.data.value * -1
+				return state
+			})
 		}
 
 		if (this.state.idToUpdate) {
