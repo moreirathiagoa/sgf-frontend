@@ -2,19 +2,14 @@ export { default as login } from './login'
 export { getDashboardData } from './balanceDashboard'
 export { getExtractData } from './extractPage'
 export { getTransactionData } from './newTransaction'
+export { getPlaningData } from './planning'
 export {
 	listCategories,
 	createCategory,
 	removeCategory,
 	updateCategory,
 } from './category'
-export {
-	listBanks,
-	createBank,
-	removeBank,
-	updateBank,
-	listBanksDashboard,
-} from './bank'
+export { listBanks, createBank, removeBank, updateBank } from './bank'
 export {
 	createTransaction,
 	bankTransference,
@@ -22,6 +17,5 @@ export {
 	updateTransaction,
 	getTransaction,
 	planToPrincipal,
-	futureTransactionBalance,
 } from './transaction'
 export { startServer } from './verification'

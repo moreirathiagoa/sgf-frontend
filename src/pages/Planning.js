@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Row, Col, Card } from 'antd'
 import '../App.css'
-import { listBanksDashboard, futureTransactionBalance } from '../api'
+import { getPlaningData } from '../api'
 import { openNotification, prepareValue } from '../utils'
 import { uniqueId } from 'lodash'
 
@@ -29,56 +29,29 @@ class DashboardPlan extends React.Component {
 		this.props.loading(true)
 		this.props.mudaTitulo('Planejamento')
 
-		Promise.all([
-			this.initFutureTransactionBalance(),
-			this.getListBanks(),
-		]).then(() => this.props.loading(false))
-	}
-
-	initFutureTransactionBalance() {
-		return futureTransactionBalance()
+		return getPlaningData()
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')
 					this.props.verificaLogin()
 				} else {
+					const planingData = res.data
 					let state = this.state
-					state.principalContent = res.data.data
-					this.setState(state)
-				}
-			})
-			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro interno',
-					'Erro ao obter saldo liquido atual.'
-				)
-			})
-	}
 
-	getListBanks() {
-		return listBanksDashboard()
-			.then((res) => {
-				if (res.status === 401) {
-					localStorage.removeItem('token')
-					this.props.verificaLogin()
-				} else {
-					let state = this.state
-					const banks = res.data.data
+					state.principalContent = planingData.futureTransactionBalance
+
 					let saldoLiquido = 0
-					banks.forEach((bank) => {
+					planingData.banksList.forEach((bank) => {
 						saldoLiquido += bank.saldoSistema
 					})
 					state.actualBalance = saldoLiquido
+
 					this.setState(state)
+					this.props.loading(false)
 				}
 			})
 			.catch((err) => {
-				openNotification(
-					'error',
-					'Erro interno',
-					'Erro ao obter a listagem de sados.'
-				)
+				openNotification('error', 'Erro ao listar o planejamento', err.message)
 			})
 	}
 
