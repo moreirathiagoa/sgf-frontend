@@ -104,24 +104,6 @@ const updateTransaction = (transaction, idCategory) => {
 	return response
 }
 
-const futureTransactionBalance = () => {
-	const token = localStorage.getItem('token')
-	const response = axios({
-		method: 'get',
-		url: properties.url + 'transaction/future-balance',
-		headers: {
-			auth: token,
-		},
-	})
-		.then((res) => {
-			return res
-		})
-		.catch((err) => {
-			return err.response
-		})
-	return response
-}
-
 const planToPrincipal = (transaction) => {
 	const token = localStorage.getItem('token')
 
@@ -149,5 +131,4 @@ export {
 	removeTransaction,
 	updateTransaction,
 	planToPrincipal,
-	futureTransactionBalance,
 }
