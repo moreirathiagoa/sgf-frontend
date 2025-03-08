@@ -1,0 +1,61 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - release
+      - master
+
+jobs:
+  build:
+    name: Build and Deploy (${{ github.ref_name }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Npm Install
+        run: |
+          npm install
+
+      - name: Building
+        run: |
+          if [[ "${{ github.ref_name }}" == "release" ]]; then
+            npm run build-hml
+          elif [[ "${{ github.ref_name }}" == "master" ]]; then
+            npm run build
+          else
+            echo "Branch não reconhecida para build"
+            exit 1
+          fi
+
+      - name: Verify Build
+        run: |
+          if [ ! -d "build" ]; then echo "Build directory not found!"; exit 1; fi
+
+      - name: Upload to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --delete
+        env:
+          AWS_S3_BUCKET: ${{ github.ref_name == 'master' && 'sgf' || 'sgf-hml' }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1'
+          SOURCE_DIR: 'build'
