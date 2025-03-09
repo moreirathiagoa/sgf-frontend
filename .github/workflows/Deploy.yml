@@ -6,7 +6,7 @@ on:
       - closed
     branches:
       - release
-      - master
+      - main
 
 jobs:
   build:
@@ -41,7 +41,7 @@ jobs:
         run: |
           if [[ "${{ github.ref_name }}" == "release" ]]; then
             npm run build-hml
-          elif [[ "${{ github.ref_name }}" == "master" ]]; then
+          elif [[ "${{ github.ref_name }}" == "main" ]]; then
             npm run build
           else
             echo "Branch não reconhecida para build"
@@ -57,7 +57,7 @@ jobs:
         with:
           args: --acl public-read --delete
         env:
-          AWS_S3_BUCKET: ${{ github.ref_name == 'master' && 'sgf' || 'sgf-hml' }}
+          AWS_S3_BUCKET: ${{ github.ref_name == 'main' && 'sgf' || 'sgf-hml' }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: 'us-east-1'
