@@ -82,14 +82,14 @@ const removeTransaction = (id) => {
 	return response
 }
 
-const updateTransaction = (transaction, idCategory) => {
+const updateTransaction = (transaction, idTransaction) => {
 	const token = localStorage.getItem('token')
 
 	transaction.efectedDate = formatDateToMoment(transaction.efectedDate)
 
 	const params = {
 		method: 'put',
-		url: properties.url + 'transaction/update/' + idCategory,
+		url: properties.url + 'transaction/update/' + idTransaction,
 		data: transaction,
 		headers: {
 			auth: token,

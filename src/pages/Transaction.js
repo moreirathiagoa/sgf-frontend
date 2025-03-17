@@ -14,7 +14,7 @@ import {
 	formatDateToMoment,
 	formatDateToUser,
 } from '../utils'
-import { SelectCategories, SelectBank } from '../components'
+import { SelectDescription, SelectBank } from '../components'
 
 class Transaction extends React.Component {
 	constructor(props) {
@@ -22,23 +22,20 @@ class Transaction extends React.Component {
 		const transactionType = props.transactionType
 		const transactionId = props.transactionId
 		const todayDate = actualDateToUser()
-		const isCompesed = transactionType === 'contaCorrente' ? true : undefined
+		const isTransactionProcessed = transactionType === 'contaCorrente' ? true : undefined
 
-		// deepcode ignore ReactStateFromProps: the suggestion use an deprecated method
 		this.state = {
 			idToUpdate: transactionId,
 			data: {
 				efectedDate: todayDate,
-				bank_id: 'Selecione',
-				category_id: 'Selecione',
 				isSimples: false,
 				value: null,
-				isCompesed: isCompesed,
+				isCompesed: isTransactionProcessed,
 				typeTransaction: transactionType,
 			},
 			isCredit: false,
 			banks: [],
-			categories: [],
+			lastDescriptions: [],
 			saveExit: null,
 			exit: false,
 		}
@@ -60,7 +57,7 @@ class Transaction extends React.Component {
 						})
 
 						state.banks = banks
-						state.categories = transactionData.categoryList
+						state.lastDescriptions = transactionData.lastDescriptions
 
 						if (transactionData.transactionData) {
 							state.data = transactionData.transactionData
@@ -98,10 +95,27 @@ class Transaction extends React.Component {
 
 				case 'efectedDate':
 					state.data.efectedDate = event.target.value
+
+					const dateList = event?.target?.value?.split('/')
+					if (dateList) {
+						const isoDate = `${dateList[2]}-${dateList[1]}-${dateList[0]}`
+						if (new Date(isoDate).getTime() > new Date().getTime()) {
+							state.data.isCompesed = false
+						} else {
+							state.data.isCompesed = true
+						}
+					}
 					break
 
 				case 'description':
-					state.data.description = event.target.value
+					state.data.description = event.target.currentDescription
+					if (event?.target?.newDescriptionItens?.length > 0) {
+						state.lastDescriptions = event.target.newDescriptionItens
+					}
+					break
+
+				case 'detail':
+					state.data.detail = event.target.value
 					break
 
 				case 'value':
@@ -118,10 +132,6 @@ class Transaction extends React.Component {
 
 				case 'bank_id':
 					state.data.bank_id = event.target.value
-					break
-
-				case 'category_id':
-					state.data.category_id = event.target.value
 					break
 
 				case 'isSimples':
@@ -149,17 +159,17 @@ class Transaction extends React.Component {
 		}
 
 		if (this.state.idToUpdate) {
-			this.atualizar(data).then((res) => {
+			this.updateTransaction(data).then((res) => {
 				if (res === 'success' && type === 'salvarSair') this.props.handleClose()
 			})
 		} else {
-			this.cadastrar(data).then((res) => {
+			this.createTransaction(data).then((res) => {
 				if (res === 'success' && type === 'salvarSair') this.props.handleClose()
 			})
 		}
 	}
 
-	cadastrar(data) {
+	createTransaction(data) {
 		return createTransaction(data)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
@@ -194,7 +204,7 @@ class Transaction extends React.Component {
 			})
 	}
 
-	atualizar(data) {
+	updateTransaction(data) {
 		return updateTransaction(data, this.state.idToUpdate)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
@@ -208,7 +218,7 @@ class Transaction extends React.Component {
 					openNotification(
 						'error',
 						'Transação não atualizada',
-						'A Transação não pode ser atualizada.'
+						`A Transação não pode ser atualizada: ${res.data.message}`
 					)
 					return 'error'
 				}
@@ -235,22 +245,6 @@ class Transaction extends React.Component {
 					initialValues={{ remember: true }}
 					onFinishFailed={() => {}}
 				>
-					<Form.Item label='Banco'>
-						<SelectBank
-							handleChange={this.handleChange}
-							bank_id={this.state.data.bank_id}
-							banks={this.state.banks}
-						/>
-					</Form.Item>
-
-					<Form.Item label='Categoria'>
-						<SelectCategories
-							handleChange={this.handleChange}
-							category_id={this.state.data.category_id}
-							categories={this.state.categories}
-						/>
-					</Form.Item>
-
 					<Form.Item label='Data'>
 						<Row>
 							<Col span={12}>
@@ -270,8 +264,12 @@ class Transaction extends React.Component {
 									}}
 								/>
 							</Col>
-							<Col span={10}>
-								{this.state.data.typeTransaction === 'contaCorrente' && (
+						</Row>
+					</Form.Item>
+					{this.state.data.typeTransaction === 'contaCorrente' && (
+						<Form.Item label='Status'>
+							<Row>
+								<Col span={15}>
 									<>
 										<span
 											style={{ padding: '0 10px' }}
@@ -287,10 +285,10 @@ class Transaction extends React.Component {
 											{this.state.data.isCompesed ? 'Compensado' : 'Programado'}
 										</span>
 									</>
-								)}
-							</Col>
-						</Row>
-					</Form.Item>
+								</Col>
+							</Row>
+						</Form.Item>
+					)}
 
 					<Form.Item label='Valor'>
 						<Row>
@@ -325,13 +323,29 @@ class Transaction extends React.Component {
 						</Row>
 					</Form.Item>
 
+					<Form.Item label='Banco'>
+						<SelectBank
+							handleChange={this.handleChange}
+							bank_id={this.state.data.bank_id}
+							banks={this.state.banks}
+						/>
+					</Form.Item>
+
 					<Form.Item label='Descrição'>
+						<SelectDescription
+							lastDescriptions={this.state.lastDescriptions}
+							currentDescription={this.state.data.description}
+							handleChange={this.handleChange}
+						/>
+					</Form.Item>
+
+					<Form.Item label='Detalhes'>
 						<Input
-							placeholder=''
+							placeholder='Informe um detalhamento'
 							type='text'
-							name='description'
+							name='detail'
 							size='md'
-							value={this.state.data.description}
+							value={this.state.data.detail}
 							onChange={this.handleChange}
 							style={{ width: 350 }}
 						/>
