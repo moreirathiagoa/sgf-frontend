@@ -5,7 +5,6 @@ import { Menu } from 'antd'
 import { Link } from 'react-router-dom'
 import {
 	AppstoreOutlined,
-	ProfileOutlined,
 	BankOutlined,
 	WalletOutlined,
 	FileSearchOutlined,
@@ -79,12 +78,6 @@ class MenuPrincipal extends React.Component {
 							<Link to='/banks'>
 								<BankOutlined />
 								<span>Bancos</span>
-							</Link>
-						</Menu.Item>
-						<Menu.Item key='item8'>
-							<Link to='/category'>
-								<ProfileOutlined />
-								<span>Categorias</span>
 							</Link>
 						</Menu.Item>
 					</SubMenu>

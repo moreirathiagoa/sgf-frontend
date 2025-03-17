@@ -1,13 +1,12 @@
 import React from 'react'
 
 import '../App.css'
-import { get } from 'lodash'
+
 import { Input, Typography, Row, Col, Card, Modal, Checkbox } from 'antd'
 import {
 	TitleFilter,
 	SelectYear,
 	SelectMonth,
-	SelectCategories,
 	SelectBank,
 	TransactionOptions,
 } from '../components'
@@ -39,11 +38,9 @@ class ExtractPlan extends React.Component {
 			month: nextMonthMonth,
 			notCompensated: false,
 			bank_id: null,
-			category_id: null,
 			description: '',
-
+			detail: '',
 			banks: [],
-			categories: [],
 			filtro: false,
 			idToEdit: null,
 			menu: {
@@ -83,7 +80,6 @@ class ExtractPlan extends React.Component {
 
 					this.setState((state) => {
 						state.banks = extractData.banksList
-						state.categories = extractData.categoryList
 						state.transactions = extractData.transactionList
 						state.allTransactions = extractData.transactionList
 
@@ -111,7 +107,6 @@ class ExtractPlan extends React.Component {
 					state.month = 'Selecione'
 					state.bank_id = null
 					state.description = ''
-					state.category_id = null
 					this.filterList()
 					break
 
@@ -142,13 +137,13 @@ class ExtractPlan extends React.Component {
 					this.filterList()
 					break
 
-				case 'category_id':
-					state.category_id = event.target.value
+				case 'description':
+					state.description = event.target.value
 					this.filterList()
 					break
 
-				case 'description':
-					state.description = event.target.value
+				case 'detail':
+					state.detail = event.target.value
 					this.filterList()
 					break
 
@@ -236,19 +231,18 @@ class ExtractPlan extends React.Component {
 						}
 					}
 
-					if (this.state.category_id !== null) {
-						if (
-							transaction.category_id._id.toString() !==
-							this.state.category_id.toString()
-						) {
+					if (this.state.description !== '') {
+						const description = transaction?.description?.toLowerCase()
+						const filterDescription = this?.state?.description?.toLowerCase()
+						if (!description?.includes(filterDescription)) {
 							toReturn = false
 						}
 					}
 
-					if (this.state.description !== '') {
-						const description = transaction.description.toLowerCase()
-						const filterDescription = this.state.description.toLowerCase()
-						if (!description.includes(filterDescription)) {
+					if (this.state.detail !== '') {
+						const detail = transaction?.detail?.toLowerCase()
+						const filterDetail = this?.state?.detail?.toLowerCase()
+						if (!detail?.includes(filterDetail)) {
 							toReturn = false
 						}
 					}
@@ -404,14 +398,6 @@ class ExtractPlan extends React.Component {
 										banks={this.state.banks}
 									/>
 								</Col>
-								<Col span={12}>
-									<span style={{ marginRight: '30px' }}>Categoria:</span>
-									<SelectCategories
-										handleChange={this.handleChange}
-										category_id={this.state.category_id}
-										categories={this.state.categories}
-									/>
-								</Col>
 							</Row>
 							<br></br>
 							<Row>
@@ -423,6 +409,18 @@ class ExtractPlan extends React.Component {
 										name='description'
 										size='md'
 										value={this.state.description}
+										onChange={this.handleChange}
+										style={{ width: 200 }}
+									/>
+								</Col>
+								<Col span={12}>
+									<span style={{ marginRight: '30px' }}>Detalhes:</span>
+									<Input
+										placeholder='Detail'
+										type='text'
+										name='detail'
+										size='md'
+										value={this.state.detail}
 										onChange={this.handleChange}
 										style={{ width: 200 }}
 									/>
@@ -495,17 +493,7 @@ class ExtractPlan extends React.Component {
 										}}
 									/>
 								</span>
-								<span>{element.bank_id.name}</span>
-								<span
-									style={{
-										paddingLeft: '20px',
-										color: transactionValue.color,
-										alignSelf: 'right',
-										float: 'right',
-									}}
-								>
-									{transactionValue.value}
-								</span>
+								<span>{element.description || 'Transação Genérica'}</span>
 							</>
 						)
 
@@ -522,26 +510,25 @@ class ExtractPlan extends React.Component {
 									}}
 								>
 									<Row>
-										<Col span={24}>Categoria: {element.category_id.name}</Col>
-									</Row>
-									<Row>
-										<Col span={12}>
-											Criação: {formatDateToUser(element.createDate)}
-										</Col>
-										<Col span={12}>
+										<Col span={12} title={formatDateToUser(element.createDate)}>
 											Efetivação: {formatDateToUser(element.efectedDate)}
 										</Col>
-									</Row>
-									<Row>
-										<Col span={12}>
-											Recorrência:{' '}
-											{get(element, 'currentRecurrence', '1') +
-												'/' +
-												get(element, 'finalRecurrence', '1')}
+										<Col span={12} style={{ textAlign: 'right' }}>
+											Valor:{' '}
+											<span
+												style={{
+													color: transactionValue.color,
+												}}
+											>
+												{transactionValue.value}
+											</span>
 										</Col>
 									</Row>
 									<Row>
-										<Col span={24}>Descrição: {element.description}</Col>
+										<Col span={24}>Banco: {element.bank_id.name}</Col>
+									</Row>
+									<Row>
+										<Col span={24}>Detalhes: {element.detail}</Col>
 									</Row>
 								</span>
 							</Card>
