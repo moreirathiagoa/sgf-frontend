@@ -3,7 +3,6 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import Saldos from './pages/dasboardBalance'
 import Planning from './pages/Planning'
-import Category from './pages/Category'
 import ExtractAccount from './pages/ExtractAccount'
 import ExtractPlan from './pages/ExtractPlan'
 import Bank from './pages/Bank'
@@ -63,14 +62,6 @@ class Router extends React.Component {
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 						showModal={this.props.showModal}
-						update={this.props.update}
-					/>
-				</Route>
-				<Route path='/category'>
-					<Category
-						loading={this.props.loading}
-						mudaTitulo={this.props.mudaTitulo}
-						verificaLogin={this.props.verificaLogin}
 						update={this.props.update}
 					/>
 				</Route>

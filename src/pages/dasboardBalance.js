@@ -23,7 +23,6 @@ class DashboardDebit extends React.Component {
 		super(props)
 		this.state = {
 			banks: [],
-			categories: [],
 			saldoNotCompensatedCredit: 'Aguarde...',
 			saldoNotCompensatedDebit: 'Aguarde...',
 			saldoReal: 'Aguarde...',
@@ -38,9 +37,6 @@ class DashboardDebit extends React.Component {
 				visible: false,
 				originalBankId: null,
 				finalBankId: null,
-
-				//TODO: Verificar uma forma melhor de fixar uma categoria
-				categoryId: null, //'5ed678b44ccebd0017598daf',
 				value: null,
 			},
 			tableContent: [],
@@ -71,7 +67,6 @@ class DashboardDebit extends React.Component {
 
 					this.setState((state) => {
 						state.banks = dashboardData.banksList
-						state.categories = dashboardData.categoryList
 						state.saldoNotCompensatedCredit =
 							dashboardData.balanceNotCompensatedCredit
 						state.saldoNotCompensatedDebit =
@@ -96,10 +91,6 @@ class DashboardDebit extends React.Component {
 
 				case 'transferenceValue':
 					state.modalTransferenceContent.value = event.target.value
-					break
-
-				case 'categoryId':
-					state.modalTransferenceContent.categoryId = event.target.value
 					break
 
 				default:
@@ -371,7 +362,7 @@ class DashboardDebit extends React.Component {
 				<Row>
 					<Modal
 						title='Transferência entre Bancos'
-						visible={this.state.modalTransferenceContent.visible}
+						open={this.state.modalTransferenceContent.visible}
 						onOk={() => {
 							this.handleOkTransfer(this.state.modalTransferenceContent)
 						}}
@@ -390,34 +381,6 @@ class DashboardDebit extends React.Component {
 								onChange={this.handleChange}
 								style={{ width: 100 }}
 							/>
-						</Row>
-						<Row style={{ padding: '10px' }}>
-							<span style={{ paddingRight: '5px', paddingTop: '3px' }}>
-								Selecione a Categoria:
-							</span>
-							<Select
-								name='categoryId'
-								size='md'
-								style={{ width: 150 }}
-								value={this.state.modalTransferenceContent.categoryId}
-								onSelect={(value) => {
-									const event = {
-										target: {
-											name: 'categoryId',
-											value: value,
-										},
-									}
-									this.handleChange(event)
-								}}
-							>
-								{this.state.categories.map((element) => {
-									return (
-										<Option key={element._id} value={element._id}>
-											{element.name}
-										</Option>
-									)
-								})}
-							</Select>
 						</Row>
 					</Modal>
 					<Table

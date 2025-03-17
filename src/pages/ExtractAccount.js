@@ -1,14 +1,12 @@
 import React from 'react'
 
 import '../App.css'
-import { get } from 'lodash'
 
 import { Input, Checkbox, Typography, Row, Col, Card, Modal } from 'antd'
 import {
 	TitleFilter,
 	SelectYear,
 	SelectMonth,
-	SelectCategories,
 	SelectBank,
 	TransactionOptions,
 } from '../components'
@@ -35,12 +33,11 @@ class ExtractAccount extends React.Component {
 				month: actualMonth,
 				onlyFuture: false,
 				bank_id: null,
-				category_id: null,
 				description: '',
+				detail: '',
 			},
 
 			banks: [],
-			categories: [],
 			filtro: false,
 			idToEdit: null,
 			menu: {
@@ -79,7 +76,6 @@ class ExtractAccount extends React.Component {
 
 					this.setState((state) => {
 						state.banks = extractData.banksList
-						state.categories = extractData.categoryList
 						state.transactions = extractData.transactionList
 						state.allTransactions = extractData.transactionList
 
@@ -108,7 +104,6 @@ class ExtractAccount extends React.Component {
 					state.filters.month = now.getMonth() + 1
 					state.filters.bank_id = null
 					state.filters.description = ''
-					state.filters.category_id = null
 					this.processExtractData()
 					break
 
@@ -144,13 +139,13 @@ class ExtractAccount extends React.Component {
 					this.processExtractData()
 					break
 
-				case 'category_id':
-					state.filters.category_id = event.target.value
+				case 'description':
+					state.filters.description = event.target.value
 					this.processExtractData()
 					break
 
-				case 'description':
-					state.filters.description = event.target.value
+				case 'detail':
+					state.filters.detail = event.target.value
 					this.processExtractData()
 					break
 
@@ -323,14 +318,6 @@ class ExtractAccount extends React.Component {
 										banks={this.state.banks}
 									/>
 								</Col>
-								<Col span={12}>
-									<span style={{ marginRight: '30px' }}>Categoria:</span>
-									<SelectCategories
-										handleChange={this.handleChange}
-										category_id={this.state.filters.category_id}
-										categories={this.state.categories}
-									/>
-								</Col>
 							</Row>
 							<br></br>
 							<Row>
@@ -342,6 +329,18 @@ class ExtractAccount extends React.Component {
 										name='description'
 										size='md'
 										value={this.state.filters.description}
+										onChange={this.handleChange}
+										style={{ width: 200 }}
+									/>
+								</Col>
+								<Col span={12}>
+									<span style={{ marginRight: '30px' }}>Detalhes:</span>
+									<Input
+										placeholder='Detail'
+										type='text'
+										name='detail'
+										size='md'
+										value={this.state.detail}
 										onChange={this.handleChange}
 										style={{ width: 200 }}
 									/>
@@ -406,17 +405,7 @@ class ExtractAccount extends React.Component {
 										}}
 									/>
 								</span>
-								<span>{element.bank_id.name}</span>
-								<span
-									style={{
-										paddingLeft: '20px',
-										color: transactionValue.color,
-										alignSelf: 'right',
-										float: 'right',
-									}}
-								>
-									{transactionValue.value}
-								</span>
+								<span>{element.description || 'Transação Genérica'}</span>
 							</>
 						)
 
@@ -433,26 +422,25 @@ class ExtractAccount extends React.Component {
 									}}
 								>
 									<Row>
-										<Col span={24}>Categoria: {element.category_id.name}</Col>
-									</Row>
-									<Row>
-										<Col span={12}>
-											Criação: {formatDateToUser(element.createDate)}
-										</Col>
-										<Col span={12}>
+										<Col span={12} title={formatDateToUser(element.createDate)}>
 											Efetivação: {formatDateToUser(element.efectedDate)}
 										</Col>
-									</Row>
-									<Row>
-										<Col span={12}>
-											Recorrência:{' '}
-											{get(element, 'currentRecurrence', '1') +
-												'/' +
-												get(element, 'finalRecurrence', '1')}
+										<Col span={12} style={{ textAlign: 'right' }}>
+											Valor:{' '}
+											<span
+												style={{
+													color: transactionValue.color,
+												}}
+											>
+												{transactionValue.value}
+											</span>
 										</Col>
 									</Row>
 									<Row>
-										<Col span={24}>Descrição: {element.description}</Col>
+										<Col span={24}>Banco: {element.bank_id.name}</Col>
+									</Row>
+									<Row>
+										<Col span={24}>Detalhes: {element.detail}</Col>
 									</Row>
 								</span>
 							</Card>
