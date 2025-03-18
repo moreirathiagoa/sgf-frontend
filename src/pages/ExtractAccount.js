@@ -337,7 +337,7 @@ class ExtractAccount extends React.Component {
 									/>
 								</Col>
 								<Col span={12}>
-									<span style={{ marginRight: '30px' }}>Descrição:</span>
+									<span style={{ marginRight: '30px' }}>Título:</span>
 									<SelectDescription
 										lastDescriptions={this.state.descriptions}
 										currentDescription={this.state.filters.description}

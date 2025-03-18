@@ -39,7 +39,7 @@ class Transaction extends React.Component {
 			idToUpdate: transactionId,
 			data: {
 				efectedDate: todayDate,
-				isSimples: false,
+				isSimples: true,
 				value: null,
 				isCompesed: isTransactionProcessed,
 				typeTransaction: transactionType,
@@ -146,10 +146,6 @@ class Transaction extends React.Component {
 
 				case 'bank_id':
 					state.data.bank_id = event.target.value
-					break
-
-				case 'isSimples':
-					state.data.isSimples = !state.data.isSimples
 					break
 
 				case 'isCredit':
@@ -378,6 +374,23 @@ class Transaction extends React.Component {
 							onChange={this.handleChange}
 							style={{ width: 350 }}
 						/>
+					</Form.Item>
+
+					<Form.Item label='Recorrência'>
+						<Row>
+							<Col span={8}>
+								<Input
+									placeholder='Qtd'
+									type='number'
+									name='finalRecurrence'
+									size='md'
+									value={this.state.data.finalRecurrence}
+									onChange={this.handleChange}
+									style={{ width: 80 }}
+									inputMode='numeric'
+								/>
+							</Col>
+						</Row>
 					</Form.Item>
 
 					<Form.Item label='Ação'>
