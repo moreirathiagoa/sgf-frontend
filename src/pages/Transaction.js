@@ -22,20 +22,9 @@ import {
 	actualDateToUser,
 	formatDateToMoment,
 	formatDateToUser,
+	formatNumber,
 } from '../utils'
 import { SelectDescription, SelectBank } from '../components'
-
-const formatNumber = (value, separator) => {
-	if (!value) return ''
-	// TODO: Remover qualquer caractere não numérico
-	let numStr = value.toString().replace(/\D/g, '')
-	// Remove zeros à esquerda
-	numStr = numStr.replace(/^0+(\d)/, '$1')
-	// Mínimo de três dígitos (para 2 casas decimais)
-	const paddedValue = numStr.padStart(3, '0')
-	// Casas decimais separadas por vírgula
-	return paddedValue.replace(/(\d+)(\d{2})$/, `$1${separator}$2`)
-}
 
 class Transaction extends React.Component {
 	constructor(props) {
@@ -276,7 +265,6 @@ class Transaction extends React.Component {
 								<InputNumber
 									placeholder='0,00'
 									precision={2}
-									formatter={(value) => formatNumber(value, ',')}
 									value={Number(this.state.data.value)
 										.toFixed(2)
 										.replace('.', ',')}
@@ -294,6 +282,10 @@ class Transaction extends React.Component {
 									inputMode='numeric'
 								/>
 							</Col>
+						</Row>
+					</Form.Item>
+					<Form.Item label='Tipo'>
+						<Row>
 							<Col span={10}>
 								<>
 									<span
