@@ -4,7 +4,7 @@ import {
 	Table,
 	Statistic,
 	Modal,
-	Input,
+	InputNumber,
 	Row,
 	Col,
 	Typography,
@@ -13,7 +13,7 @@ import {
 import '../App.css'
 import { getDashboardData, updateBank, bankTransference } from '../api'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
-import { openNotification, prepareValue } from '../utils'
+import { openNotification, prepareValue, formatNumber } from '../utils'
 
 const { Title } = Typography
 const { Option } = Select
@@ -302,7 +302,7 @@ class DashboardDebit extends React.Component {
 			<>
 				<Modal
 					title={this.state.modalSaldoContent.banco}
-					visible={this.state.modalSaldoContent.visible}
+					open={this.state.modalSaldoContent.visible}
 					onOk={() => {
 						this.handleOkSaldo(this.state.modalSaldoContent)
 					}}
@@ -312,14 +312,25 @@ class DashboardDebit extends React.Component {
 						<span style={{ paddingRight: '5px', paddingTop: '3px' }}>
 							Informe o saldo atual no Banco:
 						</span>
-						<Input
-							placeholder=''
-							name='saldoManualModal'
-							size='md'
-							type='number'
-							value={this.state.modalSaldoContent.saldoManual}
-							onChange={this.handleChange}
-							style={{ width: 100 }}
+						<InputNumber
+							placeholder='0,00'
+							precision={2}
+							value={Number(this.state.modalSaldoContent.saldoManual)
+								.toFixed(2)
+								.replace('.', ',')}
+							decimalSeparator=','
+							onChange={(value) => {
+								const event = {
+									target: {
+										name: 'saldoManualModal',
+										value: `${formatNumber(value, '.')}`,
+									},
+								}
+								console.log('event: ', event)
+								this.handleChange(event)
+							}}
+							style={{ width: 100, height: 30 }}
+							inputMode='numeric'
 						/>
 					</Row>
 				</Modal>
@@ -372,14 +383,24 @@ class DashboardDebit extends React.Component {
 							<span style={{ paddingRight: '5px', paddingTop: '3px' }}>
 								Informe o valor a ser transferido:
 							</span>
-							<Input
-								placeholder=''
-								name='transferenceValue'
-								size='md'
-								type='number'
-								value={this.state.modalTransferenceContent.value}
-								onChange={this.handleChange}
-								style={{ width: 100 }}
+							<InputNumber
+								placeholder='0,00'
+								precision={2}
+								value={Number(this.state.modalTransferenceContent.value)
+									.toFixed(2)
+									.replace('.', ',')}
+								onChange={(value) => {
+									const event = {
+										target: {
+											name: 'transferenceValue',
+											value: `${formatNumber(value, '.')}`,
+										},
+									}
+									console.log('event: ', event)
+									this.handleChange(event)
+								}}
+								style={{ width: 100, height: 30 }}
+								inputMode='numeric'
 							/>
 						</Row>
 					</Modal>
