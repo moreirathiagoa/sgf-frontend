@@ -18,28 +18,44 @@ class SelectDescription extends React.Component {
 		this.setName(event.target.value)
 	}
 
-	addItem = (e) => {
+	updateList = () => {
+		if (this.state.name) {
+			const eventList = {
+				target: {
+					name: 'descriptionList',
+					value: [...this.props.lastDescriptions, this.state.name],
+				},
+			}
+
+			this.props.handleChange(eventList)
+		}
+	}
+
+	addItemClick = (e) => {
 		e.preventDefault()
 
-		const event = {
+		const eventItem = {
 			target: {
 				name: 'description',
-				newDescriptionItens: [...this.props.lastDescriptions, this.state.name],
-				currentDescription: this.state.name,
+				value: this.state.name,
 			},
 		}
-		this.props.handleChange(event)
+		this.props.handleChange(eventItem)
+		this.updateList()
+
 		this.setName('')
 	}
 
-	addItemEnter = (value) => {
-		const event = {
+	addItemEnter = (selected) => {
+		const eventItem = {
 			target: {
 				name: 'description',
-				currentDescription: this.state.name || value,
+				value: this.state.name || selected,
 			},
 		}
-		this.props.handleChange(event)
+		this.props.handleChange(eventItem)
+		this.updateList()
+
 		this.setName('')
 	}
 
@@ -70,7 +86,7 @@ class SelectDescription extends React.Component {
 							<Button
 								type='text'
 								icon={<PlusOutlined />}
-								onClick={this.addItem}
+								onClick={this.addItemClick}
 							/>
 						</Space>
 					</>

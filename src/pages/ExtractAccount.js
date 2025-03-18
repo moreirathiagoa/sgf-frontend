@@ -8,6 +8,7 @@ import {
 	SelectYear,
 	SelectMonth,
 	SelectBank,
+	SelectDescription,
 	TransactionOptions,
 } from '../components'
 import { PlusCircleOutlined, DeleteOutlined } from '@ant-design/icons'
@@ -16,6 +17,7 @@ import { openNotification, formatDateToUser, prepareValue } from '../utils'
 
 const { Title } = Typography
 
+const descriptionsList = new Set()
 class ExtractAccount extends React.Component {
 	constructor(props) {
 		const today = new Date()
@@ -38,6 +40,7 @@ class ExtractAccount extends React.Component {
 			},
 
 			banks: [],
+			descriptions: [],
 			filtro: false,
 			idToEdit: null,
 			menu: {
@@ -74,11 +77,19 @@ class ExtractAccount extends React.Component {
 				} else {
 					const extractData = res.data
 
+					extractData?.transactionList?.forEach((element) => {
+						if (element.description) {
+							descriptionsList.add(element.description)
+						}
+					})
+
 					this.setState((state) => {
 						state.banks = extractData.banksList
 						state.transactions = extractData.transactionList
 						state.allTransactions = extractData.transactionList
-
+						state.descriptions = [...descriptionsList].sort((a, b) =>
+							a.localeCompare(b)
+						)
 						return state
 					})
 				}
@@ -142,6 +153,13 @@ class ExtractAccount extends React.Component {
 				case 'description':
 					state.filters.description = event.target.value
 					this.processExtractData()
+					break
+
+				case 'descriptionList':
+					if (event?.target?.value?.length > 0) {
+						state.descriptions = event.target.value
+						this.processExtractData()
+					}
 					break
 
 				case 'detail':
@@ -323,14 +341,10 @@ class ExtractAccount extends React.Component {
 							<Row>
 								<Col span={12}>
 									<span style={{ marginRight: '30px' }}>Descrição:</span>
-									<Input
-										placeholder='Descrição'
-										type='text'
-										name='description'
-										size='md'
-										value={this.state.filters.description}
-										onChange={this.handleChange}
-										style={{ width: 200 }}
+									<SelectDescription
+										lastDescriptions={this.state.descriptions}
+										currentDescription={this.state.filters.description}
+										handleChange={this.handleChange}
 									/>
 								</Col>
 								<Col span={12}>
