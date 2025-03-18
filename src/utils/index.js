@@ -81,10 +81,8 @@ function prepareValue(value, isCompensated) {
 	}
 }
 
+// TODO: Verificar remoção de caracteres não funcionando
 const formatNumber = (value, separator) => {
-	if (!value) return '0,00'
-
-	// TODO: Verificar remoção de caracteres não funcionando
 	return value
 		.toString()
 		.replace(/[^0-9]/g, '') //Remover qualquer caractere não numérico
