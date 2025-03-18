@@ -291,6 +291,7 @@ class Transaction extends React.Component {
 										this.handleChange(event)
 									}}
 									style={{ width: 100, height: 30 }}
+									inputMode='numeric'
 								/>
 							</Col>
 							<Col span={10}>
