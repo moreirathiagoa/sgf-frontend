@@ -8,6 +8,7 @@ import {
 	SelectYear,
 	SelectMonth,
 	SelectBank,
+	SelectDescription,
 	TransactionOptions,
 } from '../components'
 import {
@@ -20,6 +21,7 @@ import { openNotification, formatDateToUser, prepareValue } from '../utils'
 
 const { Title } = Typography
 
+const descriptionsList = new Set()
 const now = new Date()
 const nextMonthDate = new Date(now.setMonth(new Date().getMonth() + 1))
 const nextMonthYear = nextMonthDate.getFullYear()
@@ -41,6 +43,7 @@ class ExtractPlan extends React.Component {
 			description: '',
 			detail: '',
 			banks: [],
+			descriptions: [],
 			filtro: false,
 			idToEdit: null,
 			menu: {
@@ -78,11 +81,19 @@ class ExtractPlan extends React.Component {
 				} else {
 					const extractData = res.data
 
+					extractData?.transactionList?.forEach((element) => {
+						if (element.description) {
+							descriptionsList.add(element.description)
+						}
+					})
+
 					this.setState((state) => {
 						state.banks = extractData.banksList
 						state.transactions = extractData.transactionList
 						state.allTransactions = extractData.transactionList
-
+						state.descriptions = [...descriptionsList].sort((a, b) =>
+							a.localeCompare(b)
+						)
 						return state
 					})
 				}
@@ -140,6 +151,13 @@ class ExtractPlan extends React.Component {
 				case 'description':
 					state.description = event.target.value
 					this.filterList()
+					break
+
+				case 'descriptionList':
+					if (event?.target?.value?.length > 0) {
+						state.descriptions = event.target.value
+						this.processExtractData()
+					}
 					break
 
 				case 'detail':
@@ -403,14 +421,10 @@ class ExtractPlan extends React.Component {
 							<Row>
 								<Col span={12}>
 									<span style={{ marginRight: '30px' }}>Descrição:</span>
-									<Input
-										placeholder='Descrição'
-										type='text'
-										name='description'
-										size='md'
-										value={this.state.description}
-										onChange={this.handleChange}
-										style={{ width: 200 }}
+									<SelectDescription
+										lastDescriptions={this.state.descriptions}
+										currentDescription={this.state.description}
+										handleChange={this.handleChange}
 									/>
 								</Col>
 								<Col span={12}>

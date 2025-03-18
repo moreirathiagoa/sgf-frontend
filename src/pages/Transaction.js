@@ -2,7 +2,16 @@ import React from 'react'
 
 import { clone } from 'lodash'
 import '../App.css'
-import { Form, Input, Button, Switch, Row, Col, DatePicker } from 'antd'
+import {
+	Form,
+	Input,
+	InputNumber,
+	Button,
+	Switch,
+	Row,
+	Col,
+	DatePicker,
+} from 'antd'
 import {
 	createTransaction,
 	updateTransaction,
@@ -16,13 +25,26 @@ import {
 } from '../utils'
 import { SelectDescription, SelectBank } from '../components'
 
+const formatNumber = (value, separator) => {
+	if (!value) return ''
+	// TODO: Remover qualquer caractere não numérico
+	let numStr = value.toString().replace(/\D/g, '')
+	// Remove zeros à esquerda
+	numStr = numStr.replace(/^0+(\d)/, '$1')
+	// Mínimo de três dígitos (para 2 casas decimais)
+	const paddedValue = numStr.padStart(3, '0')
+	// Casas decimais separadas por vírgula
+	return paddedValue.replace(/(\d+)(\d{2})$/, `$1${separator}$2`)
+}
+
 class Transaction extends React.Component {
 	constructor(props) {
 		super(props)
 		const transactionType = props.transactionType
 		const transactionId = props.transactionId
 		const todayDate = actualDateToUser()
-		const isTransactionProcessed = transactionType === 'contaCorrente' ? true : undefined
+		const isTransactionProcessed =
+			transactionType === 'contaCorrente' ? true : undefined
 
 		this.state = {
 			idToUpdate: transactionId,
@@ -108,9 +130,12 @@ class Transaction extends React.Component {
 					break
 
 				case 'description':
-					state.data.description = event.target.currentDescription
-					if (event?.target?.newDescriptionItens?.length > 0) {
-						state.lastDescriptions = event.target.newDescriptionItens
+					state.data.description = event.target.value
+					break
+
+				case 'descriptionList':
+					if (event?.target?.value?.length > 0) {
+						state.lastDescriptions = event.target.value
 					}
 					break
 
@@ -245,6 +270,50 @@ class Transaction extends React.Component {
 					initialValues={{ remember: true }}
 					onFinishFailed={() => {}}
 				>
+					<Form.Item label='Valor'>
+						<Row>
+							<Col span={10}>
+								<InputNumber
+									placeholder='0,00'
+									precision={2}
+									formatter={(value) => formatNumber(value, ',')}
+									value={Number(this.state.data.value)
+										.toFixed(2)
+										.replace('.', ',')}
+									onChange={(value) => {
+										const event = {
+											target: {
+												name: 'value',
+												value: `${formatNumber(value, '.')}`,
+											},
+										}
+										console.log('event: ', event)
+										this.handleChange(event)
+									}}
+									style={{ width: 100, height: 30 }}
+									inputMode='numeric'
+								/>
+							</Col>
+							<Col span={10}>
+								<>
+									<span
+										style={{ padding: '0 10px' }}
+										onClick={this.handleChange}
+									>
+										<Switch
+											name='isCredit'
+											checked={this.state.isCredit}
+											size='md'
+										/>
+									</span>
+									<span style={{ color: '#ccc' }}>
+										{this.state.isCredit ? 'Crédito' : 'Débito'}
+									</span>
+								</>
+							</Col>
+						</Row>
+					</Form.Item>
+
 					<Form.Item label='Data'>
 						<Row>
 							<Col span={12}>
@@ -290,39 +359,6 @@ class Transaction extends React.Component {
 						</Form.Item>
 					)}
 
-					<Form.Item label='Valor'>
-						<Row>
-							<Col span={10}>
-								<Input
-									placeholder=''
-									type='number'
-									name='value'
-									size='md'
-									value={this.state.data.value}
-									onChange={this.handleChange}
-									style={{ width: 100 }}
-								/>
-							</Col>
-							<Col span={10}>
-								<>
-									<span
-										style={{ padding: '0 10px' }}
-										onClick={this.handleChange}
-									>
-										<Switch
-											name='isCredit'
-											checked={this.state.isCredit}
-											size='md'
-										/>
-									</span>
-									<span style={{ color: '#ccc' }}>
-										{this.state.isCredit ? 'Crédito' : 'Débito'}
-									</span>
-								</>
-							</Col>
-						</Row>
-					</Form.Item>
-
 					<Form.Item label='Banco'>
 						<SelectBank
 							handleChange={this.handleChange}
@@ -331,7 +367,7 @@ class Transaction extends React.Component {
 						/>
 					</Form.Item>
 
-					<Form.Item label='Descrição'>
+					<Form.Item label='Título'>
 						<SelectDescription
 							lastDescriptions={this.state.lastDescriptions}
 							currentDescription={this.state.data.description}
@@ -349,46 +385,6 @@ class Transaction extends React.Component {
 							onChange={this.handleChange}
 							style={{ width: 350 }}
 						/>
-					</Form.Item>
-					<Form.Item label='Recorrência'>
-						<Row>
-							{this.state.idToUpdate && (
-								<Col span={6}>
-									<Input
-										placeholder='Atual'
-										type='number'
-										name='currentRecurrence'
-										size='md'
-										value={this.state.data.currentRecurrence}
-										onChange={this.handleChange}
-										style={{ width: 60 }}
-									/>
-								</Col>
-							)}
-							<Col span={8}>
-								<Input
-									placeholder='Final'
-									type='number'
-									name='finalRecurrence'
-									size='md'
-									value={this.state.data.finalRecurrence}
-									onChange={this.handleChange}
-									style={{ width: 60 }}
-								/>
-							</Col>
-							<Col span={12}>
-								<span style={{ padding: '0 10px' }} onClick={this.handleChange}>
-									<Switch
-										name='isSimples'
-										checked={this.state.data.isSimples}
-										size='md'
-									/>
-								</span>
-								<span style={{ color: '#ccc' }}>
-									{this.state.data.isSimples ? 'Simples' : 'Completa'}
-								</span>
-							</Col>
-						</Row>
 					</Form.Item>
 
 					<Form.Item label='Ação'>
