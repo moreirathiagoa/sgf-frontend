@@ -416,9 +416,6 @@ class ExtractPlan extends React.Component {
 										banks={this.state.banks}
 									/>
 								</Col>
-							</Row>
-							<br></br>
-							<Row>
 								<Col span={12}>
 									<span style={{ marginRight: '30px' }}>Descrição:</span>
 									<SelectDescription
@@ -427,6 +424,9 @@ class ExtractPlan extends React.Component {
 										handleChange={this.handleChange}
 									/>
 								</Col>
+							</Row>
+							<br></br>
+							<Row>
 								<Col span={12}>
 									<span style={{ marginRight: '30px' }}>Detalhes:</span>
 									<Input
@@ -436,7 +436,7 @@ class ExtractPlan extends React.Component {
 										size='md'
 										value={this.state.detail}
 										onChange={this.handleChange}
-										style={{ width: 200 }}
+										style={{ width: 250 }}
 									/>
 								</Col>
 							</Row>

@@ -265,6 +265,7 @@ class Transaction extends React.Component {
 								<InputNumber
 									placeholder='0,00'
 									precision={2}
+									formatter={(value) => formatNumber(value, ',')}
 									value={Number(this.state.data.value)
 										.toFixed(2)
 										.replace('.', ',')}

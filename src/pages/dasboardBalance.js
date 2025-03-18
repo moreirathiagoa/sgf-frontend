@@ -315,6 +315,7 @@ class DashboardDebit extends React.Component {
 						<InputNumber
 							placeholder='0,00'
 							precision={2}
+							formatter={(value) => formatNumber(value, ',')}
 							value={Number(this.state.modalSaldoContent.saldoManual)
 								.toFixed(2)
 								.replace('.', ',')}
@@ -386,6 +387,7 @@ class DashboardDebit extends React.Component {
 							<InputNumber
 								placeholder='0,00'
 								precision={2}
+								formatter={(value) => formatNumber(value, ',')}
 								value={Number(this.state.modalTransferenceContent.value)
 									.toFixed(2)
 									.replace('.', ',')}
