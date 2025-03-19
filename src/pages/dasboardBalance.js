@@ -316,18 +316,20 @@ class DashboardDebit extends React.Component {
 							placeholder='0,00'
 							precision={2}
 							formatter={(value) => formatNumber(value, ',')}
-							value={Number(this.state.modalSaldoContent.saldoManual)
-								.toFixed(2)
-								.replace('.', ',')}
-							decimalSeparator=','
+							value={
+								this.state.modalSaldoContent.saldoManual
+									? Number(this.state.modalSaldoContent.saldoManual)
+											.toFixed(2)
+											.replace('.', ',')
+									: ''
+							}
 							onChange={(value) => {
 								const event = {
 									target: {
 										name: 'saldoManualModal',
-										value: `${formatNumber(value, '.')}`,
+										value: value / 100,
 									},
 								}
-								console.log('event: ', event)
 								this.handleChange(event)
 							}}
 							style={{ width: 100, height: 30 }}
@@ -395,10 +397,9 @@ class DashboardDebit extends React.Component {
 									const event = {
 										target: {
 											name: 'transferenceValue',
-											value: `${formatNumber(value, '.')}`,
+											value: value / 100,
 										},
 									}
-									console.log('event: ', event)
 									this.handleChange(event)
 								}}
 								style={{ width: 100, height: 30 }}

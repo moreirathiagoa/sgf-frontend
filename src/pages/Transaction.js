@@ -268,10 +268,9 @@ class Transaction extends React.Component {
 										const event = {
 											target: {
 												name: 'value',
-												value: `${formatNumber(value, '.')}`,
+												value: value/100,
 											},
 										}
-										console.log('event: ', event)
 										this.handleChange(event)
 									}}
 									style={{ width: 100, height: 30 }}
