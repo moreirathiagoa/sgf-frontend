@@ -77,7 +77,7 @@ class App extends React.Component {
 	}
 
 	showTransactionModal = (data) => {
-		const transactionType = data.typeTransaction
+		const transactionType = data.transactionType
 		const transactionId = data.idTransaction
 
 		if (this.state.transaction.id !== transactionId) {

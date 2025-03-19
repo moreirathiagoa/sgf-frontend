@@ -9,14 +9,14 @@ class SelectBank extends React.Component {
 	render() {
 		return (
 			<Select
-				name='bank_id'
-				value={this.props.bank_id || 'Selecione'}
+				name='bankId'
+				value={this.props.bankId || 'Selecione'}
 				size='md'
 				style={{ width: 150 }}
 				onSelect={(value) => {
 					const event = {
 						target: {
-							name: 'bank_id',
+							name: 'bankId',
 							value: value,
 						},
 					}

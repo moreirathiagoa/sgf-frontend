@@ -1,12 +1,12 @@
 import axios from 'axios'
 import properties from '../properties'
 
-const listBanks = (typeTransaction) => {
+const listBanks = (transactionType) => {
 	const token = localStorage.getItem('token')
 
 	const response = axios({
 		method: 'get',
-		url: properties.url + 'bank/list/' + typeTransaction,
+		url: properties.url + 'bank/list/' + transactionType,
 		headers: {
 			auth: token,
 		},

@@ -34,7 +34,7 @@ class ExtractAccount extends React.Component {
 				year: actualYear,
 				month: actualMonth,
 				onlyFuture: false,
-				bank_id: null,
+				bankId: null,
 				description: '',
 				detail: '',
 			},
@@ -113,7 +113,7 @@ class ExtractAccount extends React.Component {
 					state.transactions = state.allTransactions
 					state.filters.year = now.getFullYear()
 					state.filters.month = now.getMonth() + 1
-					state.filters.bank_id = null
+					state.filters.bankId = null
 					state.filters.description = ''
 					this.processExtractData()
 					break
@@ -145,8 +145,8 @@ class ExtractAccount extends React.Component {
 					this.processExtractData()
 					break
 
-				case 'bank_id':
-					state.filters.bank_id = event.target.value
+				case 'bankId':
+					state.filters.bankId = event.target.value
 					this.processExtractData()
 					break
 
@@ -332,7 +332,7 @@ class ExtractAccount extends React.Component {
 									<span style={{ marginRight: '30px' }}>Banco:</span>
 									<SelectBank
 										handleChange={this.handleChange}
-										bank_id={this.state.filters.bank_id}
+										bankId={this.state.filters.bankId}
 										banks={this.state.banks}
 									/>
 								</Col>
@@ -369,7 +369,7 @@ class ExtractAccount extends React.Component {
 							<PlusCircleOutlined
 								style={{ paddingLeft: '10px' }}
 								onClick={() => {
-									this.props.showModal({ typeTransaction: 'contaCorrente' })
+									this.props.showModal({ transactionType: 'contaCorrente' })
 								}}
 							/>
 							<DeleteOutlined
@@ -400,7 +400,7 @@ class ExtractAccount extends React.Component {
 					{this.state.transactions.map((element) => {
 						const transactionValue = prepareValue(
 							element.value,
-							element.isCompesed
+							element.isCompensated
 						)
 
 						const title = (
@@ -436,8 +436,8 @@ class ExtractAccount extends React.Component {
 									}}
 								>
 									<Row>
-										<Col span={12} title={formatDateToUser(element.createDate)}>
-											Efetivação: {formatDateToUser(element.efectedDate)}
+										<Col span={12} title={formatDateToUser(element.createdAt)}>
+											Efetivação: {formatDateToUser(element.effectedAt)}
 										</Col>
 										<Col span={12} style={{ textAlign: 'right' }}>
 											Valor:{' '}
@@ -451,7 +451,7 @@ class ExtractAccount extends React.Component {
 										</Col>
 									</Row>
 									<Row>
-										<Col span={24}>Banco: {element.bank_id.name}</Col>
+										<Col span={24}>Banco: {element.bankId.name}</Col>
 									</Row>
 									<Row>
 										<Col span={24}>Detalhes: {element.detail}</Col>
