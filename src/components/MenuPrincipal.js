@@ -41,7 +41,7 @@ class MenuPrincipal extends React.Component {
 						<Menu.Item
 							key='item3'
 							onClick={() => {
-								this.props.showModal({ typeTransaction: 'contaCorrente' })
+								this.props.showModal({ transactionType: 'contaCorrente' })
 							}}
 						>
 							<WalletOutlined />
@@ -65,7 +65,7 @@ class MenuPrincipal extends React.Component {
 						<Menu.Item
 							key='item6'
 							onClick={() => {
-								this.props.showModal({ typeTransaction: 'planejamento' })
+								this.props.showModal({ transactionType: 'planejamento' })
 							}}
 						>
 							<WalletOutlined />
