@@ -14,7 +14,7 @@ const getTransactionData = (transactionType, idTransaction = '') => {
 			return res
 		})
 		.catch((err) => {
-			throw new Error(err.response.data)
+			throw new Error(err?.response?.data || err.message)
 		})
 	return response
 }

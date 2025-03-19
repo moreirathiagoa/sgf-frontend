@@ -17,7 +17,7 @@ const getExtractData = (transactionType, filters) => {
 			return res
 		})
 		.catch((err) => {
-			throw new Error(err.response.data)
+			throw new Error(err?.response?.data || err.message)
 		})
 	return response
 }
