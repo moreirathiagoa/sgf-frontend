@@ -418,7 +418,7 @@ class DashboardDebit extends React.Component {
 										Diferença: {record.diference}
 									</p>
 									<Select
-										name='bank_id'
+										name='bankId'
 										size='md'
 										style={{ width: 280 }}
 										value='Transferência interna entre Bancos'

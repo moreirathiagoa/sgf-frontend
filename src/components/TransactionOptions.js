@@ -16,8 +16,8 @@ class TransactionOptions extends React.Component {
 						this.props.verificaLogin()
 					} else {
 						let transaction = res.data.data
-						transaction.efectedDate = formatDateToUser(res.data.efectedDate)
-						transaction.isCompesed = true
+						transaction.effectedAt = formatDateToUser(res.data.effectedAt)
+						transaction.isCompensated = true
 						return transaction
 					}
 				})
@@ -64,7 +64,7 @@ class TransactionOptions extends React.Component {
 				<Menu.Item
 					onClick={() => {
 						this.props.showModal({
-							typeTransaction: this.props.screenType,
+							transactionType: this.props.screenType,
 							idTransaction: this.props.element._id,
 						})
 

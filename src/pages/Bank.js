@@ -293,7 +293,7 @@ class Banks extends React.Component {
 												{formatMoeda(element.manualBalance)}
 											</Descriptions.Item>
 											<Descriptions.Item label='Data Criação'>
-												{formatDateToUser(element.createDate)}
+												{formatDateToUser(element.createdAt)}
 											</Descriptions.Item>
 										</Descriptions>
 									</Panel>

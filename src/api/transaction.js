@@ -24,7 +24,7 @@ const getTransaction = (idTransaction) => {
 const createTransaction = (transaction) => {
 	const token = localStorage.getItem('token')
 
-	transaction.efectedDate = formatDateToMoment(transaction.efectedDate)
+	transaction.effectedAt = formatDateToMoment(transaction.effectedAt)
 
 	const response = axios({
 		method: 'post',
@@ -85,7 +85,7 @@ const removeTransaction = (id) => {
 const updateTransaction = (transaction, idTransaction) => {
 	const token = localStorage.getItem('token')
 
-	transaction.efectedDate = formatDateToMoment(transaction.efectedDate)
+	transaction.effectedAt = formatDateToMoment(transaction.effectedAt)
 
 	const params = {
 		method: 'put',

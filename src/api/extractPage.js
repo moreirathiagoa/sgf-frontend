@@ -1,11 +1,11 @@
 import axios from 'axios'
 import properties from '../properties'
 
-const getExtractData = (typeTransaction, filters) => {
+const getExtractData = (transactionType, filters) => {
 	const token = localStorage.getItem('token')
 	const response = axios({
 		method: 'POST',
-		url: properties.url + 'extract-page/get-extract-data/' + typeTransaction,
+		url: properties.url + 'extract-page/get-extract-data/' + transactionType,
 		headers: {
 			auth: token,
 		},

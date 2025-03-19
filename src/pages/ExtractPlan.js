@@ -39,7 +39,7 @@ class ExtractPlan extends React.Component {
 			year: nextMonthYear,
 			month: nextMonthMonth,
 			notCompensated: false,
-			bank_id: null,
+			bankId: null,
 			description: '',
 			detail: '',
 			banks: [],
@@ -116,7 +116,7 @@ class ExtractPlan extends React.Component {
 					state.transactions = state.allTransactions
 					state.year = 'Selecione'
 					state.month = 'Selecione'
-					state.bank_id = null
+					state.bankId = null
 					state.description = ''
 					this.filterList()
 					break
@@ -143,8 +143,8 @@ class ExtractPlan extends React.Component {
 					this.filterList()
 					break
 
-				case 'bank_id':
-					state.bank_id = event.target.value
+				case 'bankId':
+					state.bankId = event.target.value
 					this.filterList()
 					break
 
@@ -240,10 +240,10 @@ class ExtractPlan extends React.Component {
 				(transaction) => {
 					let toReturn = true
 
-					if (this.state.bank_id !== null) {
+					if (this.state.bankId !== null) {
 						if (
-							transaction.bank_id._id.toString() !==
-							this.state.bank_id.toString()
+							transaction.bankId._id.toString() !==
+							this.state.bankId.toString()
 						) {
 							toReturn = false
 						}
@@ -266,7 +266,7 @@ class ExtractPlan extends React.Component {
 					}
 
 					if (this.state.year.toString() !== 'Selecione') {
-						let now = new Date(transaction.efectedDate)
+						let now = new Date(transaction.effectedAt)
 						const ano = now.getFullYear()
 
 						if (ano.toString() !== this.state.year.toString()) {
@@ -275,7 +275,7 @@ class ExtractPlan extends React.Component {
 					}
 
 					if (this.state.month.toString() !== 'Selecione') {
-						let now = new Date(transaction.efectedDate)
+						let now = new Date(transaction.effectedAt)
 						const mes = now.getMonth() + 1
 
 						if (mes.toString() !== this.state.month.toString()) {
@@ -412,7 +412,7 @@ class ExtractPlan extends React.Component {
 									<span style={{ marginRight: '30px' }}>Banco:</span>
 									<SelectBank
 										handleChange={this.handleChange}
-										bank_id={this.state.bank_id}
+										bankId={this.state.bankId}
 										banks={this.state.banks}
 									/>
 								</Col>
@@ -449,7 +449,7 @@ class ExtractPlan extends React.Component {
 							<PlusCircleOutlined
 								style={{ paddingLeft: '10px' }}
 								onClick={() => {
-									this.props.showModal({ typeTransaction: 'planejamento' })
+									this.props.showModal({ transactionType: 'planejamento' })
 								}}
 							/>
 							<span
@@ -488,7 +488,7 @@ class ExtractPlan extends React.Component {
 					{this.state.transactions.map((element) => {
 						const transactionValue = prepareValue(
 							element.value,
-							element.isCompesed
+							element.isCompensated
 						)
 
 						const title = (
@@ -524,8 +524,8 @@ class ExtractPlan extends React.Component {
 									}}
 								>
 									<Row>
-										<Col span={12} title={formatDateToUser(element.createDate)}>
-											Efetivação: {formatDateToUser(element.efectedDate)}
+										<Col span={12} title={formatDateToUser(element.createdAt)}>
+											Efetivação: {formatDateToUser(element.effectedAt)}
 										</Col>
 										<Col span={12} style={{ textAlign: 'right' }}>
 											Valor:{' '}
@@ -539,7 +539,7 @@ class ExtractPlan extends React.Component {
 										</Col>
 									</Row>
 									<Row>
-										<Col span={24}>Banco: {element.bank_id.name}</Col>
+										<Col span={24}>Banco: {element.bankId.name}</Col>
 									</Row>
 									<Row>
 										<Col span={24}>Detalhes: {element.detail}</Col>
