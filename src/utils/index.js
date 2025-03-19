@@ -83,9 +83,10 @@ function prepareValue(value, isCompensated) {
 
 // TODO: Verificar remoção de caracteres não funcionando
 const formatNumber = (value, separator) => {
+	if(!value) return ''
 	return value
 		.toString()
-		.replace(/[^0-9]/g, '') //Remover qualquer caractere não numérico
+		.replace(/(?!^-)\D/g, '') //Remover qualquer caractere não numérico
 		.replace(/^0+(\d)/, '$1') //Remove zeros à esquerda
 		.padStart(3, '0') //Mínimo de três dígitos (para 2 casas decimais)
 		.replace(/(\d+)(\d{2})$/, `$1${separator}$2`) //Casas decimais separadas dinamicamente (vírgula ou ponto)
