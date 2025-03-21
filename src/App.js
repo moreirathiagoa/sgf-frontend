@@ -79,6 +79,14 @@ class App extends React.Component {
 	showTransactionModal = (data) => {
 		const transactionType = data.transactionType
 		const transactionId = data.idTransaction
+		const bank = data.bank
+
+		if(bank){
+			this.setState((state) => {
+				state.transaction.bank = bank
+				return state
+			})
+		}
 
 		if (this.state.transaction.id !== transactionId) {
 			this.setState((state) => {
@@ -101,6 +109,7 @@ class App extends React.Component {
 			state.transaction.modalVisible = false
 			state.transaction.type = null
 			state.transaction.id = null
+			state.transaction.bank = null
 			return state
 		})
 	}
@@ -130,6 +139,7 @@ class App extends React.Component {
 						verificaLogin={this.verificaLogin}
 						transactionType={this.state.transaction.type}
 						transactionId={this.state.transaction.id}
+						bank={this.state.transaction.bank}
 						handleClose={this.transactionModalClose}
 						update={this.update}
 					/>

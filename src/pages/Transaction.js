@@ -31,6 +31,10 @@ class Transaction extends React.Component {
 		super(props)
 		const transactionType = props.transactionType
 		const transactionId = props.transactionId
+		const bank = props.bank || null
+		const amount =
+			bank?.diference < 0 ? bank?.diference * -1 : bank?.diference || null
+		const isCredit = bank?.diference < 0
 		const todayDate = actualDateToUser()
 		const isCompensated = transactionType === 'contaCorrente' ? true : undefined
 
@@ -39,11 +43,13 @@ class Transaction extends React.Component {
 			data: {
 				effectedAt: todayDate,
 				isSimples: true,
-				value: null,
+				value: amount,
+				bankId: bank?.id || null,
+				description: bank ? 'Lançamento Compilados' : '',
 				isCompensated: isCompensated,
 				transactionType: transactionType,
 			},
-			isCredit: false,
+			isCredit: isCredit,
 			banks: [],
 			lastDescriptions: [],
 			saveExit: null,
@@ -268,7 +274,7 @@ class Transaction extends React.Component {
 										const event = {
 											target: {
 												name: 'value',
-												value: value/100,
+												value: value / 100,
 											},
 										}
 										this.handleChange(event)
@@ -361,6 +367,7 @@ class Transaction extends React.Component {
 							lastDescriptions={this.state.lastDescriptions}
 							currentDescription={this.state.data.description}
 							handleChange={this.handleChange}
+							width={300}
 						/>
 					</Form.Item>
 
