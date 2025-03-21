@@ -37,6 +37,7 @@ class Router extends React.Component {
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 						update={this.props.update}
+						showModal={this.props.showModal}
 					/>
 				</Route>
 				<Route path='/planning'>

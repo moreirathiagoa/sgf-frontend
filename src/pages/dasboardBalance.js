@@ -169,7 +169,15 @@ class DashboardDebit extends React.Component {
 						<span style={{ color: diference.color }}>{diference.value}</span>
 					),
 					status: bank.diference ? (
-						<CloseCircleOutlined style={{ color: 'red' }} />
+						<CloseCircleOutlined
+							style={{ color: 'red' }}
+							onClick={() => {
+								this.props.showModal({
+									transactionType: 'contaCorrente',
+									bank: bank,
+								})
+							}}
+						/>
 					) : (
 						<CheckCircleOutlined style={{ color: 'green' }} />
 					),
