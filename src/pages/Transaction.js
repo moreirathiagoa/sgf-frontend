@@ -45,7 +45,7 @@ class Transaction extends React.Component {
 				isSimples: true,
 				value: amount,
 				bankId: bank?.id || null,
-				description: bank ? 'Lançamento Compilados' : '',
+				description: bank ? 'Consolidação de Saldo' : '',
 				isCompensated: isCompensated,
 				transactionType: transactionType,
 			},
