@@ -242,8 +242,7 @@ class ExtractPlan extends React.Component {
 
 					if (this.state.bankId !== null) {
 						if (
-							transaction.bankId._id.toString() !==
-							this.state.bankId.toString()
+							transaction.bankId._id.toString() !== this.state.bankId.toString()
 						) {
 							toReturn = false
 						}
@@ -539,7 +538,9 @@ class ExtractPlan extends React.Component {
 										</Col>
 									</Row>
 									<Row>
-										<Col span={24}>Banco: {element.bankId.name}</Col>
+										<Col span={24} title={element.bankId?.name}>
+											Banco: {element.bankName}
+										</Col>
 									</Row>
 									<Row>
 										<Col span={24}>Detalhes: {element.detail}</Col>

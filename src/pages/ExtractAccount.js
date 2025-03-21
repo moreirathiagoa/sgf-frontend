@@ -343,7 +343,7 @@ class ExtractAccount extends React.Component {
 										currentDescription={this.state.filters.description}
 										handleChange={this.handleChange}
 									/>
-								</Col>	
+								</Col>
 							</Row>
 							<br></br>
 							<Row>
@@ -451,7 +451,9 @@ class ExtractAccount extends React.Component {
 										</Col>
 									</Row>
 									<Row>
-										<Col span={24}>Banco: {element.bankId.name}</Col>
+										<Col span={24} title={element.bankId?.name}>
+											Banco: {element.bankName}
+										</Col>
 									</Row>
 									<Row>
 										<Col span={24}>Detalhes: {element.detail}</Col>
