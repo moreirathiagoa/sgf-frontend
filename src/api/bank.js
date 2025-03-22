@@ -59,12 +59,12 @@ const removeBank = (id) => {
 	return response
 }
 
-const updateBank = (bank, idBank) => {
+const updateBank = (bank, bankId) => {
 	const token = localStorage.getItem('token')
 
 	const response = axios({
 		method: 'put',
-		url: properties.url + 'bank/update/' + idBank,
+		url: properties.url + 'bank/update/' + bankId,
 		data: bank,
 		headers: {
 			auth: token,

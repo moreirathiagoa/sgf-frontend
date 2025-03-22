@@ -2,12 +2,12 @@ import axios from 'axios'
 import properties from '../properties'
 import { formatDateToMoment } from '../utils'
 
-const getTransaction = (idTransaction) => {
+const getTransaction = (transactionId) => {
 	const token = localStorage.getItem('token')
 
 	const response = axios({
 		method: 'get',
-		url: properties.url + 'transaction/' + idTransaction,
+		url: properties.url + 'transaction/' + transactionId,
 		headers: {
 			auth: token,
 		},
@@ -82,14 +82,14 @@ const removeTransaction = (id) => {
 	return response
 }
 
-const updateTransaction = (transaction, idTransaction) => {
+const updateTransaction = (transaction, transactionId) => {
 	const token = localStorage.getItem('token')
 
 	transaction.effectedAt = formatDateToMoment(transaction.effectedAt)
 
 	const params = {
 		method: 'put',
-		url: properties.url + 'transaction/update/' + idTransaction,
+		url: properties.url + 'transaction/update/' + transactionId,
 		data: transaction,
 		headers: {
 			auth: token,
