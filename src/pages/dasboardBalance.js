@@ -212,7 +212,7 @@ class DashboardDebit extends React.Component {
 					openNotification(
 						'success',
 						'Transação cadastrada',
-						'Transferência exexutada com sucesso'
+						'Transferência executada com sucesso'
 					)
 					this.processUpdate().then(() => {
 						this.handleCancelTransfer()
