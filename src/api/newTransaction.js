@@ -1,11 +1,11 @@
 import axios from 'axios'
 import properties from '../properties'
 
-const getTransactionData = (transactionType, idTransaction = '') => {
+const getTransactionData = (transactionType, transactionId = '') => {
 	const token = localStorage.getItem('token')
 	const response = axios({
 		method: 'get',
-		url: `${properties.url}new-transaction/load/${transactionType}/${idTransaction}`,
+		url: `${properties.url}new-transaction/load/${transactionType}/${transactionId}`,
 		headers: {
 			auth: token,
 		},

@@ -59,8 +59,8 @@ class Transaction extends React.Component {
 		this.getTransactionData(transactionType, transactionId)
 	}
 
-	getTransactionData(transactionType, idTransaction) {
-		return getTransactionData(transactionType, idTransaction)
+	getTransactionData(transactionType, transactionId) {
+		return getTransactionData(transactionType, transactionId)
 			.then((res) => {
 				if (res.status === 401) {
 					localStorage.removeItem('token')

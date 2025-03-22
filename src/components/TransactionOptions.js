@@ -7,9 +7,9 @@ import { updateTransaction, getTransaction } from '../api'
 import { openNotification, formatDateToUser } from '../utils'
 
 class TransactionOptions extends React.Component {
-	compensateTransaction(idTransaction) {
+	compensateTransaction(transactionId) {
 		if (window.confirm('Deseja realmente compensar essa Transação?')) {
-			return getTransaction(idTransaction)
+			return getTransaction(transactionId)
 				.then((res) => {
 					if (res.status === 401) {
 						localStorage.removeItem('token')
@@ -65,7 +65,7 @@ class TransactionOptions extends React.Component {
 					onClick={() => {
 						this.props.showModal({
 							transactionType: this.props.screenType,
-							idTransaction: this.props.element._id,
+							transactionId: this.props.element._id,
 						})
 
 						this.props.closeModal()
