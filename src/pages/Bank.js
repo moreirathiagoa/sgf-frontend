@@ -158,7 +158,7 @@ class Banks extends React.Component {
 						openNotification(
 							'error',
 							'Banco não removido',
-							'O Banco não pode ser removido.'
+							`O Banco não pode ser removido. ${res.data.message}`
 						)
 						this.props.loading(false)
 					}
@@ -226,9 +226,10 @@ class Banks extends React.Component {
 					openNotification(
 						'error',
 						'Banco não atualizado',
-						'O Banco não pode ser atualizado.'
+						`O Banco não pode ser atualizado. ${res.data.message}`
 					)
 				}
+				this.props.loading(false)
 			})
 			.catch((err) => {
 				openNotification(
@@ -236,6 +237,7 @@ class Banks extends React.Component {
 					'Banco não cadastrado',
 					'Erro interno. Tente novamente mais tarde.'
 				)
+				this.props.loading(false)
 			})
 	}
 
