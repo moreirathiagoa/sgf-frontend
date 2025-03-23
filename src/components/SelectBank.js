@@ -10,7 +10,8 @@ class SelectBank extends React.Component {
 		return (
 			<Select
 				name='bankId'
-				value={this.props.bankId || 'Selecione'}
+				placeholder='Selecione'
+				value={this.props.bankId}
 				size='md'
 				style={{ width: 150 }}
 				onSelect={(value) => {
@@ -23,13 +24,20 @@ class SelectBank extends React.Component {
 					this.props.handleChange(event)
 				}}
 			>
-				{this.props.banks.map((element) => {
-					return (
-						<Option key={element._id} value={element._id}>
-							{element.name}
-						</Option>
-					)
-				})}
+				{this.props.bankId &&
+				!this.props.banks.some((bank) => bank._id === this.props.bankId) ? (
+					<Option key={this.props.bankId} value={this.props.bankId}>
+						Removido
+					</Option>
+				) : (
+					this.props.banks.map((element) => {
+						return (
+							<Option key={element._id} value={element._id}>
+								{element.name}
+							</Option>
+						)
+					})
+				)}
 			</Select>
 		)
 	}
