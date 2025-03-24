@@ -221,7 +221,7 @@ class ExtractAccount extends React.Component {
 							openNotification(
 								'error',
 								'Transação não removida',
-								'A Transação não pode ser removida.'
+								`A Transação não pode ser removida. ${res?.data?.message}`
 							)
 						}
 					})
@@ -251,7 +251,7 @@ class ExtractAccount extends React.Component {
 						openNotification(
 							'error',
 							'Transação não removida',
-							'A Transação não pode ser removida.'
+							`A Transação não pode ser removida. ${res?.data?.message}`
 						)
 					}
 				})
