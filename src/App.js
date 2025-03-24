@@ -44,9 +44,9 @@ class App extends React.Component {
 		} else {
 			if (this.state.logado)
 				openNotification(
-					'error',
-					'Você foi desconectado',
-					'Realize login novamente.'
+					'success',
+					'Você foi desconectado!',
+					'Para acessar o sistema, realize login novamente.'
 				)
 			this.setState({ logado: false })
 		}
@@ -81,7 +81,7 @@ class App extends React.Component {
 		const transactionId = data.transactionId
 		const bank = data.bank
 
-		if(bank){
+		if (bank) {
 			this.setState((state) => {
 				state.transaction.bank = bank
 				return state

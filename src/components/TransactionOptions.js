@@ -36,7 +36,7 @@ class TransactionOptions extends React.Component {
 						openNotification(
 							'error',
 							'Transação não atualizada',
-							`A Transação não pode ser atualizada: ${res.data.message}`
+							`A Transação não pode ser atualizada: ${res?.data?.message}`
 						)
 						return 'error'
 					}

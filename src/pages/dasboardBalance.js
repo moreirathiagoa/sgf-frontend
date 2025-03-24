@@ -78,7 +78,11 @@ class DashboardDebit extends React.Component {
 				}
 			})
 			.catch((err) => {
-				openNotification('error', 'Erro ao listar os bancos', err.message)
+				openNotification(
+					'error',
+					'Listagem de Bancos',
+					`Erro ao listar os bancos ${err.message}`
+				)
 			})
 	}
 
@@ -211,7 +215,7 @@ class DashboardDebit extends React.Component {
 				if (res.data.code === 201 || res.data.code === 202) {
 					openNotification(
 						'success',
-						'Transação cadastrada',
+						'Transferência entra bancos',
 						'Transferência executada com sucesso'
 					)
 					this.processUpdate().then(() => {
@@ -220,14 +224,18 @@ class DashboardDebit extends React.Component {
 				} else {
 					openNotification(
 						'error',
-						'Transação não cadastrada',
-						res.data.message
+						'Transferência entra bancos',
+						`Erro ao cadastrar transação: ${res?.data?.message}`
 					)
 					this.props.loading(false)
 				}
 			})
 			.catch((err) => {
-				openNotification('error', 'Transação não cadastrada', err.message)
+				openNotification(
+					'error',
+					'Transferência entra bancos',
+					`Erro ao cadastrar transação: ${err?.message}`
+				)
 			})
 	}
 
@@ -271,7 +279,7 @@ class DashboardDebit extends React.Component {
 					openNotification(
 						'error',
 						'Saldo não atualizado',
-						'O Saldo não pode ser atualizado.'
+						`O Saldo não pode ser atualizado. ${res.data.message}`
 					)
 				}
 			})

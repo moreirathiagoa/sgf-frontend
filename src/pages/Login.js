@@ -45,8 +45,7 @@ class Login extends React.Component {
 				return response
 			})
 			.catch((err) => {
-				console.log('Server Offline')
-
+				console.log('Error to get Server Status')
 				return false
 			})
 		return online
