@@ -72,6 +72,7 @@ class Login extends React.Component {
 								'Seu login foi registrado com sucesso.'
 							)
 							localStorage.setItem('token', res.data.data.token)
+							localStorage.setItem('defaultDescription', res.data.data.defaultDescription)
 							this.props.verificaLogin()
 							this.render()
 						} else {
