@@ -63,14 +63,14 @@ class DashboardDebit extends React.Component {
 					localStorage.removeItem('token')
 					this.props.verificaLogin()
 				} else {
-					const dashboardData = res.data
+					const dashboardData = res.data.data
 
 					this.setState((state) => {
-						state.banks = dashboardData.banksList
-						state.saldoNotCompensatedCredit =
-							dashboardData.balanceNotCompensatedCredit
-						state.saldoNotCompensatedDebit =
-							dashboardData.balanceNotCompensatedDebit
+						state.banks = dashboardData.banks
+						state.saldoNotCompensatedCredit = dashboardData.balanceNotCompensatedCredit
+						state.saldoNotCompensatedDebit = dashboardData.balanceNotCompensatedDebit
+						state.saldoReal = dashboardData.saldoReal
+						state.saldoLiquido = dashboardData.saldoLiquido
 						return state
 					})
 					this.getSaldosGerais()
@@ -136,41 +136,26 @@ class DashboardDebit extends React.Component {
 
 	getSaldosGerais() {
 		this.setState((state) => {
-			let tableContent = []
-			let saldoLiquido = 0
-			let saldoReal = 0
-
-			const banks = state.banks.filter((bank) => {
-				return bank.isActive
-			})
-
-			banks.forEach((bank) => {
-				saldoLiquido += bank.saldoSistema
-
-				if (bank.bankType === 'Conta Corrente') {
-					saldoReal += bank.saldoSistemaDeduzido
-				}
-
-				const saldoSistema = prepareValue(bank.saldoSistemaDeduzido)
-				const saldoManual = prepareValue(bank.saldoManual)
-				const diference = prepareValue(bank.diference)
-
-				const content = {
+			const tableContent = state.banks
+				.filter((bank) => bank.isActive)
+				.map((bank) => ({
 					key: bank.id,
 					banco: bank.name,
 					saldoSistema: (
-						<span style={{ color: saldoSistema.color }}>
-							{saldoSistema.value}
+						<span style={{ color: prepareValue(bank.saldoSistemaDeduzido).color }}>
+							{prepareValue(bank.saldoSistemaDeduzido).value}
 						</span>
 					),
 					saldoManual: {
 						id: bank.id,
 						banco: bank.name,
-						saldoManual: saldoManual,
+						saldoManual: prepareValue(bank.saldoManual),
 						saldoManualModal: bank.saldoSistemaDeduzido,
 					},
 					diference: (
-						<span style={{ color: diference.color }}>{diference.value}</span>
+						<span style={{ color: prepareValue(bank.diference).color }}>
+							{prepareValue(bank.diference).value}
+						</span>
 					),
 					status: bank.diference ? (
 						<CloseCircleOutlined
@@ -185,15 +170,9 @@ class DashboardDebit extends React.Component {
 					) : (
 						<CheckCircleOutlined style={{ color: 'green' }} />
 					),
-				}
+				}))
 
-				tableContent.push(content)
-			})
-
-			state.saldoReal = saldoReal
-			state.saldoLiquido = saldoLiquido
 			state.tableContent = tableContent
-
 			return state
 		})
 	}
