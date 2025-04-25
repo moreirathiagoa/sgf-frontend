@@ -37,6 +37,8 @@ class Transaction extends React.Component {
 		const isCredit = bank?.diference < 0
 		const todayDate = actualDateToUser()
 		const isCompensated = transactionType === 'contaCorrente' ? true : undefined
+		const defaultDescription =
+			localStorage.getItem('defaultDescription') || 'Consolidação de Saldo'
 
 		this.state = {
 			idToUpdate: transactionId,
@@ -45,7 +47,7 @@ class Transaction extends React.Component {
 				isSimples: true,
 				value: amount,
 				bankId: bank?.id || null,
-				description: bank ? 'Consolidação de Saldo' : '',
+				description: bank ? defaultDescription : '',
 				isCompensated: isCompensated,
 				transactionType: transactionType,
 			},
