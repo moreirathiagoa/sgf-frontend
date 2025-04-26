@@ -1,13 +1,14 @@
 import React from 'react'
 
 import { Switch, Route } from 'react-router-dom'
-import Saldos from './pages/dasboardBalance'
+import Balances from './pages/Balances'
 import Planning from './pages/Planning'
 import ExtractAccount from './pages/ExtractAccount'
 import ExtractPlan from './pages/ExtractPlan'
 import Bank from './pages/Bank'
 import NotFound from './pages/NotFound'
 import Login from './pages/Login'
+import Dashboards from './pages/Dashboards'
 
 class Router extends React.Component {
 	render() {
@@ -32,7 +33,7 @@ class Router extends React.Component {
 					/>
 				</Route>
 				<Route path='/saldos'>
-					<Saldos
+					<Balances
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
@@ -72,6 +73,13 @@ class Router extends React.Component {
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
 						update={this.props.update}
+					/>
+				</Route>
+				<Route path='/dashboards'>
+					<Dashboards
+						loading={this.props.loading}
+						mudaTitulo={this.props.mudaTitulo}
+						verificaLogin={this.props.verificaLogin}
 					/>
 				</Route>
 				<Route path='/logout'>
