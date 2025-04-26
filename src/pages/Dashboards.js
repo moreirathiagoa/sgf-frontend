@@ -66,6 +66,10 @@ const formatXAxisForYears = (tickItem) => {
 	return tickItem.toString()
 }
 
+const formatCurrency = (value) => {
+	return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+}
+
 const Dashboards = ({ mudaTitulo, loading, update }) => {
 	const currentMonth = new Date().getMonth() + 1
 	const currentYear = new Date().getFullYear()
@@ -348,8 +352,10 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 								style={X_AXIS_STYLE}
 								dy={X_AXIS_DY}
 							/>
-							<YAxis />
-							<Tooltip />
+							<YAxis tickFormatter={(value) => formatCurrency(value)} width={100} />
+							<Tooltip
+								formatter={(value) => formatCurrency(value)}
+							/>
 							<Line
 								type='monotone'
 								dataKey='actualBalance'
@@ -391,8 +397,10 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 								style={X_AXIS_STYLE}
 								dy={X_AXIS_DY}
 							/>
-							<YAxis />
-							<Tooltip />
+							<YAxis tickFormatter={(value) => formatCurrency(value)} width={100} />
+							<Tooltip
+								formatter={(value) => formatCurrency(value)}
+							/>
 							<Line
 								type='monotone'
 								dataKey='netBalance'
@@ -434,8 +442,10 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 								style={X_AXIS_STYLE}
 								dy={X_AXIS_DY}
 							/>
-							<YAxis />
-							<Tooltip />
+							<YAxis tickFormatter={(value) => formatCurrency(value)} width={100} />
+							<Tooltip
+								formatter={(value) => formatCurrency(value)}
+							/>
 							<Line
 								type='monotone'
 								dataKey='forecastIncoming'
@@ -477,8 +487,10 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 								style={X_AXIS_STYLE}
 								dy={X_AXIS_DY}
 							/>
-							<YAxis />
-							<Tooltip />
+							<YAxis tickFormatter={(value) => formatCurrency(value)} width={100} />
+							<Tooltip
+								formatter={(value) => formatCurrency(value)}
+							/>
 							<Line
 								type='monotone'
 								dataKey='forecastOutgoing'
