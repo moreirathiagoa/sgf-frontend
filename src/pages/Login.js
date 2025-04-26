@@ -72,7 +72,16 @@ class Login extends React.Component {
 								'Seu login foi registrado com sucesso.'
 							)
 							localStorage.setItem('token', res.data.data.token)
-							localStorage.setItem('defaultDescription', res.data.data.defaultDescription)
+							if (res.data.data.defaultDescription) {
+								console.log('entrei!!')
+								localStorage.setItem(
+									'defaultDescription',
+									res.data.data.defaultDescription
+								)
+							} else {
+								localStorage.removeItem('defaultDescription')
+							}
+
 							this.props.verificaLogin()
 							this.render()
 						} else {
