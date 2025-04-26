@@ -19,7 +19,7 @@ const CHART_BACKGROUND_COLOR = '#d6d6c2'
 const LINE_COLOR = '#000000'
 const LINE_WIDTH = 2
 const CONTAINER_STYLE = {
-	flex: '1 1 calc(50% - 20px)', // Ocupa 50% da largura menos o gap no desktop
+	flex: '1 1 calc(50% - 20px)',
 	minWidth: '300px',
 	marginBottom: '20px',
 }
@@ -28,17 +28,18 @@ const WRAPPER_STYLE = {
 	flexWrap: 'wrap',
 	justifyContent: 'space-between',
 	marginBottom: '20px',
-	gap: '20px', // Adiciona espaçamento entre os gráficos
+	gap: '20px',
 }
 const CHART_MARGIN = { top: 20, left: 20, right: 20, bottom: 20 }
 const X_AXIS_STYLE = { fontSize: '12px' }
 const X_AXIS_ANGLE = -45
 const X_AXIS_TEXT_ANCHOR = 'end'
 const X_AXIS_DY = 5
+const TITLE_COLOR = '#ffffff'
 
 const formatXAxis = (tickItem) => {
-	if (!tickItem) return '' // Retorna string vazia se o valor for inválido
-	const adjustedDate = new Date(tickItem.split('T')[0] + 'T00:00:00') // Ajusta para evitar problemas de fuso horário
+	if (!tickItem) return ''
+	const adjustedDate = new Date(tickItem.split('T')[0] + 'T00:00:00')
 	const res = format(adjustedDate, 'dd/MM')
 	return res
 }
@@ -62,21 +63,21 @@ const formatXAxisForMonths = (tickItem) => {
 }
 
 const formatXAxisForYears = (tickItem) => {
-	return tickItem.toString() // Retorna o ano como string
+	return tickItem.toString()
 }
 
 const Dashboards = ({ mudaTitulo, loading, update }) => {
-	const currentMonth = new Date().getMonth() + 1 // Mês corrente
-	const currentYear = new Date().getFullYear() // Ano corrente
+	const currentMonth = new Date().getMonth() + 1
+	const currentYear = new Date().getFullYear()
 
 	const [data, setData] = useState([])
-	const [originalData, setOriginalData] = useState([]) // Armazena os dados originais
-	const [month, setMonth] = useState(currentMonth) // Inicia com o mês corrente
-	const [year, setYear] = useState(currentYear) // Inicia com o ano corrente
-	const [yearOptions, setYearOptions] = useState([]) // Opções de ano
+	const [originalData, setOriginalData] = useState([])
+	const [month, setMonth] = useState(currentMonth)
+	const [year, setYear] = useState(currentYear)
+	const [yearOptions, setYearOptions] = useState([])
 
 	const loadData = useCallback(() => {
-		loading(true) // Ativa o estado de loading
+		loading(true)
 		getLatestDashboard({
 			month: month,
 			year: year,
@@ -90,53 +91,50 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 						forecastOutgoing: item.forecastOutgoing,
 						netBalance: item.netBalance,
 					}))
-					setOriginalData(formattedData) // Salva os dados originais
+					setOriginalData(formattedData)
 				} else if (response.status === 400) {
-					setOriginalData([]) // Define os dados como vazios
+					setOriginalData([])
 				}
-				loading(false) // Desativa o estado de loading
+				loading(false)
 			})
 			.catch(() => {
-				setOriginalData([]) // Garante que os dados sejam vazios em caso de erro
-				loading(false) // Garante que o loading seja desativado em caso de erro
+				setOriginalData([])
+				loading(false)
 			})
 	}, [month, year, loading])
 
 	useEffect(() => {
-		mudaTitulo('Dashboards') // Atualiza o título da página
+		mudaTitulo('Dashboards')
 		loadData()
 	}, [mudaTitulo, loadData])
 
 	useEffect(() => {
 		if (update) {
-			loadData() // Recarrega os dados quando update for verdadeiro
+			loadData()
 		}
 	}, [update, loadData])
 
 	useEffect(() => {
-		// Aplica o filtro automaticamente no carregamento da tela
 		if (originalData.length) {
 			if (year === 'all') {
-				// Agrupa os dados por ano e seleciona o valor mais recente de cada ano
 				const groupedData = originalData.reduce((acc, item) => {
 					if (!item.createdAt) return acc
 					const itemDate = new Date(item.createdAt)
 					const year = itemDate.getFullYear()
 					if (!acc[year] || new Date(acc[year].createdAt) < itemDate) {
-						acc[year] = { ...item, year } // Adiciona o ano ao item
+						acc[year] = { ...item, year }
 					}
 					return acc
 				}, {})
 				const filteredData = Object.values(groupedData)
 				setData(filteredData)
 			} else if (month === 'all') {
-				// Agrupa os dados por mês e seleciona o valor mais recente de cada mês
 				const groupedData = originalData.reduce((acc, item) => {
 					if (!item.createdAt) return acc
 					const itemDate = new Date(item.createdAt)
 					const month = itemDate.getMonth() + 1
 					if (!acc[month] || new Date(acc[month].createdAt) < itemDate) {
-						acc[month] = { ...item, month } // Adiciona o mês ao item
+						acc[month] = { ...item, month }
 					}
 					return acc
 				}, {})
@@ -144,7 +142,7 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 				setData(filteredData)
 			} else {
 				const filteredData = originalData.filter((item) => {
-					if (!item.createdAt) return false // Ignora itens com createdAt inválido
+					if (!item.createdAt) return false
 					const itemMonth = new Date(item.createdAt).getMonth() + 1
 					const itemYear = new Date(item.createdAt).getFullYear()
 					return itemMonth === month && itemYear === year
@@ -170,11 +168,11 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 		if (originalData.length) {
 			const years = originalData
 				.map((item) => new Date(item.createdAt).getFullYear())
-				.filter((year) => !isNaN(year)) // Filtra anos válidos
-			const uniqueYears = Array.from(new Set(years)) // Garante que os anos sejam únicos
+				.filter((year) => !isNaN(year))
+			const uniqueYears = Array.from(new Set(years))
 			const minYear = Math.min(...uniqueYears)
 			const maxYear = Math.max(...uniqueYears)
-			const extendedYears = [minYear - 1, ...uniqueYears, maxYear + 1] // Adiciona anos adicionais sem duplicar
+			const extendedYears = [minYear - 1, ...uniqueYears, maxYear + 1]
 			setYearOptions(extendedYears)
 		}
 	}, [originalData])
@@ -194,10 +192,10 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 								netBalance: 0,
 							},
 					  ]
-			) // Restaura os dados originais ou mantém índices básicos
+			)
 		} else {
 			const filteredData = originalData.filter((item) => {
-				if (!item.createdAt) return false // Ignora itens com createdAt inválido
+				if (!item.createdAt) return false
 				const itemMonth = new Date(item.createdAt).getMonth() + 1
 				return itemMonth === value
 			})
@@ -213,14 +211,13 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 								netBalance: 0,
 							},
 					  ]
-			) // Atualiza os dados filtrados ou mantém índices básicos
+			)
 		}
 	}
 
 	const handleYearChange = (value) => {
 		setYear(value)
 		if (value === 'all') {
-			// Atualiza o campo mês para "Todos" automaticamente
 			setMonth('all')
 			setData(
 				originalData.length
@@ -234,10 +231,10 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 								netBalance: 0,
 							},
 					  ]
-			) // Restaura os dados originais ou mantém índices básicos
+			)
 		} else {
 			const filteredData = originalData.filter((item) => {
-				if (!item.createdAt) return false // Ignora itens com createdAt inválido
+				if (!item.createdAt) return false
 				const itemYear = new Date(item.createdAt).getFullYear()
 				return itemYear === value
 			})
@@ -253,7 +250,7 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 								netBalance: 0,
 							},
 					  ]
-			) // Atualiza os dados filtrados ou mantém índices básicos
+			)
 		}
 	}
 
@@ -261,13 +258,12 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 		const updateData = {
 			month,
 			year,
-			// Adicione aqui os dados necessários para o update
 		}
 		loading(true)
 		updateDashboard(updateData)
 			.then((response) => {
 				if (response.status === 200) {
-					loadData() // Recarrega os dados após o update
+					loadData()
 				}
 			})
 			.catch((error) => {
@@ -285,14 +281,15 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 					<Select
 						value={month}
 						onChange={handleMonthChange}
-						style={{ width: 120 }}
+						style={{ width: 85 }}
+						disabled={year === 'all'}
 					>
 						<Option key='all' value='all'>
 							Todos
 						</Option>
 						{Array.from({ length: 12 }, (_, i) => (
 							<Option key={i + 1} value={i + 1}>
-								{new Date(0, i).toLocaleString('default', { month: 'long' })}
+								{new Date(0, i).toLocaleString('default', { month: 'short' })}
 							</Option>
 						))}
 					</Select>
@@ -301,7 +298,7 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 					<Select
 						value={year}
 						onChange={handleYearChange}
-						style={{ width: 120 }}
+						style={{ width: 90 }}
 					>
 						<Option key='all' value='all'>
 							Todos
@@ -315,13 +312,13 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 				</Col>
 				<Col>
 					<Button type='primary' onClick={handleUpdateDashboard}>
-						Atualizar Hoje
+						Atualizar Saldo
 					</Button>
 				</Col>
 			</Row>
 			<div style={WRAPPER_STYLE}>
 				<div style={CONTAINER_STYLE}>
-					<Title level={4} style={{ color: '#ffffff' }}>
+					<Title level={4} style={{ color: TITLE_COLOR }}>
 						Saldo Real
 					</Title>
 					<ResponsiveContainer
@@ -364,7 +361,7 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 					</ResponsiveContainer>
 				</div>
 				<div style={CONTAINER_STYLE}>
-					<Title level={4} style={{ color: '#ffffff' }}>
+					<Title level={4} style={{ color: TITLE_COLOR }}>
 						Saldo Líquido
 					</Title>
 					<ResponsiveContainer
@@ -407,7 +404,7 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 					</ResponsiveContainer>
 				</div>
 				<div style={CONTAINER_STYLE}>
-					<Title level={4} style={{ color: '#ffffff' }}>
+					<Title level={4} style={{ color: TITLE_COLOR }}>
 						Previsão de Entrada
 					</Title>
 					<ResponsiveContainer
@@ -450,7 +447,7 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 					</ResponsiveContainer>
 				</div>
 				<div style={CONTAINER_STYLE}>
-					<Title level={4} style={{ color: '#ffffff' }}>
+					<Title level={4} style={{ color: TITLE_COLOR }}>
 						Previsão de Saída
 					</Title>
 					<ResponsiveContainer

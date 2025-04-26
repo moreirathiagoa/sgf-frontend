@@ -126,7 +126,7 @@ class App extends React.Component {
 					title={
 						this.state.transaction.id ? 'Editar Transação' : 'Nova Transação'
 					}
-					visible={this.state.transaction.modalVisible}
+					open={this.state.transaction.modalVisible}
 					onCancel={this.transactionModalClose}
 					footer={null}
 					destroyOnClose={true}
@@ -156,7 +156,7 @@ class App extends React.Component {
 								showModal={this.showMenuModal}
 							/>
 							<Modal
-								visible={this.state.menu.modalVisible}
+								open={this.state.menu.modalVisible}
 								onCancel={this.menuModalClose}
 								footer={null}
 								destroyOnClose={true}

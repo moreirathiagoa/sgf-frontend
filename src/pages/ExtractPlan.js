@@ -468,7 +468,7 @@ class ExtractPlan extends React.Component {
 						</Title>
 					</div>
 					<Modal
-						visible={this.state.menu.modalVisible}
+						open={this.state.menu.modalVisible}
 						onCancel={this.menuModalClose}
 						footer={null}
 						title=''

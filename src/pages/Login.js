@@ -154,7 +154,7 @@ class Login extends React.Component {
 					<Input.Password />
 				</Form.Item>
 
-				<Form.Item {...tailLayout} name='remember' valuePropName=''>
+				<Form.Item {...tailLayout} name='remember' valuePropName='checked'>
 					<Checkbox>Permanecer Logado</Checkbox>
 				</Form.Item>
 

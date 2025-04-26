@@ -269,7 +269,7 @@ class Banks extends React.Component {
 							Lista de Bancos{' '}
 							<PlusCircleOutlined onClick={() => this.actionButtonNew()} />
 						</Title>
-						<Collapse onChange={callback} expandIconPosition='left'>
+						<Collapse onChange={callback} expandIconPosition='start'>
 							{this.state.banks.map((element) => {
 								return (
 									<Panel
