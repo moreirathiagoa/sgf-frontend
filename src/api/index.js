@@ -4,6 +4,7 @@ export { getExtractData } from './extractPage'
 export { getTransactionData } from './newTransaction'
 export { getPlaningData } from './planning'
 export { listBanks, createBank, removeBank, updateBank } from './bank'
+export { getLatestDashboard } from './dashboards'
 export {
 	createTransaction,
 	bankTransference,

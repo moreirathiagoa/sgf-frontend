@@ -9,6 +9,7 @@ import {
 	WalletOutlined,
 	FileSearchOutlined,
 	LogoutOutlined,
+	DashboardOutlined,
 } from '@ant-design/icons'
 
 const { SubMenu } = Menu
@@ -26,6 +27,12 @@ class MenuPrincipal extends React.Component {
 					}}
 				>
 					<SubMenu key='sub1' title='Conta Corrente'>
+						<Menu.Item key='item10'>
+							<Link to='/dashboards'>
+								<DashboardOutlined />
+								<span>Dashboards</span>
+							</Link>
+						</Menu.Item>
 						<Menu.Item key='item1'>
 							<Link to='/saldos'>
 								<AppstoreOutlined />
