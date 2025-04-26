@@ -19,7 +19,7 @@ const CHART_BACKGROUND_COLOR = '#d6d6c2'
 const LINE_COLOR = '#000000'
 const LINE_WIDTH = 2
 const CONTAINER_STYLE = {
-	width: '48%',
+	flex: '1 1 calc(50% - 20px)', // Ocupa 50% da largura menos o gap no desktop
 	minWidth: '300px',
 	marginBottom: '20px',
 }
@@ -28,6 +28,7 @@ const WRAPPER_STYLE = {
 	flexWrap: 'wrap',
 	justifyContent: 'space-between',
 	marginBottom: '20px',
+	gap: '20px', // Adiciona espaçamento entre os gráficos
 }
 const CHART_MARGIN = { top: 20, left: 20, right: 20, bottom: 20 }
 const X_AXIS_STYLE = { fontSize: '12px' }
@@ -37,8 +38,8 @@ const X_AXIS_DY = 5
 
 const formatXAxis = (tickItem) => {
 	if (!tickItem) return '' // Retorna string vazia se o valor for inválido
-	const adjustedDate = new Date(tickItem.split('T')[0]	 + 'T00:00:00'); // Ajusta para evitar problemas de fuso horário
-	const res = format(adjustedDate, 'dd/MM');
+	const adjustedDate = new Date(tickItem.split('T')[0] + 'T00:00:00') // Ajusta para evitar problemas de fuso horário
+	const res = format(adjustedDate, 'dd/MM')
 	return res
 }
 
@@ -67,7 +68,6 @@ const Dashboards = ({ mudaTitulo, loading }) => {
 						forecastOutgoing: item.forecastOutgoing,
 						netBalance: item.netBalance,
 					}))
-					console.log('formattedData: ', formattedData)
 					setOriginalData(formattedData) // Salva os dados originais
 					loading(false) // Desativa o estado de loading
 				}
@@ -206,7 +206,6 @@ const Dashboards = ({ mudaTitulo, loading }) => {
 		updateDashboard(updateData)
 			.then((response) => {
 				if (response.status === 200) {
-					console.log('Update realizado com sucesso:', response.data)
 					loadData() // Recarrega os dados após o update
 				}
 			})
@@ -220,7 +219,6 @@ const Dashboards = ({ mudaTitulo, loading }) => {
 
 	return (
 		<div>
-			{console.log('data: ', data)}
 			<Row style={{ marginBottom: '20px' }} gutter={16}>
 				<Col>
 					<Select
@@ -255,7 +253,7 @@ const Dashboards = ({ mudaTitulo, loading }) => {
 					</Select>
 				</Col>
 				<Col>
-					<Button type="primary" onClick={handleUpdateDashboard}>
+					<Button type='primary' onClick={handleUpdateDashboard}>
 						Atualizar
 					</Button>
 				</Col>
