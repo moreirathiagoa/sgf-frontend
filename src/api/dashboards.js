@@ -20,4 +20,19 @@ const getLatestDashboard = () => {
 	return response
 }
 
-export { getLatestDashboard }
+const updateDashboard = (data) => {
+	const token = localStorage.getItem('token')
+
+	return axios({
+		method: 'put',
+		url: properties.url + 'dashboards/update',
+		headers: {
+			auth: token,
+			'Content-Type': 'application/json',
+		},
+	})
+		.then((res) => res)
+		.catch((err) => err.response)
+}
+
+export { getLatestDashboard, updateDashboard }
