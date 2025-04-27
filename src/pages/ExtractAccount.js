@@ -1,12 +1,11 @@
 import React from 'react'
+import moment from 'moment'
 
 import '../App.css'
 
-import { Input, Checkbox, Typography, Row, Col, Card, Modal } from 'antd'
+import { Input, Checkbox, Typography, Row, Col, Card, Modal, DatePicker } from 'antd'
 import {
 	TitleFilter,
-	SelectYear,
-	SelectMonth,
 	SelectBank,
 	SelectDescription,
 	TransactionOptions,
@@ -301,21 +300,49 @@ class ExtractAccount extends React.Component {
 					{this.state.filtro && (
 						<>
 							<Row>
-								<Col span={8}>
-									<span style={{ marginRight: '30px' }}>Ano:</span>
-									<SelectYear
-										handleChange={this.handleChange}
-										year={this.state.filters.year}
+								<Col span={12}>
+									<span style={{ marginRight: '30px' }}>Data:</span>
+									<DatePicker
+										picker="month"
+										onChange={(date, dateString) => {
+											if (!date) {
+												const now = new Date()
+												this.setState(
+													(state) => ({
+														...state,
+														filters: {
+															...state.filters,
+															year: now.getFullYear(),
+															month: now.getMonth() + 1,
+														},
+													}),
+													() => this.processExtractData() // Chamar após atualizar o estado
+												)
+												return
+											}
+											const [year, month] = dateString.split('-')
+											this.setState(
+												(state) => ({
+													...state,
+													filters: {
+														...state.filters,
+														year: parseInt(year, 10),
+														month: parseInt(month, 10),
+													},
+												}),
+												() => this.processExtractData() // Chamar após atualizar o estado
+											)
+										}}
+										format="YYYY-MM"
+										placeholder="Selecione o mês e ano"
+										value={
+											this.state.filters.year && this.state.filters.month
+												? moment(`${this.state.filters.year}-${this.state.filters.month}`, 'YYYY-MM')
+												: null
+										}
 									/>
 								</Col>
-								<Col span={8}>
-									<span style={{ marginRight: '30px' }}>Nês:</span>
-									<SelectMonth
-										handleChange={this.handleChange}
-										month={this.state.filters.month}
-									/>
-								</Col>
-								<Col span={8}>
+								<Col span={12}>
 									<span style={{ marginRight: '30px' }}>Tipo:</span>
 									<Checkbox
 										name='notCompensated'

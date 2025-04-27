@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { Typography, Select, Row, Col, Button } from 'antd'
+import { Typography, Select, Row, Col } from 'antd'
 import {
 	LineChart,
 	Line,
@@ -30,7 +30,7 @@ const WRAPPER_STYLE = {
 	marginBottom: '20px',
 	gap: '20px',
 }
-const CHART_MARGIN = { top: 20, left: 20, right: 20, bottom: 20 }
+const CHART_MARGIN = { top: 20, left: 10, right: 10, bottom: 20 }
 const X_AXIS_STYLE = { fontSize: '12px' }
 const X_AXIS_ANGLE = -45
 const X_AXIS_TEXT_ANCHOR = 'end'
@@ -109,8 +109,17 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 
 	useEffect(() => {
 		mudaTitulo('Dashboards')
-		loadData()
-	}, [mudaTitulo, loadData])
+		updateDashboard({ month, year }) // Chamada da API ao carregar a tela
+			.then((response) => {
+				if (response.status === 200) {
+					loadData()
+				}
+			})
+			.catch((error) => {
+				console.error('Erro ao realizar o update:', error)
+				loading(false)
+			})
+	}, [mudaTitulo, loadData, month, year])
 
 	useEffect(() => {
 		if (update) {
@@ -258,26 +267,6 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 		}
 	}
 
-	const handleUpdateDashboard = () => {
-		const updateData = {
-			month,
-			year,
-		}
-		loading(true)
-		updateDashboard(updateData)
-			.then((response) => {
-				if (response.status === 200) {
-					loadData()
-				}
-			})
-			.catch((error) => {
-				console.error('Erro ao realizar o update:', error)
-			})
-			.finally(() => {
-				loading(false)
-			})
-	}
-
 	return (
 		<div>
 			<Row style={{ marginBottom: '20px' }} gutter={16}>
@@ -313,11 +302,6 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 							</Option>
 						))}
 					</Select>
-				</Col>
-				<Col>
-					<Button type='primary' onClick={handleUpdateDashboard}>
-						Atualizar Saldo
-					</Button>
 				</Col>
 			</Row>
 			<div style={WRAPPER_STYLE}>

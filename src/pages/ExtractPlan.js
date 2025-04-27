@@ -2,11 +2,18 @@ import React from 'react'
 
 import '../App.css'
 
-import { Input, Typography, Row, Col, Card, Modal, Checkbox } from 'antd'
+import {
+	Input,
+	Typography,
+	Row,
+	Col,
+	Card,
+	Modal,
+	Checkbox,
+	DatePicker,
+} from 'antd'
 import {
 	TitleFilter,
-	SelectYear,
-	SelectMonth,
 	SelectBank,
 	SelectDescription,
 	TransactionOptions,
@@ -18,6 +25,7 @@ import {
 } from '@ant-design/icons'
 import { getExtractData, removeTransaction, planToPrincipal } from '../api'
 import { openNotification, formatDateToUser, prepareValue } from '../utils'
+import moment from 'moment'
 
 const { Title } = Typography
 
@@ -391,17 +399,42 @@ class ExtractPlan extends React.Component {
 						<>
 							<Row>
 								<Col span={8}>
-									<span style={{ marginRight: '30px' }}>Ano:</span>
-									<SelectYear
-										handleChange={this.handleChange}
-										year={this.state.year}
-									/>
-								</Col>
-								<Col span={8}>
-									<span style={{ marginRight: '30px' }}>Nês:</span>
-									<SelectMonth
-										handleChange={this.handleChange}
-										month={this.state.month}
+									<span style={{ marginRight: '30px' }}>Ano e Mês:</span>
+									<DatePicker
+										picker='month'
+										onChange={(date, dateString) => {
+											if (!date) {
+												const now = new Date()
+												this.setState(
+													(state) => ({
+														...state,
+														year: now.getFullYear(),
+														month: now.getMonth() + 1,
+													}),
+													() => this.filterList() // Chamar após atualizar o estado
+												)
+												return
+											}
+											const [year, month] = dateString.split('-')
+											this.setState(
+												(state) => ({
+													...state,
+													year: parseInt(year, 10),
+													month: parseInt(month, 10),
+												}),
+												() => this.filterList() // Chamar após atualizar o estado
+											)
+										}}
+										format='YYYY-MM'
+										placeholder='Selecione o mês e ano'
+										value={
+											this.state.year && this.state.month
+												? moment(
+														`${this.state.year}-${this.state.month}`,
+														'YYYY-MM'
+												  )
+												: null
+										}
 									/>
 								</Col>
 							</Row>
