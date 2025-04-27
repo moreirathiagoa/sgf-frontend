@@ -339,7 +339,8 @@ class ExtractAccount extends React.Component {
 											this.state.filters.year && this.state.filters.month
 												? moment(`${this.state.filters.year}-${this.state.filters.month}`, 'YYYY-MM')
 												: null
-										}
+											}
+										inputReadOnly // Adicionado para evitar o teclado no celular
 									/>
 								</Col>
 								<Col span={12}>

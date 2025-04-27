@@ -434,7 +434,8 @@ class ExtractPlan extends React.Component {
 														'YYYY-MM'
 												  )
 												: null
-										}
+											}
+										inputReadOnly // Adicionado para evitar o teclado no celular
 									/>
 								</Col>
 							</Row>
