@@ -119,7 +119,7 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 				console.error('Erro ao realizar o update:', error)
 				loading(false)
 			})
-	}, [mudaTitulo, loadData, month, year])
+	}, [mudaTitulo, loadData, month, year, loading])
 
 	useEffect(() => {
 		if (update) {
