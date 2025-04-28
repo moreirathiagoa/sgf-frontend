@@ -513,5 +513,5 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 		</div>
 	)
 }
-
+ 
 export default Dashboards
