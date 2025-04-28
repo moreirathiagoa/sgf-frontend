@@ -3,7 +3,12 @@
 	line-height: 64px;
 	padding: 0 24px;
 	cursor: pointer;
-	color: #ccc;
+	color: #ffffff; /* Cor mais vibrante */
+	transition: color 0.3s ease; /* Transição suave */
+}
+
+.trigger:hover {
+	color: #1e90ff; /* Azul mais vibrante */
 }
 
 .trigger-title {
@@ -11,48 +16,71 @@
 	line-height: 64px;
 	padding: 0 24px 0 38px;
 	cursor: pointer;
-	color: #ccc;
+	color: #ffffff; /* Cor mais vibrante */
+	transition: color 0.3s ease;
+}
+
+.trigger-title:hover {
+	color: #1e90ff; /* Azul mais vibrante */
 }
 
 body {
-	background: #112338;
+	background: #1e1e1e; /* Cinza escuro uniforme */
+	font-family: 'Roboto', sans-serif; /* Tipografia moderna */
+	color: #e0e0e0; /* Texto mais legível */
 }
+
 .ant-menu.ant-menu-dark {
-	background: #000129;
+	background: #121212; /* Cinza quase preto */
+	border-right: 1px solid #1f1f1f; /* Adiciona borda para separação */
 }
 
 .ant-menu-item-selected {
 	background: #001529 !important;
+	box-shadow: inset 0 0 10px #1e90ff; /* Azul mais vibrante */
+}
+
+.ant-menu-sub {
+	background: #121212; /* Cinza quase preto para o submenu */
+	color: #ccc; /* Texto consistente com o restante do site */
+}
+
+.ant-menu-sub .ant-menu-item-selected {
+	background: #1e1e1e !important; /* Mesmo cinza escuro do fundo */
+	box-shadow: none; /* Remove qualquer destaque azulado */
 }
 
 .ant-switch {
 	background: #3a3939;
+	border-radius: 20px; /* Bordas arredondadas */
+	transition: background 0.3s ease; /* Transição suave */
 }
 
 .ant-switch-checked {
 	background: #1890ff;
+	box-shadow: 0 0 10px #1e90ff; /* Azul mais vibrante */
 }
 
 .logo {
 	height: 32px;
-	color: #ccc;
+	color: #ffffff; /* Cor mais vibrante */
 	margin-bottom: 15px;
 	text-align: center;
 	font-size: 30px;
 	font-weight: bolder;
+	text-transform: uppercase; /* Texto em caixa alta */
+	letter-spacing: 2px; /* Espaçamento entre letras */
 }
 
 .site-layout .site-layout-background {
-	background: #112338;
+	background: #1e1e1e; /* Mesmo cinza escuro do fundo */
 	color: #ccc;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
 }
 
-h4.ant-typography {
+h4.ant-typography, h3.ant-typography {
 	color: #ccc;
-}
-
-h3.ant-typography {
-	color: #ccc;
+	font-weight: 600; /* Negrito para destaque */
 }
 
 .ant-layout-sider-children {
@@ -61,6 +89,12 @@ h3.ant-typography {
 
 .ant-collapse-item {
 	background: #2a313a;
+	border-radius: 8px; /* Bordas arredondadas */
+	transition: background 0.3s ease; /* Transição suave */
+}
+
+.ant-collapse-item:hover {
+	background: #3a3f47; /* Cor de destaque ao passar o mouse */
 }
 
 .ant-collapse-header {
@@ -73,6 +107,7 @@ h3.ant-typography {
 
 label {
 	color: #666 !important;
+	font-size: 14px; /* Tamanho de fonte ajustado */
 }
 
 .ant-collapse-content-box {
@@ -97,4 +132,10 @@ label {
 
 .ant-statistic-content {
 	color: #ccc;
+}
+
+.ant-modal {
+	border-radius: 8px; /* Bordas arredondadas */
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Sombra sutil */
+	
 }

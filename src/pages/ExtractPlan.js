@@ -52,7 +52,7 @@ class ExtractPlan extends React.Component {
 			detail: '',
 			banks: [],
 			descriptions: [],
-			filtro: false,
+			filtro: true,
 			idToEdit: null,
 			menu: {
 				modalVisible: false,
@@ -118,6 +118,7 @@ class ExtractPlan extends React.Component {
 			switch (event.target.name) {
 				case 'filtro':
 					state.filtro = !state.filtro
+					state.checked = [] // Limpar seleções
 					break
 
 				case 'clearFilter':
@@ -126,6 +127,7 @@ class ExtractPlan extends React.Component {
 					state.month = 'Selecione'
 					state.bankId = null
 					state.description = ''
+					state.checked = [] // Limpar seleções
 					this.filterList()
 					break
 
@@ -143,21 +145,25 @@ class ExtractPlan extends React.Component {
 
 				case 'year':
 					state.year = event.target.value
+					state.checked = [] // Limpar seleções
 					this.filterList()
 					break
 
 				case 'month':
 					state.month = event.target.value
+					state.checked = [] // Limpar seleções
 					this.filterList()
 					break
 
 				case 'bankId':
 					state.bankId = event.target.value
+					state.checked = [] // Limpar seleções
 					this.filterList()
 					break
 
 				case 'description':
 					state.description = event.target.value
+					state.checked = [] // Limpar seleções
 					this.filterList()
 					break
 
@@ -170,6 +176,7 @@ class ExtractPlan extends React.Component {
 
 				case 'detail':
 					state.detail = event.target.value
+					state.checked = [] // Limpar seleções
 					this.filterList()
 					break
 
@@ -402,6 +409,7 @@ class ExtractPlan extends React.Component {
 									<span style={{ marginRight: '30px' }}>Ano e Mês:</span>
 									<DatePicker
 										picker='month'
+										size='small' // Alterado para 'small' para reduzir a altura
 										onChange={(date, dateString) => {
 											if (!date) {
 												const now = new Date()
@@ -434,14 +442,14 @@ class ExtractPlan extends React.Component {
 														'YYYY-MM'
 												  )
 												: null
-											}
+										}
 										inputReadOnly // Adicionado para evitar o teclado no celular
 									/>
 								</Col>
 							</Row>
 							<br />
 							<Row>
-								<Col span={12}>
+								<Col xs={11} sm={12} md={6} lg={4}>
 									<span style={{ marginRight: '30px' }}>Banco:</span>
 									<SelectBank
 										handleChange={this.handleChange}
@@ -449,8 +457,8 @@ class ExtractPlan extends React.Component {
 										banks={this.state.banks}
 									/>
 								</Col>
-								<Col span={12}>
-									<span style={{ marginRight: '30px' }}>Título:</span>
+								<Col xs={12} sm={12} md={6} lg={6}>
+									<span style={{ marginRight: '15px' }}>Título:</span>
 									<SelectDescription
 										lastDescriptions={this.state.descriptions}
 										currentDescription={this.state.description}
@@ -466,7 +474,7 @@ class ExtractPlan extends React.Component {
 										placeholder='Detail'
 										type='text'
 										name='detail'
-										size='md'
+										size='small'
 										value={this.state.detail}
 										onChange={this.handleChange}
 										style={{ width: 250 }}
@@ -497,6 +505,27 @@ class ExtractPlan extends React.Component {
 								style={{ paddingLeft: '10px' }}
 								onClick={() => {
 									this.deleteTransactionChecked()
+								}}
+							/>
+							<Checkbox
+								style={{ marginLeft: '10px' }}
+								checked={
+									this.state.checked.length ===
+										this.state.transactions.length &&
+									this.state.transactions.length > 0
+								}
+								indeterminate={
+									this.state.checked.length > 0 &&
+									this.state.checked.length < this.state.transactions.length
+								}
+								onChange={(e) => {
+									if (e.target.checked) {
+										this.setState({
+											checked: this.state.transactions.map((t) => t._id),
+										})
+									} else {
+										this.setState({ checked: [] })
+									}
 								}}
 							/>
 						</Title>
