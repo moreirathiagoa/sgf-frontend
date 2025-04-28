@@ -338,6 +338,12 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 							/>
 							<YAxis tickFormatter={(value) => formatCurrency(value)} width={100} />
 							<Tooltip
+								labelFormatter={(label) => {
+									if (label) {
+										return format(new Date(label), 'dd/MM/yyyy HH:mm:ss')
+									}
+									return label
+								}}
 								formatter={(value) => formatCurrency(value)}
 							/>
 							<Line
@@ -383,6 +389,12 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 							/>
 							<YAxis tickFormatter={(value) => formatCurrency(value)} width={100} />
 							<Tooltip
+								labelFormatter={(label) => {
+									if (label) {
+										return format(new Date(label), 'dd/MM/yyyy HH:mm:ss')
+									}
+									return label
+								}}
 								formatter={(value) => formatCurrency(value)}
 							/>
 							<Line
@@ -428,6 +440,12 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 							/>
 							<YAxis tickFormatter={(value) => formatCurrency(value)} width={100} />
 							<Tooltip
+								labelFormatter={(label) => {
+									if (label) {
+										return format(new Date(label), 'dd/MM/yyyy')
+									}
+									return label
+								}}
 								formatter={(value) => formatCurrency(value)}
 							/>
 							<Line
@@ -473,6 +491,12 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 							/>
 							<YAxis tickFormatter={(value) => formatCurrency(value)} width={100} />
 							<Tooltip
+								labelFormatter={(label) => {
+									if (label) {
+										return format(new Date(label), 'dd/MM/yyyy')
+									}
+									return label
+								}}
 								formatter={(value) => formatCurrency(value)}
 							/>
 							<Line
