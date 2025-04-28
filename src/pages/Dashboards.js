@@ -140,6 +140,14 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 			)
 		}
 
+		// Garantir que forecastOutgoing seja sempre positivo
+		setData((prevData) =>
+			prevData.map((item) => ({
+				...item,
+				forecastOutgoing: Math.abs(item.forecastOutgoing),
+			}))
+		)
+
 		const years = [
 			...new Set(
 				originalData.map((item) => new Date(item.createdAt).getFullYear())

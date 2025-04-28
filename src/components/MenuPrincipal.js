@@ -132,8 +132,17 @@ class MenuPrincipal extends React.Component {
 					defaultOpenKeys={['sub1', 'sub2']}
 					onClick={() => {
 						this.props.handleClose()
-					 }}
+					}}
 					items={menuItems}
+					style={{
+						transition: 'background-color 0.3s ease', // Transição suave
+					}}
+					itemStyle={{
+						':hover': {
+							backgroundColor: '#1e90ff', // Destaque ao passar o mouse
+							color: '#ffffff', // Texto branco no hover
+						},
+					}}
 				/>
 			)
 		)

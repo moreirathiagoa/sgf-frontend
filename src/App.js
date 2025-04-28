@@ -181,9 +181,33 @@ class App extends React.Component {
 								style={{
 									padding: '100px 24px 24px 24px',
 									minHeight: 775,
+									background: 'linear-gradient(135deg, #1e1e1e, #2a2a2a)', // Gradiente no fundo
+									color: '#e0e0e0', // Texto legível
+									boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', // Sombra moderna
 								}}
 							>
-								<Spin spinning={this.state.loading} size='large'>
+								<Spin
+									spinning={this.state.loading}
+									size='large'
+									style={{
+										transition: 'opacity 0.3s ease',
+										opacity: this.state.loading ? 1 : 0,
+										position: 'relative',
+									}}
+								>
+									{this.state.loading && (
+										<div
+											style={{
+												position: 'absolute',
+												top: 0,
+												left: 0,
+												width: '100%',
+												height: '100%',
+												backgroundColor: 'rgba(0, 0, 0, 0.5)',
+												zIndex: 1,
+											}}
+										></div>
+									)}
 									<Routes
 										loading={this.setLoading}
 										mudaTitulo={this.mudaTitulo}
