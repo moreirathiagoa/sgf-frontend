@@ -478,7 +478,7 @@ class ExtractAccount extends React.Component {
 						<Title level={4}>
 							Transações
 							<PlusCircleOutlined
-								style={{ paddingLeft: '10px' }}
+								style={{ marginLeft: '10px', marginRight: '15px', cursor: 'pointer' }}
 								onClick={() => {
 									this.props.showModal({ transactionType: 'contaCorrente' })
 								}}
@@ -494,7 +494,7 @@ class ExtractAccount extends React.Component {
 							>
 								<DeleteOutlined
 									style={{
-										paddingLeft: '10px',
+										marginRight: '15px',
 										cursor:
 											this.state.checked.length > 0 ? 'pointer' : 'not-allowed',
 										color:
