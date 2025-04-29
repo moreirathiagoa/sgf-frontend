@@ -137,12 +137,6 @@ class MenuPrincipal extends React.Component {
 					style={{
 						transition: 'background-color 0.3s ease', // Transição suave
 					}}
-					itemStyle={{
-						':hover': {
-							backgroundColor: '#1e90ff', // Destaque ao passar o mouse
-							color: '#ffffff', // Texto branco no hover
-						},
-					}}
 				/>
 			)
 		)
