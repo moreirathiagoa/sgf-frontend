@@ -332,10 +332,10 @@ class ExtractPlan extends React.Component {
 	}
 
 	toAccount() {
-		this.props.loading(true);
-		const transactionsToAccount = this.state.transactions.filter((transaction) =>
-			this.state.checked.includes(transaction._id)
-		);
+		this.props.loading(true)
+		const transactionsToAccount = this.state.transactions.filter(
+			(transaction) => this.state.checked.includes(transaction._id)
+		)
 		planToPrincipal(transactionsToAccount)
 			.then((res) => {
 				if (res.data.code === 201 || res.data.code === 202) {
@@ -343,25 +343,25 @@ class ExtractPlan extends React.Component {
 						'success',
 						'Transações atualizadas',
 						'Transações atualizadas com sucesso.'
-					);
-					this.processExtractData();
+					)
+					this.processExtractData()
 				} else {
 					openNotification(
 						'error',
 						'Transações não atualizadas',
 						res.data.message
-					);
+					)
 				}
-				this.props.loading(false);
+				this.props.loading(false)
 			})
 			.catch((err) => {
 				openNotification(
 					'error',
 					'Transações não atualizadas',
 					'Erro interno. Tente novamente mais tarde.'
-				);
-				this.props.loading(false);
-			});
+				)
+				this.props.loading(false)
+			})
 	}
 
 	submitForm(e) {}
@@ -477,7 +477,11 @@ class ExtractPlan extends React.Component {
 						<Title level={4}>
 							Transações
 							<PlusCircleOutlined
-								style={{ marginLeft: '10px', marginRight: '15px', cursor: 'pointer' }}
+								style={{
+									marginLeft: '15px',
+									marginRight: '15px',
+									cursor: 'pointer',
+								}}
 								onClick={() => {
 									this.props.showModal({ transactionType: 'planejamento' })
 								}}
@@ -492,8 +496,10 @@ class ExtractPlan extends React.Component {
 								<span
 									style={{
 										marginRight: '15px',
-										cursor: this.state.checked.length > 0 ? 'pointer' : 'not-allowed',
-										color: this.state.checked.length > 0 ? 'inherit' : '#d9d9d9',
+										cursor:
+											this.state.checked.length > 0 ? 'pointer' : 'not-allowed',
+										color:
+											this.state.checked.length > 0 ? 'inherit' : '#d9d9d9',
 									}}
 								>
 									<CheckOutlined />
@@ -519,7 +525,6 @@ class ExtractPlan extends React.Component {
 								/>
 							</Popconfirm>
 							<Checkbox
-								style={{ marginLeft: '10px' }}
 								checked={
 									this.state.checked.length ===
 										this.state.transactions.length &&

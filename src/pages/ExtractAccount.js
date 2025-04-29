@@ -478,7 +478,11 @@ class ExtractAccount extends React.Component {
 						<Title level={4}>
 							Transações
 							<PlusCircleOutlined
-								style={{ marginLeft: '10px', marginRight: '15px', cursor: 'pointer' }}
+								style={{
+									marginLeft: '15px',
+									marginRight: '15px',
+									cursor: 'pointer',
+								}}
 								onClick={() => {
 									this.props.showModal({ transactionType: 'contaCorrente' })
 								}}
@@ -503,7 +507,6 @@ class ExtractAccount extends React.Component {
 								/>
 							</Popconfirm>
 							<Checkbox
-								style={{ marginLeft: '10px' }}
 								checked={
 									this.state.checked.length ===
 										this.state.transactions.length &&
