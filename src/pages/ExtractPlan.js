@@ -8,20 +8,16 @@ import {
 	Row,
 	Col,
 	Card,
-	Modal,
 	Checkbox,
 	DatePicker,
+	Popconfirm,
 } from 'antd'
-import {
-	TitleFilter,
-	SelectBank,
-	SelectDescription,
-	TransactionOptions,
-} from '../components'
+import { TitleFilter, SelectBank, SelectDescription } from '../components'
 import {
 	PlusCircleOutlined,
 	CheckOutlined,
 	DeleteOutlined,
+	EditOutlined,
 } from '@ant-design/icons'
 import { getExtractData, removeTransaction, planToPrincipal } from '../api'
 import { openNotification, formatDateToUser, prepareValue } from '../utils'
@@ -197,10 +193,7 @@ class ExtractPlan extends React.Component {
 
 	removeChecked(id) {
 		this.setState((state) => {
-			state.checked = state.checked.filter((element) => {
-				return element !== id
-			})
-
+			state.checked = state.checked.filter((element) => element !== id)
 			return state
 		})
 	}
@@ -214,39 +207,38 @@ class ExtractPlan extends React.Component {
 	}
 
 	deleteTransactionChecked() {
-		if (window.confirm('Deseja realmente apagar essa Transação?')) {
-			this.props.loading(true)
+		this.props.loading(true)
 
-			const checked = this.state.checked
+		const checked = this.state.checked
 
-			for (let i = 0; i < checked.length; i++) {
-				removeTransaction(checked[i])
-					.then((res) => {
-						if (res.data.code === 202) {
-							openNotification(
-								'success',
-								'Transação removida',
-								'Transação removida com sucesso.'
-							)
-							this.processExtractData()
-						} else {
-							openNotification(
-								'error',
-								'Transação não removida',
-								`A Transação não pode ser removida. ${res?.data?.message}`
-							)
-						}
-					})
-					.catch((err) => {
+		for (let i = 0; i < checked.length; i++) {
+			removeTransaction(checked[i])
+				.then((res) => {
+					if (res.data.code === 202) {
+						openNotification(
+							'success',
+							'Transação removida',
+							'Transação removida com sucesso.'
+						)
+						// TODO: chamar essa função apenas ao finalizar o loop
+						this.processExtractData()
+					} else {
 						openNotification(
 							'error',
 							'Transação não removida',
-							'Erro interno. Tente novamente mais tarde.'
+							`A Transação não pode ser removida. ${res?.data?.message}`
 						)
-					})
-			}
-			this.setState({ checked: [] })
+					}
+				})
+				.catch((err) => {
+					openNotification(
+						'error',
+						'Transação não removida',
+						'Erro interno. Tente novamente mais tarde.'
+					)
+				})
 		}
+		this.setState({ checked: [] })
 	}
 
 	filterList() {
@@ -305,74 +297,68 @@ class ExtractPlan extends React.Component {
 			)
 
 			state.transactions = transactionFiltered
+			state.checked = state.checked.filter((id) =>
+				transactionFiltered.some((transaction) => transaction._id === id)
+			) // Remover itens não exibidos
 			return state
 		})
 	}
 
 	remover(id) {
-		if (window.confirm('Deseja realmente apagar essa Transação?')) {
-			return removeTransaction(id)
-				.then((res) => {
-					if (res.data.code === 202) {
-						openNotification(
-							'success',
-							'Transação removida',
-							'Transação removida com sucesso.'
-						)
-					} else {
-						openNotification(
-							'error',
-							'Transação não removida',
-							`A Transação não pode ser removida. ${res?.data?.message}`
-						)
-					}
-				})
-				.catch((err) => {
+		return removeTransaction(id)
+			.then((res) => {
+				if (res.data.code === 202) {
+					openNotification(
+						'success',
+						'Transação removida',
+						'Transação removida com sucesso.'
+					)
+					this.processExtractData()
+				} else {
 					openNotification(
 						'error',
 						'Transação não removida',
-						'Erro interno. Tente novamente mais tarde.'
+						`A Transação não pode ser removida. ${res?.data?.message}`
 					)
-				})
-		} else {
-			const promise = new Promise((resolve, reject) => {
-				resolve()
+				}
 			})
-
-			return promise
-		}
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Transação não removida',
+					'Erro interno. Tente novamente mais tarde.'
+				)
+			})
 	}
 
 	toAccount() {
 		this.props.loading(true)
-		if (window.confirm('Deseja lançar essas transações em Conta Corrente?')) {
-			return planToPrincipal(this.state.transactions)
-				.then((res) => {
-					if (res.data.code === 201 || res.data.code === 202) {
-						openNotification(
-							'success',
-							'Transação atualizadas',
-							'Transação atualizadas com sucesso.'
-						)
-						this.processExtractData()
-					} else {
-						openNotification(
-							'error',
-							'Transação não atualizada',
-							res.data.message
-						)
-					}
-					this.props.loading(false)
-				})
-				.catch((err) => {
+		planToPrincipal(this.state.transactions)
+			.then((res) => {
+				if (res.data.code === 201 || res.data.code === 202) {
+					openNotification(
+						'success',
+						'Transação atualizadas',
+						'Transação atualizadas com sucesso.'
+					)
+					this.processExtractData()
+				} else {
 					openNotification(
 						'error',
 						'Transação não atualizada',
-						'Erro interno. Tente novamente mais tarde.'
+						res.data.message
 					)
-					this.props.loading(false)
-				})
-		}
+				}
+				this.props.loading(false)
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Transação não atualizada',
+					'Erro interno. Tente novamente mais tarde.'
+				)
+				this.props.loading(false)
+			})
 	}
 
 	submitForm(e) {}
@@ -493,20 +479,35 @@ class ExtractPlan extends React.Component {
 									this.props.showModal({ transactionType: 'planejamento' })
 								}}
 							/>
-							<span
-								style={{ paddingLeft: '15px' }}
-								onClick={() => {
-									this.toAccount()
-								}}
+							<Popconfirm
+								title='Deseja lançar essas transações em Conta Corrente?'
+								onConfirm={this.toAccount} // Corrigido para chamar a função diretamente
+								okText='Sim'
+								cancelText='Não'
 							>
-								<CheckOutlined />
-							</span>
-							<DeleteOutlined
-								style={{ paddingLeft: '10px' }}
-								onClick={() => {
+								<span style={{ paddingLeft: '15px', cursor: 'pointer' }}>
+									<CheckOutlined />
+								</span>
+							</Popconfirm>
+							<Popconfirm
+								title='Deseja realmente apagar as transações selecionadas?'
+								onConfirm={() => {
 									this.deleteTransactionChecked()
 								}}
-							/>
+								okText='Sim'
+								cancelText='Não'
+								disabled={this.state.checked.length === 0} // Desabilitar se nenhum item estiver selecionado
+							>
+								<DeleteOutlined
+									style={{
+										paddingLeft: '10px',
+										cursor:
+											this.state.checked.length > 0 ? 'pointer' : 'not-allowed', // Alterar cursor
+										color:
+											this.state.checked.length > 0 ? 'inherit' : '#d9d9d9', // Alterar cor
+									}}
+								/>
+							</Popconfirm>
 							<Checkbox
 								style={{ marginLeft: '10px' }}
 								checked={
@@ -520,9 +521,9 @@ class ExtractPlan extends React.Component {
 								}
 								onChange={(e) => {
 									if (e.target.checked) {
-										this.setState({
-											checked: this.state.transactions.map((t) => t._id),
-										})
+										this.setState((state) => ({
+											checked: state.transactions.map((t) => t._id), // Apenas itens exibidos
+										}))
 									} else {
 										this.setState({ checked: [] })
 									}
@@ -530,22 +531,6 @@ class ExtractPlan extends React.Component {
 							/>
 						</Title>
 					</div>
-					<Modal
-						open={this.state.menu.modalVisible}
-						onCancel={this.menuModalClose}
-						footer={null}
-						title=''
-						destroyOnClose={true}
-					>
-						<TransactionOptions
-							element={this.state.menu.transactionToUpdate}
-							screenType={'planejamento'}
-							showModal={this.props.showModal}
-							closeModal={this.menuModalClose}
-							remover={this.remover}
-							list={this.processExtractData}
-						/>
-					</Modal>
 
 					{this.state.transactions.map((element) => {
 						const transactionValue = prepareValue(
@@ -570,6 +555,38 @@ class ExtractPlan extends React.Component {
 									/>
 								</span>
 								<span>{element.description || 'Transação Genérica'}</span>
+								<span
+									style={{
+										float: 'right',
+										display: 'flex',
+										gap: '15px',
+										fontSize: '18px',
+									}}
+								>
+									<EditOutlined
+										style={{ cursor: 'pointer', color: '#006400' }} // Verde mais escuro
+										onClick={() => {
+											this.props.showModal({
+												transactionType: 'planejamento',
+												transactionId: element._id,
+											})
+										}}
+									/>
+									<Popconfirm
+										title='Deseja realmente apagar essa Transação?'
+										onConfirm={() => {
+											this.remover(element._id).then(() => {
+												this.processExtractData()
+											})
+										}}
+										okText='Sim'
+										cancelText='Não'
+									>
+										<DeleteOutlined
+											style={{ cursor: 'pointer', color: 'red' }}
+										/>
+									</Popconfirm>
+								</span>
 							</>
 						)
 
@@ -580,35 +597,29 @@ class ExtractPlan extends React.Component {
 								style={{ width: 370, marginBottom: '5px' }}
 								key={element._id}
 							>
-								<span
-									onClick={() => {
-										this.showMenuModal(element)
-									}}
-								>
-									<Row>
-										<Col span={12} title={formatDateToUser(element.createdAt)}>
-											Efetivação: {formatDateToUser(element.effectedAt)}
-										</Col>
-										<Col span={12} style={{ textAlign: 'right' }}>
-											Valor:{' '}
-											<span
-												style={{
-													color: transactionValue.color,
-												}}
-											>
-												{transactionValue.value}
-											</span>
-										</Col>
-									</Row>
-									<Row>
-										<Col span={24} title={element.bankId?.name}>
-											Banco: {element.bankName}
-										</Col>
-									</Row>
-									<Row>
-										<Col span={24}>Detalhes: {element.detail}</Col>
-									</Row>
-								</span>
+								<Row>
+									<Col span={12} title={formatDateToUser(element.createdAt)}>
+										Efetivação: {formatDateToUser(element.effectedAt)}
+									</Col>
+									<Col span={12} style={{ textAlign: 'right' }}>
+										Valor:{' '}
+										<span
+											style={{
+												color: transactionValue.color,
+											}}
+										>
+											{transactionValue.value}
+										</span>
+									</Col>
+								</Row>
+								<Row>
+									<Col span={24} title={element.bankId?.name}>
+										Banco: {element.bankName}
+									</Col>
+								</Row>
+								<Row>
+									<Col span={24}>Detalhes: {element.detail}</Col>
+								</Row>
 							</Card>
 						)
 					})}

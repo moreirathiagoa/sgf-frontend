@@ -40,14 +40,16 @@ class MenuPrincipal extends React.Component {
 					{
 						key: 'item3',
 						label: (
-							<span
-								onClick={() =>
+							<Link
+								to='#'
+								onClick={(e) => {
+									e.preventDefault()
 									this.props.showModal({ transactionType: 'contaCorrente' })
-								}
+								}}
 							>
 								<WalletOutlined />
 								<span>Novo</span>
-							</span>
+							</Link>
 						),
 					},
 					{
@@ -86,14 +88,16 @@ class MenuPrincipal extends React.Component {
 					{
 						key: 'item6',
 						label: (
-							<span
-								onClick={() =>
+							<Link
+								to='#'
+								onClick={(e) => {
+									e.preventDefault()
 									this.props.showModal({ transactionType: 'planejamento' })
-								}
+								}}
 							>
 								<WalletOutlined />
 								<span>Novo</span>
-							</span>
+							</Link>
 						),
 					},
 				],
