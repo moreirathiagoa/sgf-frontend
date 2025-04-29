@@ -10,18 +10,23 @@ import {
 	Row,
 	Col,
 	Card,
-	Modal,
 	DatePicker,
 	Radio,
+	Popconfirm,
 } from 'antd'
+import { TitleFilter, SelectBank, SelectDescription } from '../components'
 import {
-	TitleFilter,
-	SelectBank,
-	SelectDescription,
-	TransactionOptions,
-} from '../components'
-import { PlusCircleOutlined, DeleteOutlined } from '@ant-design/icons'
-import { getExtractData, removeTransaction } from '../api'
+	PlusCircleOutlined,
+	DeleteOutlined,
+	EditOutlined,
+	CheckCircleOutlined,
+} from '@ant-design/icons'
+import {
+	getExtractData,
+	removeTransaction,
+	updateTransaction,
+	getTransaction,
+} from '../api'
 import { openNotification, formatDateToUser, prepareValue } from '../utils'
 
 const { Title } = Typography
@@ -64,6 +69,7 @@ class ExtractAccount extends React.Component {
 		this.deleteTransactionChecked = this.deleteTransactionChecked.bind(this)
 		this.isChecked = this.isChecked.bind(this)
 		this.remover = this.remover.bind(this)
+		this.compensateTransaction = this.compensateTransaction.bind(this)
 	}
 
 	componentDidUpdate() {
@@ -110,6 +116,9 @@ class ExtractAccount extends React.Component {
 						state.descriptions = [...descriptionsList].sort((a, b) =>
 							a.localeCompare(b)
 						)
+						state.checked = state.checked.filter((id) =>
+							state.transactions.some((transaction) => transaction._id === id)
+						) // Remover itens não exibidos
 						return state
 					})
 				}
@@ -230,45 +239,12 @@ class ExtractAccount extends React.Component {
 	}
 
 	deleteTransactionChecked() {
-		if (window.confirm('Deseja realmente apagar essa Transação?')) {
-			this.props.loading(true)
+		this.props.loading(true)
 
-			const checked = this.state.checked
+		const checked = this.state.checked
 
-			for (let i = 0; i < checked.length; i++) {
-				removeTransaction(checked[i])
-					.then((res) => {
-						if (res.data.code === 202) {
-							openNotification(
-								'success',
-								'Transação removida',
-								'Transação removida com sucesso.'
-							)
-							//TODO: chamar essa função apenas ao finalizar o loop
-							this.processExtractData()
-						} else {
-							openNotification(
-								'error',
-								'Transação não removida',
-								`A Transação não pode ser removida. ${res?.data?.message}`
-							)
-						}
-					})
-					.catch((err) => {
-						openNotification(
-							'error',
-							'Transação não removida',
-							'Erro interno. Tente novamente mais tarde.'
-						)
-					})
-			}
-			this.setState({ checked: [] })
-		}
-	}
-
-	remover(id) {
-		if (window.confirm('Deseja realmente apagar essa Transação?')) {
-			return removeTransaction(id)
+		for (let i = 0; i < checked.length; i++) {
+			removeTransaction(checked[i])
 				.then((res) => {
 					if (res.data.code === 202) {
 						openNotification(
@@ -276,6 +252,8 @@ class ExtractAccount extends React.Component {
 							'Transação removida',
 							'Transação removida com sucesso.'
 						)
+						//TODO: chamar essa função apenas ao finalizar o loop
+						this.processExtractData()
 					} else {
 						openNotification(
 							'error',
@@ -291,33 +269,79 @@ class ExtractAccount extends React.Component {
 						'Erro interno. Tente novamente mais tarde.'
 					)
 				})
-		} else {
-			const promise = new Promise((resolve, reject) => {
-				resolve()
-			})
-
-			return promise
 		}
+		this.setState({ checked: [] })
+	}
+
+	remover(id) {
+		return removeTransaction(id)
+			.then((res) => {
+				if (res.data.code === 202) {
+					openNotification(
+						'success',
+						'Transação removida',
+						'Transação removida com sucesso.'
+					)
+					this.processExtractData() // Atualizar os dados após a remoção
+				} else {
+					openNotification(
+						'error',
+						'Transação não removida',
+						`A Transação não pode ser removida. ${res?.data?.message}`
+					)
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Transação não removida',
+					'Erro interno. Tente novamente mais tarde.'
+				)
+			})
+	}
+
+	compensateTransaction(transactionId) {
+		return getTransaction(transactionId)
+			.then((res) => {
+				if (res.status === 401) {
+					localStorage.removeItem('token')
+					this.props.verificaLogin()
+				} else {
+					let transaction = res.data.data
+					transaction.effectedAt = formatDateToUser(res.data.effectedAt)
+					transaction.isCompensated = true
+					return transaction
+				}
+			})
+			.then((transaction) => {
+				return updateTransaction(transaction, transaction._id)
+			})
+			.then((res) => {
+				if (res.data.code === 201 || res.data.code === 202) {
+					openNotification(
+						'success',
+						'Transação atualizada',
+						'Transação atualizada com sucesso.'
+					)
+					this.processExtractData()
+				} else {
+					openNotification(
+						'error',
+						'Transação não atualizada',
+						`A Transação não pode ser atualizada: ${res?.data?.message}`
+					)
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Transação não atualizada',
+					'Erro interno. Tente novamente mais tarde.'
+				)
+			})
 	}
 
 	submitForm(e) {}
-
-	showMenuModal = (data) => {
-		if (this.state.menu.modalVisible !== data) {
-			this.setState((state) => {
-				state.menu.modalVisible = true
-				state.menu.transactionToUpdate = data
-				return state
-			})
-		}
-	}
-
-	menuModalClose = (e) => {
-		this.setState((state) => {
-			state.menu.modalVisible = false
-			return state
-		})
-	}
 
 	render() {
 		return (
@@ -378,17 +402,31 @@ class ExtractAccount extends React.Component {
 									/>
 								</Col>
 								<Col xs={13} sm={12} md={6} lg={3}>
-										<span style={{ marginRight: '20px' }}>Tipo:</span>
-										<Radio.Group
-											size="small"
-											name="timeFilter"
-											value={this.state.filters.onlyFuture ? 'future' : this.state.filters.onlyPast ? 'past' : 'all'}
-											onChange={(e) => this.handleChange({ target: { name: 'timeFilter', value: e.target.value } })}
-										>
-											<Radio.Button value="all" style={{ marginRight: '4px' }}>Todos</Radio.Button>
-											<Radio.Button value="future" style={{ marginRight: '4px' }}>Futuro</Radio.Button>
-											<Radio.Button value="past">Passado</Radio.Button>
-										</Radio.Group>
+									<span style={{ marginRight: '20px' }}>Tipo:</span>
+									<Radio.Group
+										size='small'
+										name='timeFilter'
+										value={
+											this.state.filters.onlyFuture
+												? 'future'
+												: this.state.filters.onlyPast
+												? 'past'
+												: 'all'
+										}
+										onChange={(e) =>
+											this.handleChange({
+												target: { name: 'timeFilter', value: e.target.value },
+											})
+										}
+									>
+										<Radio.Button value='all' style={{ marginRight: '4px' }}>
+											Todos
+										</Radio.Button>
+										<Radio.Button value='future' style={{ marginRight: '4px' }}>
+											Futuro
+										</Radio.Button>
+										<Radio.Button value='past'>Passado</Radio.Button>
+									</Radio.Group>
 								</Col>
 							</Row>
 							<br />
@@ -437,12 +475,25 @@ class ExtractAccount extends React.Component {
 									this.props.showModal({ transactionType: 'contaCorrente' })
 								}}
 							/>
-							<DeleteOutlined
-								style={{ paddingLeft: '10px' }}
-								onClick={() => {
+							<Popconfirm
+								title='Deseja realmente apagar as transações selecionadas?'
+								onConfirm={() => {
 									this.deleteTransactionChecked()
 								}}
-							/>
+								okText='Sim'
+								cancelText='Não'
+								disabled={this.state.checked.length === 0} // Desabilitar se nenhum item estiver selecionado
+							>
+								<DeleteOutlined
+									style={{
+										paddingLeft: '10px',
+										cursor:
+											this.state.checked.length > 0 ? 'pointer' : 'not-allowed', // Alterar cursor
+										color:
+											this.state.checked.length > 0 ? 'inherit' : '#d9d9d9', // Alterar cor
+									}}
+								/>
+							</Popconfirm>
 							<Checkbox
 								style={{ marginLeft: '10px' }}
 								checked={
@@ -457,7 +508,7 @@ class ExtractAccount extends React.Component {
 								onChange={(e) => {
 									if (e.target.checked) {
 										this.setState({
-											checked: this.state.transactions.map((t) => t._id),
+											checked: this.state.transactions.map((t) => t._id), // Apenas itens exibidos
 										})
 									} else {
 										this.setState({ checked: [] })
@@ -466,22 +517,6 @@ class ExtractAccount extends React.Component {
 							/>
 						</Title>
 					</div>
-					<Modal
-						open={this.state.menu.modalVisible}
-						onCancel={this.menuModalClose}
-						footer={null}
-						title=''
-						destroyOnClose={true}
-					>
-						<TransactionOptions
-							element={this.state.menu.transactionToUpdate}
-							screenType={'contaCorrente'}
-							showModal={this.props.showModal}
-							closeModal={this.menuModalClose}
-							remover={this.remover}
-							list={this.processExtractData}
-						/>
-					</Modal>
 
 					{this.state.transactions.map((element) => {
 						const transactionValue = prepareValue(
@@ -506,6 +541,48 @@ class ExtractAccount extends React.Component {
 									/>
 								</span>
 								<span>{element.description || 'Transação Genérica'}</span>
+								<span
+									style={{
+										float: 'right',
+										display: 'flex',
+										gap: '15px',
+										fontSize: '17px',
+									}}
+								>
+									<EditOutlined
+										style={{ cursor: 'pointer', color: '#006400' }} // Verde mais escuro
+										onClick={() => {
+											this.props.showModal({
+												transactionType: 'contaCorrente',
+												transactionId: element._id,
+											})
+										}}
+									/>
+									<Popconfirm
+										title='Deseja realmente compensar essa Transação?'
+										onConfirm={() => this.compensateTransaction(element._id)}
+										okText='Sim'
+										cancelText='Não'
+									>
+										<CheckCircleOutlined
+											style={{ cursor: 'pointer', color: '#006400' }}
+										/>
+									</Popconfirm>
+									<Popconfirm
+										title='Deseja realmente apagar essa Transação?'
+										onConfirm={() => {
+											this.remover(element._id).then(() => {
+												this.processExtractData()
+											})
+										}}
+										okText='Sim'
+										cancelText='Não'
+									>
+										<DeleteOutlined
+											style={{ cursor: 'pointer', color: 'red' }}
+										/>
+									</Popconfirm>
+								</span>
 							</>
 						)
 
@@ -516,35 +593,29 @@ class ExtractAccount extends React.Component {
 								style={{ width: 370, marginBottom: '5px' }}
 								key={element._id}
 							>
-								<span
-									onClick={() => {
-										this.showMenuModal(element)
-									}}
-								>
-									<Row>
-										<Col span={12} title={formatDateToUser(element.createdAt)}>
-											Efetivação: {formatDateToUser(element.effectedAt)}
-										</Col>
-										<Col span={12} style={{ textAlign: 'right' }}>
-											Valor:{' '}
-											<span
-												style={{
-													color: transactionValue.color,
-												}}
-											>
-												{transactionValue.value}
-											</span>
-										</Col>
-									</Row>
-									<Row>
-										<Col span={24} title={element.bankId?.name}>
-											Banco: {element.bankName}
-										</Col>
-									</Row>
-									<Row>
-										<Col span={24}>Detalhes: {element.detail}</Col>
-									</Row>
-								</span>
+								<Row>
+									<Col span={12} title={formatDateToUser(element.createdAt)}>
+										Efetivação: {formatDateToUser(element.effectedAt)}
+									</Col>
+									<Col span={12} style={{ textAlign: 'right' }}>
+										Valor:{' '}
+										<span
+											style={{
+												color: transactionValue.color,
+											}}
+										>
+											{transactionValue.value}
+										</span>
+									</Col>
+								</Row>
+								<Row>
+									<Col span={24} title={element.bankId?.name}>
+										Banco: {element.bankName}
+									</Col>
+								</Row>
+								<Row>
+									<Col span={24}>Detalhes: {element.detail}</Col>
+								</Row>
 							</Card>
 						)
 					})}
