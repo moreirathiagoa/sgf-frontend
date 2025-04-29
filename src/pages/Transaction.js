@@ -180,7 +180,7 @@ class Transaction extends React.Component {
 		const { data, banks, lastDescriptions, isCredit } = this.state
 
 		return (
-			<Form layout='horizontal' size='small' name='transactionForm'>
+			<Form layout='horizontal' size='medium' name='transactionForm'>
 				<ResponsiveFormItem label='Valor'>
 					<InputNumber
 						placeholder='0,00'
@@ -194,6 +194,7 @@ class Transaction extends React.Component {
 						}
 						style={{ width: '100%', maxWidth: '150px', textAlign: 'left' }}
 						inputMode='numeric'
+						size='medium'
 					/>
 				</ResponsiveFormItem>
 
@@ -205,7 +206,8 @@ class Transaction extends React.Component {
 							this.handleChange({
 								target: { name: 'isCredit', value: e.target.value === 'credit' },
 							})
-						}
+							}
+						size='medium'
 					>
 						<Radio value='credit'>Crédito</Radio>
 						<Radio value='debit'>Débito</Radio>
@@ -223,6 +225,7 @@ class Transaction extends React.Component {
 						}
 						style={{ width: '100%', maxWidth: '160px', textAlign: 'left' }}
 						inputReadOnly // Adicionado para evitar o teclado no celular
+						size='medium'
 					/>
 				</ResponsiveFormItem>
 
@@ -246,6 +249,7 @@ class Transaction extends React.Component {
 						bankId={data.bankId}
 						banks={banks}
 						style={{ width: '100%', maxWidth: '250px', textAlign: 'left' }}
+						size='medium'
 					/>
 				</ResponsiveFormItem>
 
@@ -256,6 +260,7 @@ class Transaction extends React.Component {
 						handleChange={this.handleChange}
 						width={200}
 						style={{ textAlign: 'left' }}
+						size='medium'
 					/>
 				</ResponsiveFormItem>
 
@@ -267,6 +272,7 @@ class Transaction extends React.Component {
 						value={data.detail}
 						onChange={this.handleChange}
 						style={{ width: '100%', maxWidth: '300px', textAlign: 'left' }}
+						size='medium'
 					/>
 				</ResponsiveFormItem>
 
@@ -279,6 +285,7 @@ class Transaction extends React.Component {
 						onChange={this.handleChange}
 						style={{ width: '100%', maxWidth: '60px', textAlign: 'left' }}
 						inputMode='numeric'
+						size='medium'
 					/>
 				</ResponsiveFormItem>
 

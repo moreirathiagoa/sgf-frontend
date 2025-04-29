@@ -62,7 +62,7 @@ class SelectDescription extends React.Component {
 	render() {
 		return (
 			<Select
-				size='small' // Alterado para 'small' para reduzir a altura
+				size='medium' // Alterado para 'medium'
 				style={{ width: this.props.width || 200 }} 
 				placeholder='Selecione ou digite...'
 				dropdownRender={(menu) => (
