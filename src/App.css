@@ -31,7 +31,7 @@ body {
 }
 
 .ant-menu.ant-menu-dark {
-	background: #121212; /* Cinza quase preto */
+	background: #0e0e0f; /* Cinza quase preto */
 	border-right: 1px solid #1f1f1f; /* Adiciona borda para separação */
 }
 
@@ -48,6 +48,10 @@ body {
 .ant-menu-sub .ant-menu-item-selected {
 	background: #1e1e1e !important; /* Mesmo cinza escuro do fundo */
 	box-shadow: none; /* Remove qualquer destaque azulado */
+}
+
+.ant-menu.ant-menu-dark .ant-menu-submenu-open > .ant-menu-sub {
+	background: rgb(26, 26, 27) !important; /* Fundo vermelho para submenus expandidos */
 }
 
 .ant-switch {
@@ -136,6 +140,6 @@ label {
 
 .ant-modal {
 	border-radius: 8px; /* Bordas arredondadas */
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Sombra sutil */
+	box-shadow: 0 4px 10px rgba(27, 26, 26, 0.3); /* Sombra sutil */
 	
 }
