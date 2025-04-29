@@ -47,7 +47,7 @@ class ExtractAccount extends React.Component {
 			filters: {
 				year: actualYear,
 				month: actualMonth,
-				onlyFuture: true, // Alterado para carregar como futuro
+				onlyFuture: true,
 				onlyPast: false,
 				bankId: null,
 				description: '',
@@ -56,7 +56,7 @@ class ExtractAccount extends React.Component {
 
 			banks: [],
 			descriptions: [],
-			filtro: true, // Alterado para começar aberto
+			filtro: true,
 			idToEdit: null,
 			menu: {
 				modalVisible: false,
@@ -102,7 +102,6 @@ class ExtractAccount extends React.Component {
 					this.setState((state) => {
 						let transactions = extractData.transactionList
 
-						// Aplicar filtro "Passado"
 						if (state.filters.onlyPast) {
 							const today = new Date()
 							transactions = transactions.filter(
@@ -118,7 +117,7 @@ class ExtractAccount extends React.Component {
 						)
 						state.checked = state.checked.filter((id) =>
 							state.transactions.some((transaction) => transaction._id === id)
-						) // Remover itens não exibidos
+						)
 						return state
 					})
 				}
@@ -135,7 +134,7 @@ class ExtractAccount extends React.Component {
 			switch (event.target.name) {
 				case 'filtro':
 					state.filtro = !state.filtro
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					break
 
 				case 'clearFilter':
@@ -145,7 +144,7 @@ class ExtractAccount extends React.Component {
 					state.filters.month = now.getMonth() + 1
 					state.filters.bankId = null
 					state.filters.description = ''
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					this.processExtractData()
 					break
 
@@ -163,32 +162,32 @@ class ExtractAccount extends React.Component {
 
 				case 'year':
 					state.filters.year = event.target.value
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					this.processExtractData()
 					break
 
 				case 'month':
 					state.filters.month = event.target.value
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					this.processExtractData()
 					break
 
 				case 'timeFilter':
 					state.filters.onlyFuture = event.target.value === 'future'
 					state.filters.onlyPast = event.target.value === 'past'
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					this.processExtractData()
 					break
 
 				case 'bankId':
 					state.filters.bankId = event.target.value
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					this.processExtractData()
 					break
 
 				case 'description':
 					state.filters.description = event.target.value
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					this.processExtractData()
 					break
 
@@ -201,7 +200,7 @@ class ExtractAccount extends React.Component {
 
 				case 'detail':
 					state.filters.detail = event.target.value
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					this.processExtractData()
 					break
 
@@ -282,7 +281,7 @@ class ExtractAccount extends React.Component {
 						'Transação removida',
 						'Transação removida com sucesso.'
 					)
-					this.processExtractData() // Atualizar os dados após a remoção
+					this.processExtractData()
 				} else {
 					openNotification(
 						'error',
@@ -354,11 +353,12 @@ class ExtractAccount extends React.Component {
 					{this.state.filtro && (
 						<>
 							<Row>
-								<Col xs={11} sm={12} md={6} lg={3}>
+								<Col xs={10} sm={12} md={6} lg={3}>
 									<span style={{ marginRight: '20px' }}>Data:</span>
 									<DatePicker
-										size='small' // Alterado para 'small' para reduzir a altura
+										size='middle'
 										picker='month'
+										style={{ width: 100 }}
 										onChange={(date, dateString) => {
 											if (!date) {
 												const now = new Date()
@@ -371,7 +371,7 @@ class ExtractAccount extends React.Component {
 															month: now.getMonth() + 1,
 														},
 													}),
-													() => this.processExtractData() // Chamar após atualizar o estado
+													() => this.processExtractData()
 												)
 												return
 											}
@@ -385,7 +385,7 @@ class ExtractAccount extends React.Component {
 														month: parseInt(month, 10),
 													},
 												}),
-												() => this.processExtractData() // Chamar após atualizar o estado
+												() => this.processExtractData()
 											)
 										}}
 										format='YYYY-MM'
@@ -398,13 +398,13 @@ class ExtractAccount extends React.Component {
 												  )
 												: null
 										}
-										inputReadOnly // Adicionado para evitar o teclado no celular
+										inputReadOnly
 									/>
 								</Col>
-								<Col xs={13} sm={12} md={6} lg={3}>
+								<Col xs={13} sm={12} md={6} lg={4}>
 									<span style={{ marginRight: '20px' }}>Tipo:</span>
 									<Radio.Group
-										size='small'
+										size='middle'
 										name='timeFilter'
 										value={
 											this.state.filters.onlyFuture
@@ -419,13 +419,21 @@ class ExtractAccount extends React.Component {
 											})
 										}
 									>
-										<Radio.Button value='all' style={{ marginRight: '4px' }}>
+										<Radio.Button
+											value='all'
+											style={{ marginRight: '5px', padding: '0 7px' }}
+										>
 											Todos
 										</Radio.Button>
-										<Radio.Button value='future' style={{ marginRight: '4px' }}>
+										<Radio.Button
+											value='future'
+											style={{ marginRight: '5px', padding: '0 7px' }}
+										>
 											Futuro
 										</Radio.Button>
-										<Radio.Button value='past'>Passado</Radio.Button>
+										<Radio.Button value='past' style={{ padding: '0 6px' }}>
+											Concluído
+										</Radio.Button>
 									</Radio.Group>
 								</Col>
 							</Row>
@@ -456,10 +464,10 @@ class ExtractAccount extends React.Component {
 										placeholder='Detail'
 										type='text'
 										name='detail'
-										size='small'
+										size='middle'
 										value={this.state.detail}
 										onChange={this.handleChange}
-										style={{ width: 250 }}
+										style={{ width: 300 }}
 									/>
 								</Col>
 							</Row>
@@ -482,15 +490,15 @@ class ExtractAccount extends React.Component {
 								}}
 								okText='Sim'
 								cancelText='Não'
-								disabled={this.state.checked.length === 0} // Desabilitar se nenhum item estiver selecionado
+								disabled={this.state.checked.length === 0}
 							>
 								<DeleteOutlined
 									style={{
 										paddingLeft: '10px',
 										cursor:
-											this.state.checked.length > 0 ? 'pointer' : 'not-allowed', // Alterar cursor
+											this.state.checked.length > 0 ? 'pointer' : 'not-allowed',
 										color:
-											this.state.checked.length > 0 ? 'inherit' : '#d9d9d9', // Alterar cor
+											this.state.checked.length > 0 ? 'inherit' : '#d9d9d9',
 									}}
 								/>
 							</Popconfirm>
@@ -508,7 +516,7 @@ class ExtractAccount extends React.Component {
 								onChange={(e) => {
 									if (e.target.checked) {
 										this.setState({
-											checked: this.state.transactions.map((t) => t._id), // Apenas itens exibidos
+											checked: this.state.transactions.map((t) => t._id),
 										})
 									} else {
 										this.setState({ checked: [] })
@@ -550,7 +558,7 @@ class ExtractAccount extends React.Component {
 									}}
 								>
 									<EditOutlined
-										style={{ cursor: 'pointer', color: '#006400' }} // Verde mais escuro
+										style={{ cursor: 'pointer', color: '#006400' }}
 										onClick={() => {
 											this.props.showModal({
 												transactionType: 'contaCorrente',

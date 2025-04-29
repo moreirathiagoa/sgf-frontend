@@ -114,7 +114,7 @@ class ExtractPlan extends React.Component {
 			switch (event.target.name) {
 				case 'filtro':
 					state.filtro = !state.filtro
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					break
 
 				case 'clearFilter':
@@ -123,7 +123,7 @@ class ExtractPlan extends React.Component {
 					state.month = 'Selecione'
 					state.bankId = null
 					state.description = ''
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					this.filterList()
 					break
 
@@ -141,25 +141,25 @@ class ExtractPlan extends React.Component {
 
 				case 'year':
 					state.year = event.target.value
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					this.filterList()
 					break
 
 				case 'month':
 					state.month = event.target.value
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					this.filterList()
 					break
 
 				case 'bankId':
 					state.bankId = event.target.value
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					this.filterList()
 					break
 
 				case 'description':
 					state.description = event.target.value
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					this.filterList()
 					break
 
@@ -172,7 +172,7 @@ class ExtractPlan extends React.Component {
 
 				case 'detail':
 					state.detail = event.target.value
-					state.checked = [] // Limpar seleções
+					state.checked = []
 					this.filterList()
 					break
 
@@ -220,7 +220,7 @@ class ExtractPlan extends React.Component {
 							'Transação removida',
 							'Transação removida com sucesso.'
 						)
-						// TODO: chamar essa função apenas ao finalizar o loop
+
 						this.processExtractData()
 					} else {
 						openNotification(
@@ -299,7 +299,7 @@ class ExtractPlan extends React.Component {
 			state.transactions = transactionFiltered
 			state.checked = state.checked.filter((id) =>
 				transactionFiltered.some((transaction) => transaction._id === id)
-			) // Remover itens não exibidos
+			)
 			return state
 		})
 	}
@@ -392,10 +392,10 @@ class ExtractPlan extends React.Component {
 						<>
 							<Row>
 								<Col span={8}>
-									<span style={{ marginRight: '30px' }}>Ano e Mês:</span>
+									<span style={{ marginRight: '30px' }}>Data:</span>
 									<DatePicker
 										picker='month'
-										size='small' // Alterado para 'small' para reduzir a altura
+										size='middle'
 										onChange={(date, dateString) => {
 											if (!date) {
 												const now = new Date()
@@ -405,7 +405,7 @@ class ExtractPlan extends React.Component {
 														year: now.getFullYear(),
 														month: now.getMonth() + 1,
 													}),
-													() => this.filterList() // Chamar após atualizar o estado
+													() => this.filterList()
 												)
 												return
 											}
@@ -416,7 +416,7 @@ class ExtractPlan extends React.Component {
 													year: parseInt(year, 10),
 													month: parseInt(month, 10),
 												}),
-												() => this.filterList() // Chamar após atualizar o estado
+												() => this.filterList()
 											)
 										}}
 										format='YYYY-MM'
@@ -429,7 +429,7 @@ class ExtractPlan extends React.Component {
 												  )
 												: null
 										}
-										inputReadOnly // Adicionado para evitar o teclado no celular
+										inputReadOnly
 									/>
 								</Col>
 							</Row>
@@ -460,7 +460,7 @@ class ExtractPlan extends React.Component {
 										placeholder='Detail'
 										type='text'
 										name='detail'
-										size='small'
+										size='middle'
 										value={this.state.detail}
 										onChange={this.handleChange}
 										style={{ width: 250 }}
@@ -481,7 +481,7 @@ class ExtractPlan extends React.Component {
 							/>
 							<Popconfirm
 								title='Deseja lançar essas transações em Conta Corrente?'
-								onConfirm={this.toAccount} // Corrigido para chamar a função diretamente
+								onConfirm={this.toAccount}
 								okText='Sim'
 								cancelText='Não'
 							>
@@ -496,15 +496,15 @@ class ExtractPlan extends React.Component {
 								}}
 								okText='Sim'
 								cancelText='Não'
-								disabled={this.state.checked.length === 0} // Desabilitar se nenhum item estiver selecionado
+								disabled={this.state.checked.length === 0}
 							>
 								<DeleteOutlined
 									style={{
 										paddingLeft: '10px',
 										cursor:
-											this.state.checked.length > 0 ? 'pointer' : 'not-allowed', // Alterar cursor
+											this.state.checked.length > 0 ? 'pointer' : 'not-allowed',
 										color:
-											this.state.checked.length > 0 ? 'inherit' : '#d9d9d9', // Alterar cor
+											this.state.checked.length > 0 ? 'inherit' : '#d9d9d9',
 									}}
 								/>
 							</Popconfirm>
@@ -522,7 +522,7 @@ class ExtractPlan extends React.Component {
 								onChange={(e) => {
 									if (e.target.checked) {
 										this.setState((state) => ({
-											checked: state.transactions.map((t) => t._id), // Apenas itens exibidos
+											checked: state.transactions.map((t) => t._id),
 										}))
 									} else {
 										this.setState({ checked: [] })
@@ -564,7 +564,7 @@ class ExtractPlan extends React.Component {
 									}}
 								>
 									<EditOutlined
-										style={{ cursor: 'pointer', color: '#006400' }} // Verde mais escuro
+										style={{ cursor: 'pointer', color: '#006400' }}
 										onClick={() => {
 											this.props.showModal({
 												transactionType: 'planejamento',
