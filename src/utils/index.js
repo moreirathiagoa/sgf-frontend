@@ -5,6 +5,9 @@ function openNotification(type, message, description) {
 	notification[type]({
 		message: message,
 		description: description,
+		onClick: () => {
+			notification.destroy();
+		},
 	})
 }
 
