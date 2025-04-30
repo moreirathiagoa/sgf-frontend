@@ -570,16 +570,6 @@ class ExtractAccount extends React.Component {
 										}}
 									/>
 									<Popconfirm
-										title='Deseja realmente compensar essa Transação?'
-										onConfirm={() => this.compensateTransaction(element._id)}
-										okText='Sim'
-										cancelText='Não'
-									>
-										<CheckCircleOutlined
-											style={{ cursor: 'pointer', color: '#006400' }}
-										/>
-									</Popconfirm>
-									<Popconfirm
 										title='Deseja realmente apagar essa Transação?'
 										onConfirm={() => {
 											this.remover(element._id).then(() => {
@@ -593,6 +583,18 @@ class ExtractAccount extends React.Component {
 											style={{ cursor: 'pointer', color: 'red' }}
 										/>
 									</Popconfirm>
+									{!element.isCompensated && (
+										<Popconfirm
+											title='Deseja realmente compensar essa Transação?'
+											onConfirm={() => this.compensateTransaction(element._id)}
+											okText='Sim'
+											cancelText='Não'
+										>
+											<CheckCircleOutlined
+												style={{ cursor: 'pointer', color: '#006400' }}
+											/>
+										</Popconfirm>
+									)}
 								</span>
 							</>
 						)
