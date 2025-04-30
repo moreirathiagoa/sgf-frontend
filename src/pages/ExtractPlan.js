@@ -39,7 +39,6 @@ class ExtractPlan extends React.Component {
 			transactions: [],
 			allTransactions: [],
 			checked: [],
-
 			year: nextMonthYear,
 			month: nextMonthMonth,
 			notCompensated: false,
@@ -394,8 +393,8 @@ class ExtractPlan extends React.Component {
 					{this.state.filtro && (
 						<>
 							<Row>
-								<Col span={8}>
-									<span style={{ marginRight: '30px' }}>Data:</span>
+								<Col xs={10} lg={3}>
+									<span style={{ marginRight: '40px' }}>Data:</span>
 									<DatePicker
 										picker='month'
 										size='middle'
@@ -438,7 +437,7 @@ class ExtractPlan extends React.Component {
 							</Row>
 							<br />
 							<Row>
-								<Col xs={11} sm={12} md={6} lg={4}>
+								<Col xs={11} lg={3}>
 									<span style={{ marginRight: '30px' }}>Banco:</span>
 									<SelectBank
 										handleChange={this.handleChange}
@@ -446,8 +445,8 @@ class ExtractPlan extends React.Component {
 										banks={this.state.banks}
 									/>
 								</Col>
-								<Col xs={12} sm={12} md={6} lg={6}>
-									<span style={{ marginRight: '15px' }}>Título:</span>
+								<Col xs={12} lg={3}>
+									<span style={{ marginRight: '14px' }}>Título:</span>
 									<SelectDescription
 										lastDescriptions={this.state.descriptions}
 										currentDescription={this.state.description}
@@ -457,8 +456,8 @@ class ExtractPlan extends React.Component {
 							</Row>
 							<br></br>
 							<Row>
-								<Col span={12}>
-									<span style={{ marginRight: '30px' }}>Detalhes:</span>
+								<Col xs={16} lg={5}>
+									<span style={{ marginRight: '15px' }}>Detalhes:</span>
 									<Input
 										placeholder='Detail'
 										type='text'
@@ -609,7 +608,7 @@ class ExtractPlan extends React.Component {
 							<Card
 								size='small'
 								title={title}
-								style={{ width: 370, marginBottom: '5px' }}
+								style={{ maxWidth: 560, marginBottom: '5px' }}
 								key={element._id}
 							>
 								<Row>

@@ -353,8 +353,8 @@ class ExtractAccount extends React.Component {
 					{this.state.filtro && (
 						<>
 							<Row>
-								<Col xs={10} sm={12} md={6} lg={3}>
-									<span style={{ marginRight: '20px' }}>Data:</span>
+								<Col xs={10}  lg={3}>
+									<span style={{ marginRight: '40px' }}>Data:</span>
 									<DatePicker
 										size='middle'
 										picker='month'
@@ -401,8 +401,8 @@ class ExtractAccount extends React.Component {
 										inputReadOnly
 									/>
 								</Col>
-								<Col xs={13} sm={12} md={6} lg={4}>
-									<span style={{ marginRight: '20px' }}>Tipo:</span>
+								<Col xs={13}  lg={4}>
+									<span style={{ marginRight: '15px' }}>Tipo:</span>
 									<Radio.Group
 										size='middle'
 										name='timeFilter'
@@ -431,7 +431,7 @@ class ExtractAccount extends React.Component {
 										>
 											Futuro
 										</Radio.Button>
-										<Radio.Button value='past' style={{ padding: '0 6px' }}>
+										<Radio.Button value='past' style={{ padding: '0 7px' }}>
 											Concluído
 										</Radio.Button>
 									</Radio.Group>
@@ -439,16 +439,16 @@ class ExtractAccount extends React.Component {
 							</Row>
 							<br />
 							<Row>
-								<Col xs={11} sm={12} md={6} lg={3}>
-									<span style={{ marginRight: '15px' }}>Banco:</span>
+								<Col xs={11} lg={3}>
+									<span style={{ marginRight: '30px' }}>Banco:</span>
 									<SelectBank
 										handleChange={this.handleChange}
 										bankId={this.state.filters.bankId}
 										banks={this.state.banks}
 									/>
 								</Col>
-								<Col span={12}>
-									<span style={{ marginRight: '15px' }}>Título:</span>
+								<Col xs={12} lg={4}>
+									<span style={{ marginRight: '5px' }}>Título:</span>
 									<SelectDescription
 										lastDescriptions={this.state.descriptions}
 										currentDescription={this.state.filters.description}
@@ -458,7 +458,7 @@ class ExtractAccount extends React.Component {
 							</Row>
 							<br></br>
 							<Row>
-								<Col span={12}>
+								<Col xs={16} lg={6}>
 									<span style={{ marginRight: '15px' }}>Detalhes:</span>
 									<Input
 										placeholder='Detail'
@@ -467,7 +467,7 @@ class ExtractAccount extends React.Component {
 										size='middle'
 										value={this.state.detail}
 										onChange={this.handleChange}
-										style={{ width: 300 }}
+										style={{ maxWidth: 300 }}
 									/>
 								</Col>
 							</Row>
@@ -603,7 +603,7 @@ class ExtractAccount extends React.Component {
 							<Card
 								size='small'
 								title={title}
-								style={{ width: 370, marginBottom: '5px' }}
+								style={{ maxWidth: 560, marginBottom: '5px' }}
 								key={element._id}
 							>
 								<Row>
