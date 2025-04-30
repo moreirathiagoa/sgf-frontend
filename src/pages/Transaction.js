@@ -1,6 +1,14 @@
 import React from 'react'
 import { clone } from 'lodash'
-import { Form, Input, InputNumber, Button, Checkbox, DatePicker, Radio } from 'antd'
+import {
+	Form,
+	Input,
+	InputNumber,
+	Button,
+	Checkbox,
+	DatePicker,
+	Radio,
+} from 'antd'
 import {
 	createTransaction,
 	updateTransaction,
@@ -204,9 +212,12 @@ class Transaction extends React.Component {
 						value={isCredit ? 'credit' : 'debit'}
 						onChange={(e) =>
 							this.handleChange({
-								target: { name: 'isCredit', value: e.target.value === 'credit' },
+								target: {
+									name: 'isCredit',
+									value: e.target.value === 'credit',
+								},
 							})
-							}
+						}
 						size='medium'
 					>
 						<Radio value='credit'>Crédito</Radio>
@@ -231,15 +242,15 @@ class Transaction extends React.Component {
 
 				{data.transactionType === 'contaCorrente' && (
 					<ResponsiveFormItem label='Status'>
-							<Checkbox
-								name='isCompensated'
-								checked={data.isCompensated}
-								onChange={() =>
-									this.handleChange({ target: { name: 'isCompensated' } })
-								}
-							>
-								Compensado
-							</Checkbox>
+						<Checkbox
+							name='isCompensated'
+							checked={data.isCompensated}
+							onChange={() =>
+								this.handleChange({ target: { name: 'isCompensated' } })
+							}
+						>
+							Compensado
+						</Checkbox>
 					</ResponsiveFormItem>
 				)}
 
@@ -258,9 +269,6 @@ class Transaction extends React.Component {
 						lastDescriptions={lastDescriptions}
 						currentDescription={data.description}
 						handleChange={this.handleChange}
-						width={200}
-						style={{ textAlign: 'left' }}
-						size='medium'
 					/>
 				</ResponsiveFormItem>
 
