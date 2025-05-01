@@ -23,7 +23,7 @@ const STYLES = {
 		marginBottom: 20,
 	},
 	chartBackground: '#d6d6c2',
-	chartMargin: { top: 20, left: 10, right: 10, bottom: 20 },
+	chartMargin: { top: 20, left: -30, right: 10, bottom: 20 }, // Margem esquerda reduzida para -10
 	xAxis: { fontSize: 12, angle: -45, textAnchor: 'end', dy: 5 },
 	titleColor: '#ffffff',
 }
@@ -50,8 +50,22 @@ const formatXAxis = (tick, view) => {
 	return format(new Date(tick.split('T')[0] + 'T00:00:00'), 'dd/MM')
 }
 
-const formatCurrency = (value) =>
-	`R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+const formatYAxis = (value) => {
+	if (value > 10000) {
+		return `R$ ${(value / 1000).toLocaleString('pt-BR', {
+			maximumFractionDigits: 0,
+		})}k`
+	}
+	return `R$ ${value.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}`
+}
+
+const calculateLeftMargin = (data, dataKey) => {
+	const maxValue = Math.max(...data.map((item) => item[dataKey] || 0))
+	if (maxValue > 10000) return -30
+	if (maxValue > 1000) return -15
+	if (maxValue > 100) return -25
+	return -30
+}
 
 const Dashboards = ({ mudaTitulo, loading, update }) => {
 	const now = new Date()
@@ -193,7 +207,13 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 					height={300}
 					style={{ backgroundColor: STYLES.chartBackground }}
 				>
-					<LineChart data={placeholderData} margin={STYLES.chartMargin}>
+					<LineChart
+						data={placeholderData} // Mantém os valores originais do backend
+						margin={{
+							...STYLES.chartMargin,
+							left: calculateLeftMargin(placeholderData, dataKey),
+						}}
+					>
 						<CartesianGrid strokeDasharray='3 3' />
 						<XAxis
 							dataKey={
@@ -210,11 +230,18 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 							style={{ fontSize: STYLES.xAxis.fontSize }}
 							dy={STYLES.xAxis.dy}
 						/>
-						<YAxis tickFormatter={formatCurrency} width={100} />
-						<Tooltip formatter={formatCurrency} labelFormatter={() => ''} />
+						<YAxis tickFormatter={formatYAxis} width={100} />
+						<Tooltip
+							formatter={(value) =>
+								`R$ ${value.toLocaleString('pt-BR', {
+									minimumFractionDigits: 2,
+								})}`
+							}
+							labelFormatter={() => ''}
+						/>
 						<Line
 							type='monotone'
-							dataKey={dataKey}
+							dataKey={dataKey} // Mantém o valor original nas linhas
 							stroke='#000'
 							strokeWidth={2}
 							name={title}
@@ -236,10 +263,10 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 						style={{ width: 100 }}
 						disabled={year === 'all'}
 					>
-						<Option value='all'>Todos</Option>
+						<Option value='all'>TODOS</Option>
 						{Array.from({ length: 12 }, (_, i) => (
 							<Option key={i + 1} value={i + 1}>
-								{new Date(0, i).toLocaleString('default', { month: 'short' })}
+								{new Date(0, i).toLocaleString('default', { month: 'short' }).toUpperCase().replace('.', '')}
 							</Option>
 						))}
 					</Select>
@@ -250,7 +277,7 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 						onChange={handleYearChange}
 						style={{ width: 100 }}
 					>
-						<Option value='all'>Todos</Option>
+						<Option value='all'>TODOS</Option>
 						{yearOptions.map((yr) => (
 							<Option key={yr} value={yr}>
 								{yr}
