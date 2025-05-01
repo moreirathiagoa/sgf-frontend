@@ -1,12 +1,12 @@
 import axios from 'axios'
 import properties from '../properties'
 
-const getLatestDashboard = () => {
+const getLatestDashboard = (filter) => {
 	const token = localStorage.getItem('token')
 
 	const response = axios({
 		method: 'get',
-		url: properties.url + 'dashboards/list',
+		url: properties.url + `dashboards/list/${filter.year}/${filter.month}`,
 		headers: {
 			auth: token,
 		},

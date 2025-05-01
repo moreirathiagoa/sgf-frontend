@@ -14,12 +14,6 @@
 		"react-scripts": "^5.0.1",
 		"recharts": "^2.15.3"
 	},
-	"overrides": {
-		"css-select@2.1.0": {
-			"nth-check": "2.0.1",
-			"css-what": "5.0.1"
-		}
-	},
 	"scripts": {
 		"dev": "react-scripts start",
 		"hml": "REACT_APP_NODE_ENV=hml react-scripts start",

@@ -62,8 +62,11 @@ class SelectDescription extends React.Component {
 	render() {
 		return (
 			<Select
-				size='md'
-				style={{ width: this.props.width || 200 }} 
+				size='medium'
+				style={{
+					width: '100%',
+					maxWidth: '200px', // Ajuste para desktop
+				}}
 				placeholder='Selecione ou digite...'
 				dropdownRender={(menu) => (
 					<>
@@ -97,6 +100,8 @@ class SelectDescription extends React.Component {
 				}))}
 				value={this.props.currentDescription}
 				onSelect={(value) => this.addItemEnter(value)}
+				getPopupContainer={(triggerNode) => triggerNode.parentNode}
+				dropdownMatchSelectWidth={false}
 			/>
 		)
 	}

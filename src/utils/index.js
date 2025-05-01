@@ -5,6 +5,9 @@ function openNotification(type, message, description) {
 	notification[type]({
 		message: message,
 		description: description,
+		onClick: () => {
+			notification.destroy();
+		},
 	})
 }
 
@@ -83,7 +86,7 @@ function prepareValue(value, isCompensated) {
 
 // TODO: Verificar remoção de caracteres não funcionando
 const formatNumber = (value, separator) => {
-	if(!value) return ''
+	if (!value) return ''
 	return value
 		.toString()
 		.replace(/(?!^-)\D/g, '') //Remover qualquer caractere não numérico

@@ -6,26 +6,17 @@ import {
 	Input,
 	Button,
 	Switch,
-	Collapse,
-	Menu,
-	Dropdown,
-	Descriptions,
-	Typography,
 	Select,
+	Typography,
+	Table,
+	Popconfirm,
 } from 'antd'
-import {
-	ArrowLeftOutlined,
-	MenuOutlined,
-	PlusCircleOutlined,
-} from '@ant-design/icons'
+import { ArrowLeftOutlined, PlusCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { listBanks, createBank, removeBank, updateBank } from '../api'
 import { openNotification, formatDateToUser, formatMoeda } from '../utils'
 
-const { Panel } = Collapse
 const { Title } = Typography
 const { Option } = Select
-
-function callback(key) {}
 
 class Banks extends React.Component {
 	constructor(props) {
@@ -85,40 +76,15 @@ class Banks extends React.Component {
 			})
 	}
 
-	menu = (element) => (
-		<Menu>
-			<Menu.Item
-				onClick={() => {
-					this.props.loading(true)
-					this.remover(element._id)
-				}}
-			>
-				Apagar
-			</Menu.Item>
-			<Menu.Item onClick={() => this.editInit(element)}>Editar</Menu.Item>
-		</Menu>
-	)
-
-	genExtra = (key) => (
-		<Dropdown
-			overlay={this.menu(key)}
-			placement='bottomRight'
-			onClick={(event) => {
-				event.stopPropagation()
-			}}
-		>
-			<MenuOutlined />
-		</Dropdown>
-	)
-
 	editInit(element) {
-		this.setState((state) => {
-			state.list = false
-			state.idToUpdate = element._id
-			state.data.name = element.name
-			state.data.bankType = element.bankType
-			state.data.isActive = element.isActive
-			return state
+		this.setState({
+			list: false,
+			idToUpdate: element._id,
+			data: {
+				name: element.name || '',
+				bankType: element.bankType || '',
+				isActive: element.isActive || false,
+			},
 		})
 	}
 
@@ -144,34 +110,32 @@ class Banks extends React.Component {
 	}
 
 	remover(id) {
-		if (window.confirm('Deseja realmente apagar esse Banco?')) {
-			return removeBank(id)
-				.then((res) => {
-					if (res.data.code === 202) {
-						openNotification(
-							'success',
-							'Banco removido',
-							'Banco removido com sucesso.'
-						)
-						return this.list()
-					} else {
-						openNotification(
-							'error',
-							'Banco não removido',
-							`O Banco não pode ser removido. ${res?.data?.message}`
-						)
-						this.props.loading(false)
-					}
-				})
-				.catch((err) => {
+		return removeBank(id)
+			.then((res) => {
+				if (res.data.code === 202) {
+					openNotification(
+						'success',
+						'Banco removido',
+						'Banco removido com sucesso.'
+					)
+					return this.list()
+				} else {
 					openNotification(
 						'error',
 						'Banco não removido',
-						'Erro interno. Tente novamente mais tarde.'
+						`O Banco não pode ser removido. ${res?.data?.message}`
 					)
 					this.props.loading(false)
-				})
-		}
+				}
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Banco não removido',
+					'Erro interno. Tente novamente mais tarde.'
+				)
+				this.props.loading(false)
+			})
 	}
 
 	submitForm(e) {
@@ -261,47 +225,83 @@ class Banks extends React.Component {
 	}
 
 	render() {
+		const columns = [
+			{
+				title: 'Nome',
+				dataIndex: 'name',
+				key: 'name',
+			},
+			{
+				title: 'Status',
+				dataIndex: 'isActive',
+				key: 'isActive',
+				render: (isActive) => (isActive ? 'Ativo' : 'Inativo'),
+			},
+			{
+				title: 'Tipo',
+				dataIndex: 'bankType',
+				key: 'bankType',
+			},
+			{
+				title: 'Ações',
+				key: 'actions',
+				render: (text, record) => (
+					<div style={{ display: 'flex', gap: '8px' }}>
+						<Button type='link' onClick={() => this.editInit(record)}>
+							<EditOutlined />
+						</Button>
+						<Popconfirm
+							title={`Deseja realmente apagar o banco "${record.name}"?`}
+							onConfirm={() => this.remover(record._id)}
+							okText='Sim'
+							cancelText='Não'
+						>
+							<Button type='link' danger>
+								<DeleteOutlined />
+							</Button>
+						</Popconfirm>
+					</div>
+				),
+			},
+		]
+
 		return (
 			<div>
 				{this.state.list ? (
 					<div>
 						<Title level={3}>
 							Lista de Bancos{' '}
-							<PlusCircleOutlined onClick={() => this.actionButtonNew()} />
+							<Button
+								type="text"
+								icon={<PlusCircleOutlined style={{ color: 'white' }} />}
+								onClick={() => this.actionButtonNew()}
+							/>
 						</Title>
-						<Collapse onChange={callback} expandIconPosition='left'>
-							{this.state.banks.map((element) => {
-								return (
-									<Panel
-										header={element.name}
-										key={element.name}
-										extra={this.genExtra(element)}
-										style={{ fontSize: '16px' }}
-									>
-										<Descriptions title='Detalhes:'>
-											<Descriptions.Item label='Nome'>
-												{element.name}
-											</Descriptions.Item>
-											<Descriptions.Item label='Status'>
-												{element.isActive ? 'Ativo' : 'Inativo'}
-											</Descriptions.Item>
-											<Descriptions.Item label='Tipo'>
-												{element.bankType}
-											</Descriptions.Item>
-											<Descriptions.Item label='Saldo Sistema'>
-												{formatMoeda(element.systemBalance)}
-											</Descriptions.Item>
-											<Descriptions.Item label='Saldo Manual'>
-												{formatMoeda(element.manualBalance)}
-											</Descriptions.Item>
-											<Descriptions.Item label='Data Criação'>
-												{formatDateToUser(element.createdAt)}
-											</Descriptions.Item>
-										</Descriptions>
-									</Panel>
-								)
-							})}
-						</Collapse>
+						<Table
+							dataSource={this.state.banks}
+							columns={columns}
+							rowKey='_id'
+							pagination={false}
+							size='small'
+							bordered
+							expandable={{
+								expandedRowRender: (record) => (
+									<div>
+										<p>
+											<strong>Saldo Sistema:</strong>{' '}
+											{formatMoeda(record.systemBalance)}
+										</p>
+										<p>
+											<strong>Saldo Manual:</strong>{' '}
+											{formatMoeda(record.manualBalance)}
+										</p>
+										<p>
+											<strong>Data:</strong> {formatDateToUser(record.date)}
+										</p>
+									</div>
+								),
+							}}
+						/>
 					</div>
 				) : (
 					<div>
@@ -313,30 +313,48 @@ class Banks extends React.Component {
 							labelCol={{ span: 4 }}
 							wrapperCol={{ span: 14 }}
 							layout='horizontal'
-							size={'small'}
+							size='small'
 							name='basic'
-							initialValues={{ remember: true }}
+							initialValues={{
+								name: this.state.data.name,
+								bankType: this.state.data.bankType,
+								isActive: this.state.data.isActive,
+							}}
 							onFinish={this.submitForm}
-							onFinishFailed={() => {}}
 						>
-							<Form.Item label='Nome de Banco'>
+							<Form.Item
+								label='Nome de Banco'
+								name='name'
+								rules={[
+									{
+										required: true,
+										message: 'Por favor, insira o nome do banco!',
+									},
+								]}
+							>
 								<Input
-									placeholder='Banco'
+									placeholder='Digite o nome do banco'
 									type='text'
 									name='name'
-									size='md'
 									value={this.state.data.name}
 									onChange={this.handleChange}
 								/>
 							</Form.Item>
 
-							<Form.Item label='Tipo de Banco'>
+							<Form.Item
+								label='Tipo de Banco'
+								name='bankType'
+								rules={[
+									{
+										required: true,
+										message: 'Por favor, selecione o tipo do banco!',
+									},
+								]}
+							>
 								<Select
 									name='bankType'
-									defaultValue={this.state.data.bankType}
-									size='md'
-									style={{ width: 200 }}
-									onSelect={(value) => {
+									value={this.state.data.bankType}
+									onChange={(value) => {
 										const event = { target: { name: 'bankType', value: value } }
 										this.handleChange(event)
 									}}
@@ -347,21 +365,18 @@ class Banks extends React.Component {
 							</Form.Item>
 
 							<Form.Item label='Banco Ativo'>
-								<span onClick={this.handleChange}>
-									<Switch
-										name='isActive'
-										checked={this.state.data.isActive}
-										size='md'
-									/>
-								</span>
+								<Switch
+									name='isActive'
+									checked={this.state.data.isActive}
+									onChange={() => {
+										const event = { target: { name: 'isActive' } }
+										this.handleChange(event)
+									}}
+								/>
 							</Form.Item>
-							<Form.Item label=''>
-								<Button
-									className='btn-fill'
-									size='lg'
-									type='primary'
-									htmlType='submit'
-								>
+
+							<Form.Item>
+								<Button type='primary' htmlType='submit'>
 									Confirmar
 								</Button>
 							</Form.Item>

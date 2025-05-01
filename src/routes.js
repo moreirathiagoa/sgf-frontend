@@ -80,6 +80,7 @@ class Router extends React.Component {
 						loading={this.props.loading}
 						mudaTitulo={this.props.mudaTitulo}
 						verificaLogin={this.props.verificaLogin}
+						update={this.props.update}
 					/>
 				</Route>
 				<Route path='/logout'>

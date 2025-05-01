@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { Typography, Select, Row, Col, Button } from 'antd'
+import { Typography, Select, Row, Col } from 'antd'
 import {
 	LineChart,
 	Line,
@@ -15,223 +15,249 @@ import { format } from 'date-fns'
 const { Title } = Typography
 const { Option } = Select
 
-const CHART_BACKGROUND_COLOR = '#d6d6c2'
-const LINE_COLOR = '#000000'
-const LINE_WIDTH = 2
-const CONTAINER_STYLE = {
-	flex: '1 1 calc(50% - 20px)', // Ocupa 50% da largura menos o gap no desktop
-	minWidth: '300px',
-	marginBottom: '20px',
-}
-const WRAPPER_STYLE = {
-	display: 'flex',
-	flexWrap: 'wrap',
-	justifyContent: 'space-between',
-	marginBottom: '20px',
-	gap: '20px', // Adiciona espaçamento entre os gráficos
-}
-const CHART_MARGIN = { top: 20, left: 20, right: 20, bottom: 20 }
-const X_AXIS_STYLE = { fontSize: '12px' }
-const X_AXIS_ANGLE = -45
-const X_AXIS_TEXT_ANCHOR = 'end'
-const X_AXIS_DY = 5
-
-const formatXAxis = (tickItem) => {
-	if (!tickItem) return '' // Retorna string vazia se o valor for inválido
-	const adjustedDate = new Date(tickItem.split('T')[0] + 'T00:00:00') // Ajusta para evitar problemas de fuso horário
-	const res = format(adjustedDate, 'dd/MM')
-	return res
+const STYLES = {
+	wrapper: { display: 'flex', flexWrap: 'wrap', gap: 20, marginBottom: 20 },
+	chartContainer: {
+		flex: '1 1 calc(50% - 20px)',
+		minWidth: 300,
+		marginBottom: 20,
+	},
+	chartBackground: '#d6d6c2',
+	chartMargin: { top: 20, left: 10, right: 10, bottom: 20 },
+	xAxis: { fontSize: 12, angle: -45, textAnchor: 'end', dy: 5 },
+	titleColor: '#ffffff',
 }
 
-const Dashboards = ({ mudaTitulo, loading }) => {
-	const currentMonth = new Date().getMonth() + 1 // Mês corrente
-	const currentYear = new Date().getFullYear() // Ano corrente
+const monthNames = [
+	'Janeiro',
+	'Fevereiro',
+	'Março',
+	'Abril',
+	'Maio',
+	'Junho',
+	'Julho',
+	'Agosto',
+	'Setembro',
+	'Outubro',
+	'Novembro',
+	'Dezembro',
+]
 
+const formatXAxis = (tick, view) => {
+	if (!tick) return ''
+	if (view === 'year') return tick.toString()
+	if (view === 'month') return monthNames[tick - 1] || ''
+	return format(new Date(tick.split('T')[0] + 'T00:00:00'), 'dd/MM')
+}
+
+const formatCurrency = (value) =>
+	`R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+
+const Dashboards = ({ mudaTitulo, loading, update }) => {
+	const now = new Date()
+	const [month, setMonth] = useState(now.getMonth() + 1)
+	const [year, setYear] = useState(now.getFullYear())
 	const [data, setData] = useState([])
-	const [originalData, setOriginalData] = useState([]) // Armazena os dados originais
-	const [month, setMonth] = useState(currentMonth) // Inicia com o mês corrente
-	const [year, setYear] = useState(currentYear) // Inicia com o ano corrente
-	const [yearOptions, setYearOptions] = useState([]) // Opções de ano
+	const [originalData, setOriginalData] = useState([])
+	const [yearOptions, setYearOptions] = useState([])
 
-	const loadData = useCallback(() => {
-		loading(true) // Ativa o estado de loading
-		getLatestDashboard({
-			month: month === 'all' ? null : month,
-			year: year === 'all' ? null : year,
-		})
-			.then((response) => {
-				if (response.status === 200) {
-					const formattedData = response.data.data.map((item) => ({
-						createdAt: item.createdAt,
-						actualBalance: item.actualBalance,
-						forecastIncoming: item.forecastIncoming,
-						forecastOutgoing: item.forecastOutgoing,
-						netBalance: item.netBalance,
-					}))
-					setOriginalData(formattedData) // Salva os dados originais
-					loading(false) // Desativa o estado de loading
-				}
-			})
-			.catch(() => {
-				loading(false) // Garante que o loading seja desativado em caso de erro
-			})
+	const loadData = useCallback(async () => {
+		try {
+			loading(true)
+			const response = await getLatestDashboard({ month, year })
+			if (response.status === 200) {
+				setOriginalData(
+					response.data.data.map(
+						({
+							createdAt,
+							actualBalance,
+							forecastIncoming,
+							forecastOutgoing,
+							netBalance,
+						}) => ({
+							createdAt,
+							actualBalance,
+							forecastIncoming,
+							forecastOutgoing,
+							netBalance,
+						})
+					)
+				)
+			} else {
+				setOriginalData([])
+			}
+		} catch {
+			setOriginalData([])
+		} finally {
+			loading(false)
+		}
 	}, [month, year, loading])
 
 	useEffect(() => {
 		mudaTitulo('Dashboards')
-		loadData()
-	}, [mudaTitulo, loadData])
+		updateDashboard({ month, year })
+			.then((res) => {
+				if (res.status === 200) loadData()
+			})
+			.catch((error) => {
+				console.error('Erro ao realizar update:', error)
+				loading(false)
+			})
+	}, [mudaTitulo, loadData, month, year, loading])
 
 	useEffect(() => {
-		// Aplica o filtro automaticamente no carregamento da tela
-		if (originalData.length) {
-			const filteredData = originalData.filter((item) => {
-				if (!item.createdAt) return false // Ignora itens com createdAt inválido
-				const itemMonth = new Date(item.createdAt).getMonth() + 1
-				const itemYear = new Date(item.createdAt).getFullYear()
-				return itemMonth === month && itemYear === year
-			})
-			setData(
-				filteredData.length
-					? filteredData
-					: [
-							{
-								createdAt: null,
-								actualBalance: 0,
-								forecastIncoming: 0,
-								forecastOutgoing: 0,
-								netBalance: 0,
-							},
-					  ]
+		if (update) loadData()
+	}, [update, loadData])
+
+	const normalizeToLocalDate = (isoDate) => {
+		const date = new Date(isoDate)
+		return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+	}
+
+	useEffect(() => {
+		if (!originalData.length) return
+
+		const groupData = (keyExtractor) => {
+			return Object.values(
+				originalData.reduce((acc, item) => {
+					const key = keyExtractor(normalizeToLocalDate(item.createdAt))
+					if (
+						!acc[key] ||
+						new Date(acc[key].createdAt) < new Date(item.createdAt)
+					) {
+						acc[key] = { ...item, key }
+					}
+					return acc
+				}, {})
 			)
 		}
-	}, [originalData, month, year])
 
-	useEffect(() => {
-		if (originalData.length) {
-			const years = originalData
-				.map((item) => new Date(item.createdAt).getFullYear())
-				.filter((year) => !isNaN(year)) // Filtra anos válidos
-			const uniqueYears = Array.from(new Set(years)) // Garante que os anos sejam únicos
-			const minYear = Math.min(...uniqueYears)
-			const maxYear = Math.max(...uniqueYears)
-			const extendedYears = [minYear - 1, ...uniqueYears, maxYear + 1] // Adiciona anos adicionais sem duplicar
-			setYearOptions(extendedYears)
+		if (year === 'all') {
+			setData(groupData((date) => date.getFullYear()))
+		} else if (month === 'all') {
+			setData(groupData((date) => date.getMonth() + 1))
+		} else {
+			const lastDayOfPreviousMonth = new Date(year, month - 1, 0)
+			const filteredData = originalData.filter((item) => {
+				const localDate = normalizeToLocalDate(item.createdAt)
+				return (
+					localDate.getFullYear() === year && localDate.getMonth() + 1 === month
+				)
+			})
+
+			setData(filteredData)
+
+			const lastDayData = originalData.find((item) => {
+				const localDate = normalizeToLocalDate(item.createdAt)
+				return localDate.getTime() <= lastDayOfPreviousMonth.getTime()
+			})
+
+			console.log('filteredData: ', filteredData);
+			console.log('lastDayData: ', lastDayData);
+			if (lastDayData) {
+				filteredData.unshift(lastDayData)
+			}
+			console.log('filteredData: ', filteredData);
+			
+
+			setData(filteredData)
+			
 		}
-	}, [originalData])
+
+		// Garantir que forecastOutgoing seja sempre positivo
+		setData((prevData) =>
+			prevData.map((item) => ({
+				...item,
+				forecastOutgoing: Math.abs(item.forecastOutgoing),
+			}))
+		)
+
+		const years = [
+			...new Set(
+				originalData.map((item) =>
+					normalizeToLocalDate(item.createdAt).getFullYear()
+				)
+			),
+		]
+		setYearOptions([Math.min(...years) - 1, ...years, Math.max(...years) + 1])
+	}, [originalData, month, year])
 
 	const handleMonthChange = (value) => {
 		setMonth(value)
-		if (value === 'all') {
-			setData(
-				originalData.length
-					? originalData
-					: [
-							{
-								createdAt: null,
-								actualBalance: 0,
-								forecastIncoming: 0,
-								forecastOutgoing: 0,
-								netBalance: 0,
-							},
-					  ]
-			) // Restaura os dados originais ou mantém índices básicos
-		} else {
-			const filteredData = originalData.filter((item) => {
-				if (!item.createdAt) return false // Ignora itens com createdAt inválido
-				const itemMonth = new Date(item.createdAt).getMonth() + 1
-				return itemMonth === value
-			})
-			setData(
-				filteredData.length
-					? filteredData
-					: [
-							{
-								createdAt: null,
-								actualBalance: 0,
-								forecastIncoming: 0,
-								forecastOutgoing: 0,
-								netBalance: 0,
-							},
-					  ]
-			) // Atualiza os dados filtrados ou mantém índices básicos
-		}
+		if (value === 'all') setData(originalData)
 	}
 
 	const handleYearChange = (value) => {
 		setYear(value)
-		if (value === 'all') {
-			setData(
-				originalData.length
-					? originalData
-					: [
-							{
-								createdAt: null,
-								actualBalance: 0,
-								forecastIncoming: 0,
-								forecastOutgoing: 0,
-								netBalance: 0,
-							},
-					  ]
-			) // Restaura os dados originais ou mantém índices básicos
-		} else {
-			const filteredData = originalData.filter((item) => {
-				if (!item.createdAt) return false // Ignora itens com createdAt inválido
-				const itemYear = new Date(item.createdAt).getFullYear()
-				return itemYear === value
-			})
-			setData(
-				filteredData.length
-					? filteredData
-					: [
-							{
-								createdAt: null,
-								actualBalance: 0,
-								forecastIncoming: 0,
-								forecastOutgoing: 0,
-								netBalance: 0,
-							},
-					  ]
-			) // Atualiza os dados filtrados ou mantém índices básicos
-		}
+		if (value === 'all') setMonth('all')
 	}
 
-	const handleUpdateDashboard = () => {
-		const updateData = {
-			month,
-			year,
-			// Adicione aqui os dados necessários para o update
-		}
-		loading(true)
-		updateDashboard(updateData)
-			.then((response) => {
-				if (response.status === 200) {
-					loadData() // Recarrega os dados após o update
-				}
-			})
-			.catch((error) => {
-				console.error('Erro ao realizar o update:', error)
-			})
-			.finally(() => {
-				loading(false)
-			})
+	const renderChart = (title, dataKey) => {
+		const hasData = data.length > 0
+		const placeholderData = hasData
+			? data
+			: Array.from({ length: 5 }, (_, i) => ({
+					key: i + 1,
+					[dataKey]: 0,
+			  }))
+
+		return (
+			<div style={STYLES.chartContainer}>
+				<Title level={4} style={{ color: STYLES.titleColor }}>
+					{title}
+				</Title>
+				<ResponsiveContainer
+					width='100%'
+					height={300}
+					style={{ backgroundColor: STYLES.chartBackground }}
+				>
+					<LineChart data={placeholderData} margin={STYLES.chartMargin}>
+						<CartesianGrid strokeDasharray='3 3' />
+						<XAxis
+							dataKey={
+								year === 'all' ? 'key' : month === 'all' ? 'key' : 'createdAt'
+							}
+							tickFormatter={(tick) =>
+								formatXAxis(
+									tick,
+									year === 'all' ? 'year' : month === 'all' ? 'month' : 'day'
+								)
+							}
+							angle={STYLES.xAxis.angle}
+							textAnchor={STYLES.xAxis.textAnchor}
+							style={{ fontSize: STYLES.xAxis.fontSize }}
+							dy={STYLES.xAxis.dy}
+						/>
+						<YAxis tickFormatter={formatCurrency} width={100} />
+						<Tooltip formatter={formatCurrency} labelFormatter={() => ''} />
+						<Line
+							type='monotone'
+							dataKey={dataKey}
+							stroke='#000'
+							strokeWidth={2}
+							name={title}
+							dot={hasData}
+						/>
+					</LineChart>
+				</ResponsiveContainer>
+			</div>
+		)
 	}
 
 	return (
 		<div>
-			<Row style={{ marginBottom: '20px' }} gutter={16}>
+			<Row style={{ marginBottom: 20 }} gutter={16}>
 				<Col>
 					<Select
 						value={month}
 						onChange={handleMonthChange}
-						style={{ width: 120 }}
+						style={{ width: 100 }}
+						disabled={year === 'all'}
 					>
-						<Option key='all' value='all'>
-							Todos
-						</Option>
+						<Option value='all'>Todos</Option>
 						{Array.from({ length: 12 }, (_, i) => (
 							<Option key={i + 1} value={i + 1}>
-								{new Date(0, i).toLocaleString('default', { month: 'long' })}
+								{new Date(0, i).toLocaleString('default', { month: 'short' })}
 							</Option>
 						))}
 					</Select>
@@ -240,149 +266,23 @@ const Dashboards = ({ mudaTitulo, loading }) => {
 					<Select
 						value={year}
 						onChange={handleYearChange}
-						style={{ width: 120 }}
+						style={{ width: 100 }}
 					>
-						<Option key='all' value='all'>
-							Todos
-						</Option>
-						{yearOptions.map((yearOption) => (
-							<Option key={yearOption} value={yearOption}>
-								{yearOption}
+						<Option value='all'>Todos</Option>
+						{yearOptions.map((yr) => (
+							<Option key={yr} value={yr}>
+								{yr}
 							</Option>
 						))}
 					</Select>
 				</Col>
-				<Col>
-					<Button type='primary' onClick={handleUpdateDashboard}>
-						Atualizar
-					</Button>
-				</Col>
 			</Row>
-			<div style={WRAPPER_STYLE}>
-				<div style={CONTAINER_STYLE}>
-					<Title level={4} style={{ color: '#ffffff' }}>
-						Saldo Atual
-					</Title>
-					<ResponsiveContainer
-						width='100%'
-						height={300}
-						style={{ backgroundColor: CHART_BACKGROUND_COLOR }}
-					>
-						<LineChart data={data} margin={CHART_MARGIN}>
-							<CartesianGrid strokeDasharray='3 3' />
-							<XAxis
-								dataKey='createdAt'
-								tickFormatter={formatXAxis}
-								angle={X_AXIS_ANGLE}
-								textAnchor={X_AXIS_TEXT_ANCHOR}
-								style={X_AXIS_STYLE}
-								dy={X_AXIS_DY}
-							/>
-							<YAxis />
-							<Tooltip />
-							<Line
-								type='monotone'
-								dataKey='actualBalance'
-								stroke={LINE_COLOR}
-								strokeWidth={LINE_WIDTH}
-								name='Saldo Atual'
-							/>
-						</LineChart>
-					</ResponsiveContainer>
-				</div>
-				<div style={CONTAINER_STYLE}>
-					<Title level={4} style={{ color: '#ffffff' }}>
-						Previsão de Entrada
-					</Title>
-					<ResponsiveContainer
-						width='100%'
-						height={300}
-						style={{ backgroundColor: CHART_BACKGROUND_COLOR }}
-					>
-						<LineChart data={data} margin={CHART_MARGIN}>
-							<CartesianGrid strokeDasharray='3 3' />
-							<XAxis
-								dataKey='createdAt'
-								tickFormatter={formatXAxis}
-								angle={X_AXIS_ANGLE}
-								textAnchor={X_AXIS_TEXT_ANCHOR}
-								style={X_AXIS_STYLE}
-								dy={X_AXIS_DY}
-							/>
-							<YAxis />
-							<Tooltip />
-							<Line
-								type='monotone'
-								dataKey='forecastIncoming'
-								stroke={LINE_COLOR}
-								strokeWidth={LINE_WIDTH}
-								name='Previsão de Entrada'
-							/>
-						</LineChart>
-					</ResponsiveContainer>
-				</div>
-				<div style={CONTAINER_STYLE}>
-					<Title level={4} style={{ color: '#ffffff' }}>
-						Previsão de Saída
-					</Title>
-					<ResponsiveContainer
-						width='100%'
-						height={300}
-						style={{ backgroundColor: CHART_BACKGROUND_COLOR }}
-					>
-						<LineChart data={data} margin={CHART_MARGIN}>
-							<CartesianGrid strokeDasharray='3 3' />
-							<XAxis
-								dataKey='createdAt'
-								tickFormatter={formatXAxis}
-								angle={X_AXIS_ANGLE}
-								textAnchor={X_AXIS_TEXT_ANCHOR}
-								style={X_AXIS_STYLE}
-								dy={X_AXIS_DY}
-							/>
-							<YAxis />
-							<Tooltip />
-							<Line
-								type='monotone'
-								dataKey='forecastOutgoing'
-								stroke={LINE_COLOR}
-								strokeWidth={LINE_WIDTH}
-								name='Previsão de Saída'
-							/>
-						</LineChart>
-					</ResponsiveContainer>
-				</div>
-				<div style={CONTAINER_STYLE}>
-					<Title level={4} style={{ color: '#ffffff' }}>
-						Saldo Líquido
-					</Title>
-					<ResponsiveContainer
-						width='100%'
-						height={300}
-						style={{ backgroundColor: CHART_BACKGROUND_COLOR }}
-					>
-						<LineChart data={data} margin={CHART_MARGIN}>
-							<CartesianGrid strokeDasharray='3 3' />
-							<XAxis
-								dataKey='createdAt'
-								tickFormatter={formatXAxis}
-								angle={X_AXIS_ANGLE}
-								textAnchor={X_AXIS_TEXT_ANCHOR}
-								style={X_AXIS_STYLE}
-								dy={X_AXIS_DY}
-							/>
-							<YAxis />
-							<Tooltip />
-							<Line
-								type='monotone'
-								dataKey='netBalance'
-								stroke={LINE_COLOR}
-								strokeWidth={LINE_WIDTH}
-								name='Saldo Líquido'
-							/>
-						</LineChart>
-					</ResponsiveContainer>
-				</div>
+
+			<div style={STYLES.wrapper}>
+				{renderChart('Saldo Real', 'actualBalance')}
+				{renderChart('Saldo Líquido', 'netBalance')}
+				{renderChart('Previsão de Entrada', 'forecastIncoming')}
+				{renderChart('Previsão de Saída', 'forecastOutgoing')}
 			</div>
 		</div>
 	)

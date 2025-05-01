@@ -2,22 +2,26 @@ import React from 'react'
 
 import '../App.css'
 
-import { Input, Typography, Row, Col, Card, Modal, Checkbox } from 'antd'
 import {
-	TitleFilter,
-	SelectYear,
-	SelectMonth,
-	SelectBank,
-	SelectDescription,
-	TransactionOptions,
-} from '../components'
+	Input,
+	Typography,
+	Row,
+	Col,
+	Card,
+	Checkbox,
+	DatePicker,
+	Popconfirm,
+} from 'antd'
+import { TitleFilter, SelectBank, SelectDescription } from '../components'
 import {
 	PlusCircleOutlined,
 	CheckOutlined,
 	DeleteOutlined,
+	EditOutlined,
 } from '@ant-design/icons'
 import { getExtractData, removeTransaction, planToPrincipal } from '../api'
 import { openNotification, formatDateToUser, prepareValue } from '../utils'
+import moment from 'moment'
 
 const { Title } = Typography
 
@@ -35,7 +39,6 @@ class ExtractPlan extends React.Component {
 			transactions: [],
 			allTransactions: [],
 			checked: [],
-
 			year: nextMonthYear,
 			month: nextMonthMonth,
 			notCompensated: false,
@@ -44,7 +47,7 @@ class ExtractPlan extends React.Component {
 			detail: '',
 			banks: [],
 			descriptions: [],
-			filtro: false,
+			filtro: true,
 			idToEdit: null,
 			menu: {
 				modalVisible: false,
@@ -110,6 +113,7 @@ class ExtractPlan extends React.Component {
 			switch (event.target.name) {
 				case 'filtro':
 					state.filtro = !state.filtro
+					state.checked = []
 					break
 
 				case 'clearFilter':
@@ -118,6 +122,7 @@ class ExtractPlan extends React.Component {
 					state.month = 'Selecione'
 					state.bankId = null
 					state.description = ''
+					state.checked = []
 					this.filterList()
 					break
 
@@ -135,21 +140,25 @@ class ExtractPlan extends React.Component {
 
 				case 'year':
 					state.year = event.target.value
+					state.checked = []
 					this.filterList()
 					break
 
 				case 'month':
 					state.month = event.target.value
+					state.checked = []
 					this.filterList()
 					break
 
 				case 'bankId':
 					state.bankId = event.target.value
+					state.checked = []
 					this.filterList()
 					break
 
 				case 'description':
 					state.description = event.target.value
+					state.checked = []
 					this.filterList()
 					break
 
@@ -162,6 +171,7 @@ class ExtractPlan extends React.Component {
 
 				case 'detail':
 					state.detail = event.target.value
+					state.checked = []
 					this.filterList()
 					break
 
@@ -182,10 +192,7 @@ class ExtractPlan extends React.Component {
 
 	removeChecked(id) {
 		this.setState((state) => {
-			state.checked = state.checked.filter((element) => {
-				return element !== id
-			})
-
+			state.checked = state.checked.filter((element) => element !== id)
 			return state
 		})
 	}
@@ -199,39 +206,38 @@ class ExtractPlan extends React.Component {
 	}
 
 	deleteTransactionChecked() {
-		if (window.confirm('Deseja realmente apagar essa Transação?')) {
-			this.props.loading(true)
+		this.props.loading(true)
 
-			const checked = this.state.checked
+		const checked = this.state.checked
 
-			for (let i = 0; i < checked.length; i++) {
-				removeTransaction(checked[i])
-					.then((res) => {
-						if (res.data.code === 202) {
-							openNotification(
-								'success',
-								'Transação removida',
-								'Transação removida com sucesso.'
-							)
-							this.processExtractData()
-						} else {
-							openNotification(
-								'error',
-								'Transação não removida',
-								`A Transação não pode ser removida. ${res?.data?.message}`
-							)
-						}
-					})
-					.catch((err) => {
+		for (let i = 0; i < checked.length; i++) {
+			removeTransaction(checked[i])
+				.then((res) => {
+					if (res.data.code === 202) {
+						openNotification(
+							'success',
+							'Transação removida',
+							'Transação removida com sucesso.'
+						)
+
+						this.processExtractData()
+					} else {
 						openNotification(
 							'error',
 							'Transação não removida',
-							'Erro interno. Tente novamente mais tarde.'
+							`A Transação não pode ser removida. ${res?.data?.message}`
 						)
-					})
-			}
-			this.setState({ checked: [] })
+					}
+				})
+				.catch((err) => {
+					openNotification(
+						'error',
+						'Transação não removida',
+						'Erro interno. Tente novamente mais tarde.'
+					)
+				})
 		}
+		this.setState({ checked: [] })
 	}
 
 	filterList() {
@@ -290,74 +296,71 @@ class ExtractPlan extends React.Component {
 			)
 
 			state.transactions = transactionFiltered
+			state.checked = state.checked.filter((id) =>
+				transactionFiltered.some((transaction) => transaction._id === id)
+			)
 			return state
 		})
 	}
 
 	remover(id) {
-		if (window.confirm('Deseja realmente apagar essa Transação?')) {
-			return removeTransaction(id)
-				.then((res) => {
-					if (res.data.code === 202) {
-						openNotification(
-							'success',
-							'Transação removida',
-							'Transação removida com sucesso.'
-						)
-					} else {
-						openNotification(
-							'error',
-							'Transação não removida',
-							`A Transação não pode ser removida. ${res?.data?.message}`
-						)
-					}
-				})
-				.catch((err) => {
+		return removeTransaction(id)
+			.then((res) => {
+				if (res.data.code === 202) {
+					openNotification(
+						'success',
+						'Transação removida',
+						'Transação removida com sucesso.'
+					)
+					this.processExtractData()
+				} else {
 					openNotification(
 						'error',
 						'Transação não removida',
-						'Erro interno. Tente novamente mais tarde.'
+						`A Transação não pode ser removida. ${res?.data?.message}`
 					)
-				})
-		} else {
-			const promise = new Promise((resolve, reject) => {
-				resolve()
+				}
 			})
-
-			return promise
-		}
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Transação não removida',
+					'Erro interno. Tente novamente mais tarde.'
+				)
+			})
 	}
 
 	toAccount() {
 		this.props.loading(true)
-		if (window.confirm('Deseja lançar essas transações em Conta Corrente?')) {
-			return planToPrincipal(this.state.transactions)
-				.then((res) => {
-					if (res.data.code === 201 || res.data.code === 202) {
-						openNotification(
-							'success',
-							'Transação atualizadas',
-							'Transação atualizadas com sucesso.'
-						)
-						this.processExtractData()
-					} else {
-						openNotification(
-							'error',
-							'Transação não atualizada',
-							res.data.message
-						)
-					}
-					this.props.loading(false)
-				})
-				.catch((err) => {
+		const transactionsToAccount = this.state.transactions.filter(
+			(transaction) => this.state.checked.includes(transaction._id)
+		)
+		planToPrincipal(transactionsToAccount)
+			.then((res) => {
+				if (res.data.code === 201 || res.data.code === 202) {
+					openNotification(
+						'success',
+						'Transações atualizadas',
+						'Transações atualizadas com sucesso.'
+					)
+					this.processExtractData()
+				} else {
 					openNotification(
 						'error',
-						'Transação não atualizada',
-						'Erro interno. Tente novamente mais tarde.'
+						'Transações não atualizadas',
+						res.data.message
 					)
-					this.props.loading(false)
-				})
-		}
+				}
+				this.props.loading(false)
+			})
+			.catch((err) => {
+				openNotification(
+					'error',
+					'Transações não atualizadas',
+					'Erro interno. Tente novamente mais tarde.'
+				)
+				this.props.loading(false)
+			})
 	}
 
 	submitForm(e) {}
@@ -390,24 +393,51 @@ class ExtractPlan extends React.Component {
 					{this.state.filtro && (
 						<>
 							<Row>
-								<Col span={8}>
-									<span style={{ marginRight: '30px' }}>Ano:</span>
-									<SelectYear
-										handleChange={this.handleChange}
-										year={this.state.year}
-									/>
-								</Col>
-								<Col span={8}>
-									<span style={{ marginRight: '30px' }}>Nês:</span>
-									<SelectMonth
-										handleChange={this.handleChange}
-										month={this.state.month}
+								<Col xs={10} lg={3}>
+									<span style={{ marginRight: '40px' }}>Data:</span>
+									<DatePicker
+										picker='month'
+										size='middle'
+										onChange={(date, dateString) => {
+											if (!date) {
+												const now = new Date()
+												this.setState(
+													(state) => ({
+														...state,
+														year: now.getFullYear(),
+														month: now.getMonth() + 1,
+													}),
+													() => this.filterList()
+												)
+												return
+											}
+											const [year, month] = dateString.split('-')
+											this.setState(
+												(state) => ({
+													...state,
+													year: parseInt(year, 10),
+													month: parseInt(month, 10),
+												}),
+												() => this.filterList()
+											)
+										}}
+										format='YYYY-MM'
+										placeholder='Selecione o mês e ano'
+										value={
+											this.state.year && this.state.month
+												? moment(
+														`${this.state.year}-${this.state.month}`,
+														'YYYY-MM'
+												  )
+												: null
+										}
+										inputReadOnly
 									/>
 								</Col>
 							</Row>
 							<br />
 							<Row>
-								<Col span={12}>
+								<Col xs={11} lg={3}>
 									<span style={{ marginRight: '30px' }}>Banco:</span>
 									<SelectBank
 										handleChange={this.handleChange}
@@ -415,8 +445,8 @@ class ExtractPlan extends React.Component {
 										banks={this.state.banks}
 									/>
 								</Col>
-								<Col span={12}>
-									<span style={{ marginRight: '30px' }}>Título:</span>
+								<Col xs={12} lg={3}>
+									<span style={{ marginRight: '14px' }}>Título:</span>
 									<SelectDescription
 										lastDescriptions={this.state.descriptions}
 										currentDescription={this.state.description}
@@ -426,13 +456,13 @@ class ExtractPlan extends React.Component {
 							</Row>
 							<br></br>
 							<Row>
-								<Col span={12}>
-									<span style={{ marginRight: '30px' }}>Detalhes:</span>
+								<Col xs={16} lg={5}>
+									<span style={{ marginRight: '15px' }}>Detalhes:</span>
 									<Input
 										placeholder='Detail'
 										type='text'
 										name='detail'
-										size='md'
+										size='middle'
 										value={this.state.detail}
 										onChange={this.handleChange}
 										style={{ width: 250 }}
@@ -446,43 +476,75 @@ class ExtractPlan extends React.Component {
 						<Title level={4}>
 							Transações
 							<PlusCircleOutlined
-								style={{ paddingLeft: '10px' }}
+								style={{
+									marginLeft: '15px',
+									marginRight: '15px',
+									cursor: 'pointer',
+								}}
 								onClick={() => {
 									this.props.showModal({ transactionType: 'planejamento' })
 								}}
 							/>
-							<span
-								style={{ paddingLeft: '15px' }}
-								onClick={() => {
-									this.toAccount()
-								}}
+							<Popconfirm
+								title='Deseja lançar essas transações em Conta Corrente?'
+								onConfirm={this.toAccount}
+								okText='Sim'
+								cancelText='Não'
+								disabled={this.state.checked.length === 0}
 							>
-								<CheckOutlined />
-							</span>
-							<DeleteOutlined
-								style={{ paddingLeft: '10px' }}
-								onClick={() => {
+								<span
+									style={{
+										marginRight: '15px',
+										cursor:
+											this.state.checked.length > 0 ? 'pointer' : 'not-allowed',
+										color:
+											this.state.checked.length > 0 ? 'inherit' : '#d9d9d9',
+									}}
+								>
+									<CheckOutlined />
+								</span>
+							</Popconfirm>
+							<Popconfirm
+								title='Deseja realmente apagar as transações selecionadas?'
+								onConfirm={() => {
 									this.deleteTransactionChecked()
+								}}
+								okText='Sim'
+								cancelText='Não'
+								disabled={this.state.checked.length === 0}
+							>
+								<DeleteOutlined
+									style={{
+										marginRight: '15px',
+										cursor:
+											this.state.checked.length > 0 ? 'pointer' : 'not-allowed',
+										color:
+											this.state.checked.length > 0 ? 'inherit' : '#d9d9d9',
+									}}
+								/>
+							</Popconfirm>
+							<Checkbox
+								checked={
+									this.state.checked.length ===
+										this.state.transactions.length &&
+									this.state.transactions.length > 0
+								}
+								indeterminate={
+									this.state.checked.length > 0 &&
+									this.state.checked.length < this.state.transactions.length
+								}
+								onChange={(e) => {
+									if (e.target.checked) {
+										this.setState((state) => ({
+											checked: state.transactions.map((t) => t._id),
+										}))
+									} else {
+										this.setState({ checked: [] })
+									}
 								}}
 							/>
 						</Title>
 					</div>
-					<Modal
-						visible={this.state.menu.modalVisible}
-						onCancel={this.menuModalClose}
-						footer={null}
-						title=''
-						destroyOnClose={true}
-					>
-						<TransactionOptions
-							element={this.state.menu.transactionToUpdate}
-							screenType={'planejamento'}
-							showModal={this.props.showModal}
-							closeModal={this.menuModalClose}
-							remover={this.remover}
-							list={this.processExtractData}
-						/>
-					</Modal>
 
 					{this.state.transactions.map((element) => {
 						const transactionValue = prepareValue(
@@ -507,6 +569,38 @@ class ExtractPlan extends React.Component {
 									/>
 								</span>
 								<span>{element.description || 'Transação Genérica'}</span>
+								<span
+									style={{
+										float: 'right',
+										display: 'flex',
+										gap: '15px',
+										fontSize: '18px',
+									}}
+								>
+									<EditOutlined
+										style={{ cursor: 'pointer', color: '#006400' }}
+										onClick={() => {
+											this.props.showModal({
+												transactionType: 'planejamento',
+												transactionId: element._id,
+											})
+										}}
+									/>
+									<Popconfirm
+										title='Deseja realmente apagar essa Transação?'
+										onConfirm={() => {
+											this.remover(element._id).then(() => {
+												this.processExtractData()
+											})
+										}}
+										okText='Sim'
+										cancelText='Não'
+									>
+										<DeleteOutlined
+											style={{ cursor: 'pointer', color: 'red' }}
+										/>
+									</Popconfirm>
+								</span>
 							</>
 						)
 
@@ -514,38 +608,32 @@ class ExtractPlan extends React.Component {
 							<Card
 								size='small'
 								title={title}
-								style={{ width: 370, marginBottom: '5px' }}
+								style={{ maxWidth: 560, marginBottom: '5px' }}
 								key={element._id}
 							>
-								<span
-									onClick={() => {
-										this.showMenuModal(element)
-									}}
-								>
-									<Row>
-										<Col span={12} title={formatDateToUser(element.createdAt)}>
-											Efetivação: {formatDateToUser(element.effectedAt)}
-										</Col>
-										<Col span={12} style={{ textAlign: 'right' }}>
-											Valor:{' '}
-											<span
-												style={{
-													color: transactionValue.color,
-												}}
-											>
-												{transactionValue.value}
-											</span>
-										</Col>
-									</Row>
-									<Row>
-										<Col span={24} title={element.bankId?.name}>
-											Banco: {element.bankName}
-										</Col>
-									</Row>
-									<Row>
-										<Col span={24}>Detalhes: {element.detail}</Col>
-									</Row>
-								</span>
+								<Row>
+									<Col span={12} title={formatDateToUser(element.createdAt)}>
+										Efetivação: {formatDateToUser(element.effectedAt)}
+									</Col>
+									<Col span={12} style={{ textAlign: 'right' }}>
+										Valor:{' '}
+										<span
+											style={{
+												color: transactionValue.color,
+											}}
+										>
+											{transactionValue.value}
+										</span>
+									</Col>
+								</Row>
+								<Row>
+									<Col span={24} title={element.bankId?.name}>
+										Banco: {element.bankName}
+									</Col>
+								</Row>
+								<Row>
+									<Col span={24}>Detalhes: {element.detail}</Col>
+								</Row>
 							</Card>
 						)
 					})}

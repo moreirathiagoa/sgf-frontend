@@ -12,10 +12,122 @@ import {
 	DashboardOutlined,
 } from '@ant-design/icons'
 
-const { SubMenu } = Menu
-
 class MenuPrincipal extends React.Component {
 	render() {
+		const menuItems = [
+			{
+				key: 'sub1',
+				label: 'Conta Corrente',
+				children: [
+					{
+						key: 'item1',
+						label: (
+							<Link to='/saldos'>
+								<AppstoreOutlined />
+								<span>Resumo</span>
+							</Link>
+						),
+					},
+					{
+						key: 'item2',
+						label: (
+							<Link to='/extrato-conta'>
+								<FileSearchOutlined />
+								<span>Extrato</span>
+							</Link>
+						),
+					},
+					{
+						key: 'item3',
+						label: (
+							<Link
+								to='#'
+								onClick={(e) => {
+									e.preventDefault()
+									this.props.showModal({ transactionType: 'contaCorrente' })
+								}}
+							>
+								<WalletOutlined />
+								<span>Novo</span>
+							</Link>
+						),
+					},
+					{
+						key: 'item10',
+						label: (
+							<Link to='/dashboards'>
+								<DashboardOutlined />
+								<span>Dashboards</span>
+							</Link>
+						),
+					},
+				],
+			},
+			{
+				key: 'sub2',
+				label: 'Planejamento',
+				children: [
+					{
+						key: 'item4',
+						label: (
+							<Link to='/planning'>
+								<AppstoreOutlined />
+								<span>Resumo</span>
+							</Link>
+						),
+					},
+					{
+						key: 'item5',
+						label: (
+							<Link to='/extrato-plano'>
+								<FileSearchOutlined />
+								<span>Extrato</span>
+							</Link>
+						),
+					},
+					{
+						key: 'item6',
+						label: (
+							<Link
+								to='#'
+								onClick={(e) => {
+									e.preventDefault()
+									this.props.showModal({ transactionType: 'planejamento' })
+								}}
+							>
+								<WalletOutlined />
+								<span>Novo</span>
+							</Link>
+						),
+					},
+				],
+			},
+			{
+				key: 'sub4',
+				label: 'Cadastros',
+				children: [
+					{
+						key: 'item7',
+						label: (
+							<Link to='/banks'>
+								<BankOutlined />
+								<span>Bancos</span>
+							</Link>
+						),
+					},
+				],
+			},
+			{
+				key: 'item9',
+				label: (
+					<Link to='/logout'>
+						<LogoutOutlined />
+						<span>Logout</span>
+					</Link>
+				),
+			},
+		]
+
 		return (
 			this.props.logado && (
 				<Menu
@@ -25,77 +137,11 @@ class MenuPrincipal extends React.Component {
 					onClick={() => {
 						this.props.handleClose()
 					}}
-				>
-					<SubMenu key='sub1' title='Conta Corrente'>
-						<Menu.Item key='item10'>
-							<Link to='/dashboards'>
-								<DashboardOutlined />
-								<span>Dashboards</span>
-							</Link>
-						</Menu.Item>
-						<Menu.Item key='item1'>
-							<Link to='/saldos'>
-								<AppstoreOutlined />
-								<span>Resumo</span>
-							</Link>
-						</Menu.Item>
-						<Menu.Item key='item2'>
-							<Link to='/extrato-conta'>
-								<FileSearchOutlined />
-								<span>Extrato</span>
-							</Link>
-						</Menu.Item>
-						<Menu.Item
-							key='item3'
-							onClick={() => {
-								this.props.showModal({ transactionType: 'contaCorrente' })
-							}}
-						>
-							<WalletOutlined />
-							<span>Novo</span>
-						</Menu.Item>
-					</SubMenu>
-
-					<SubMenu key='sub2' title='Planejamento'>
-						<Menu.Item key='item4'>
-							<Link to='/planning'>
-								<AppstoreOutlined />
-								<span>Resumo</span>
-							</Link>
-						</Menu.Item>
-						<Menu.Item key='item5'>
-							<Link to='/extrato-plano'>
-								<FileSearchOutlined />
-								<span>Extrato</span>
-							</Link>
-						</Menu.Item>
-						<Menu.Item
-							key='item6'
-							onClick={() => {
-								this.props.showModal({ transactionType: 'planejamento' })
-							}}
-						>
-							<WalletOutlined />
-							<span>Novo</span>
-						</Menu.Item>
-					</SubMenu>
-
-					<SubMenu key='sub4' title='Cadastros'>
-						<Menu.Item key='item7'>
-							<Link to='/banks'>
-								<BankOutlined />
-								<span>Bancos</span>
-							</Link>
-						</Menu.Item>
-					</SubMenu>
-
-					<Menu.Item key='item9'>
-						<Link to='/logout'>
-							<LogoutOutlined />
-							<span>Logout</span>
-						</Link>
-					</Menu.Item>
-				</Menu>
+					items={menuItems}
+					style={{
+						transition: 'background-color 0.3s ease', // Transição suave
+					}}
+				/>
 			)
 		)
 	}
