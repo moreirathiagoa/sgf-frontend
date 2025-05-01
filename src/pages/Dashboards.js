@@ -109,13 +109,18 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 		if (update) loadData()
 	}, [update, loadData])
 
+	const normalizeToLocalDate = (isoDate) => {
+		const date = new Date(isoDate)
+		return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+	}
+
 	useEffect(() => {
 		if (!originalData.length) return
 
 		const groupData = (keyExtractor) => {
 			return Object.values(
 				originalData.reduce((acc, item) => {
-					const key = keyExtractor(new Date(item.createdAt))
+					const key = keyExtractor(normalizeToLocalDate(item.createdAt))
 					if (
 						!acc[key] ||
 						new Date(acc[key].createdAt) < new Date(item.createdAt)
@@ -132,12 +137,31 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 		} else if (month === 'all') {
 			setData(groupData((date) => date.getMonth() + 1))
 		} else {
-			setData(
-				originalData.filter((item) => {
-					const date = new Date(item.createdAt)
-					return date.getFullYear() === year && date.getMonth() + 1 === month
-				})
-			)
+			const lastDayOfPreviousMonth = new Date(year, month - 1, 0)
+			const filteredData = originalData.filter((item) => {
+				const localDate = normalizeToLocalDate(item.createdAt)
+				return (
+					localDate.getFullYear() === year && localDate.getMonth() + 1 === month
+				)
+			})
+
+			setData(filteredData)
+
+			const lastDayData = originalData.find((item) => {
+				const localDate = normalizeToLocalDate(item.createdAt)
+				return localDate.getTime() <= lastDayOfPreviousMonth.getTime()
+			})
+
+			console.log('filteredData: ', filteredData);
+			console.log('lastDayData: ', lastDayData);
+			if (lastDayData) {
+				filteredData.unshift(lastDayData)
+			}
+			console.log('filteredData: ', filteredData);
+			
+
+			setData(filteredData)
+			
 		}
 
 		// Garantir que forecastOutgoing seja sempre positivo
@@ -150,7 +174,9 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 
 		const years = [
 			...new Set(
-				originalData.map((item) => new Date(item.createdAt).getFullYear())
+				originalData.map((item) =>
+					normalizeToLocalDate(item.createdAt).getFullYear()
+				)
 			),
 		]
 		setYearOptions([Math.min(...years) - 1, ...years, Math.max(...years) + 1])
