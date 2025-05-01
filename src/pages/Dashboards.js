@@ -145,26 +145,18 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 				)
 			})
 
-			setData(filteredData)
-
 			const lastDayData = originalData.find((item) => {
 				const localDate = normalizeToLocalDate(item.createdAt)
 				return localDate.getTime() <= lastDayOfPreviousMonth.getTime()
 			})
 
-			console.log('filteredData: ', filteredData);
-			console.log('lastDayData: ', lastDayData);
 			if (lastDayData) {
 				filteredData.unshift(lastDayData)
 			}
-			console.log('filteredData: ', filteredData);
-			
 
 			setData(filteredData)
-			
 		}
 
-		// Garantir que forecastOutgoing seja sempre positivo
 		setData((prevData) =>
 			prevData.map((item) => ({
 				...item,
