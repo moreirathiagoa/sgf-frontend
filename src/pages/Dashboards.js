@@ -137,22 +137,12 @@ const Dashboards = ({ mudaTitulo, loading, update }) => {
 		} else if (month === 'all') {
 			setData(groupData((date) => date.getMonth() + 1))
 		} else {
-			const lastDayOfPreviousMonth = new Date(year, month - 1, 0)
 			const filteredData = originalData.filter((item) => {
 				const localDate = normalizeToLocalDate(item.createdAt)
 				return (
-					localDate.getFullYear() === year && localDate.getMonth() + 1 === month
+					localDate.getFullYear() === year && localDate.getMonth() + 1 <= month
 				)
 			})
-
-			const lastDayData = originalData.find((item) => {
-				const localDate = normalizeToLocalDate(item.createdAt)
-				return localDate.getTime() <= lastDayOfPreviousMonth.getTime()
-			})
-
-			if (lastDayData) {
-				filteredData.unshift(lastDayData)
-			}
 
 			setData(filteredData)
 		}
