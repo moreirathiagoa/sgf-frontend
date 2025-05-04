@@ -65,7 +65,7 @@ class SelectDescription extends React.Component {
 				size='medium'
 				style={{
 					width: '100%',
-					maxWidth: '200px', // Ajuste para desktop
+					maxWidth: this.props.maxWidth,
 				}}
 				placeholder='Selecione ou digite...'
 				dropdownRender={(menu) => (

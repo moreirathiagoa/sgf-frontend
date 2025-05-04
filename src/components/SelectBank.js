@@ -12,8 +12,8 @@ class SelectBank extends React.Component {
 				name='bankId'
 				placeholder='Selecione'
 				value={this.props.bankId}
-				size='medium' // Alterado para 'medium'
-				style={{ width: 150 }}
+				size='medium'
+				style={{ width: 160 }}
 				onSelect={(value) => {
 					const event = {
 						target: {

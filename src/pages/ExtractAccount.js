@@ -47,8 +47,8 @@ class ExtractAccount extends React.Component {
 			filters: {
 				year: actualYear,
 				month: actualMonth,
-				onlyFuture: true,
-				onlyPast: false,
+				onlyCompensated: true,
+				onlyNotCompensated: false,
 				bankId: null,
 				description: '',
 				detail: '',
@@ -56,7 +56,6 @@ class ExtractAccount extends React.Component {
 
 			banks: [],
 			descriptions: [],
-			filtro: true,
 			idToEdit: null,
 			menu: {
 				modalVisible: false,
@@ -102,10 +101,13 @@ class ExtractAccount extends React.Component {
 					this.setState((state) => {
 						let transactions = extractData.transactionList
 
-						if (state.filters.onlyPast) {
-							const today = new Date()
+						if (state.filters.onlyCompensated) {
 							transactions = transactions.filter(
-								(transaction) => new Date(transaction.effectedAt) < today
+								(transaction) => !transaction.isCompensated
+							)
+						} else if (state.filters.onlyNotCompensated) {
+							transactions = transactions.filter(
+								(transaction) => transaction.isCompensated
 							)
 						}
 
@@ -132,11 +134,6 @@ class ExtractAccount extends React.Component {
 	handleChange(event) {
 		this.setState((state) => {
 			switch (event.target.name) {
-				case 'filtro':
-					state.filtro = !state.filtro
-					state.checked = []
-					break
-
 				case 'clearFilter':
 					const now = new Date()
 					state.transactions = state.allTransactions
@@ -172,9 +169,10 @@ class ExtractAccount extends React.Component {
 					this.processExtractData()
 					break
 
-				case 'timeFilter':
-					state.filters.onlyFuture = event.target.value === 'future'
-					state.filters.onlyPast = event.target.value === 'past'
+				case 'compensationFilter':
+					state.filters.onlyCompensated =
+						event.target.value === 'notCompensated'
+					state.filters.onlyNotCompensated = event.target.value === 'past'
 					state.checked = []
 					this.processExtractData()
 					break
@@ -346,134 +344,151 @@ class ExtractAccount extends React.Component {
 		return (
 			<div>
 				<div>
-					<TitleFilter
-						handleChange={this.handleChange}
-						isFiltered={this.state.filtro}
-					/>
-					{this.state.filtro && (
-						<>
-							<Row>
-								<Col xs={10}  lg={3}>
-									<span style={{ marginRight: '40px' }}>Data:</span>
-									<DatePicker
-										size='middle'
-										picker='month'
-										style={{ width: 100 }}
-										onChange={(date, dateString) => {
-											if (!date) {
-												const now = new Date()
-												this.setState(
-													(state) => ({
-														...state,
-														filters: {
-															...state.filters,
-															year: now.getFullYear(),
-															month: now.getMonth() + 1,
-														},
-													}),
-													() => this.processExtractData()
-												)
-												return
-											}
-											const [year, month] = dateString.split('-')
+					<TitleFilter handleChange={this.handleChange} />
+					<>
+						<Row>
+							<Col xs={20} lg={4}>
+								<Radio.Group
+									size='middle'
+									name='compensationFilter'
+									value={
+										this.state.filters.onlyCompensated
+											? 'notCompensated'
+											: this.state.filters.onlyNotCompensated
+											? 'past'
+											: 'all'
+									}
+									onChange={(e) =>
+										this.handleChange({
+											target: {
+												name: 'compensationFilter',
+												value: e.target.value,
+											},
+										})
+									}
+								>
+									<Radio.Button
+										value='notCompensated'
+										style={{
+											marginRight: '5px',
+											padding: '0 7px',
+											backgroundColor: this.state.filters.onlyCompensated
+												? '#e6f7ff'
+												: 'transparent',
+										}}
+									>
+										Pendentes
+									</Radio.Button>
+									<Radio.Button
+										value='all'
+										style={{
+											marginRight: '5px',
+											padding: '0 7px',
+											backgroundColor:
+												!this.state.filters.onlyCompensated &&
+												!this.state.filters.onlyNotCompensated
+													? '#e6f7ff'
+													: 'transparent',
+										}}
+									>
+										Todos
+									</Radio.Button>
+									<Radio.Button
+										value='past'
+										style={{
+											padding: '0 7px',
+											backgroundColor: this.state.filters.onlyNotCompensated
+												? '#e6f7ff'
+												: 'transparent',
+										}}
+									>
+										Compensados
+									</Radio.Button>
+								</Radio.Group>
+							</Col>
+						</Row>
+						<Row style={{ marginTop: '8px' }}>
+							<Col xs={12} lg={3}>
+								<span style={{ marginRight: '20px' }}>Data:</span>
+								<DatePicker
+									size='middle'
+									picker='month'
+									style={{ width: 160 }}
+									onChange={(date, dateString) => {
+										if (!date) {
+											const now = new Date()
 											this.setState(
 												(state) => ({
 													...state,
 													filters: {
 														...state.filters,
-														year: parseInt(year, 10),
-														month: parseInt(month, 10),
+														year: now.getFullYear(),
+														month: now.getMonth() + 1,
 													},
 												}),
 												() => this.processExtractData()
 											)
-										}}
-										format='YYYY-MM'
-										placeholder='Selecione o mês e ano'
-										value={
-											this.state.filters.year && this.state.filters.month
-												? moment(
-														`${this.state.filters.year}-${this.state.filters.month}`,
-														'YYYY-MM'
-												  )
-												: null
+											return
 										}
-										inputReadOnly
-									/>
-								</Col>
-								<Col xs={13}  lg={4}>
-									<span style={{ marginRight: '15px' }}>Tipo:</span>
-									<Radio.Group
-										size='middle'
-										name='timeFilter'
-										value={
-											this.state.filters.onlyFuture
-												? 'future'
-												: this.state.filters.onlyPast
-												? 'past'
-												: 'all'
-										}
-										onChange={(e) =>
-											this.handleChange({
-												target: { name: 'timeFilter', value: e.target.value },
-											})
-										}
-									>
-										<Radio.Button
-											value='all'
-											style={{ marginRight: '5px', padding: '0 7px' }}
-										>
-											Todos
-										</Radio.Button>
-										<Radio.Button
-											value='future'
-											style={{ marginRight: '5px', padding: '0 7px' }}
-										>
-											Futuro
-										</Radio.Button>
-										<Radio.Button value='past' style={{ padding: '0 7px' }}>
-											Concluído
-										</Radio.Button>
-									</Radio.Group>
-								</Col>
-							</Row>
-							<br />
-							<Row>
-								<Col xs={11} lg={3}>
-									<span style={{ marginRight: '30px' }}>Banco:</span>
-									<SelectBank
-										handleChange={this.handleChange}
-										bankId={this.state.filters.bankId}
-										banks={this.state.banks}
-									/>
-								</Col>
-								<Col xs={12} lg={4}>
-									<span style={{ marginRight: '5px' }}>Título:</span>
-									<SelectDescription
-										lastDescriptions={this.state.descriptions}
-										currentDescription={this.state.filters.description}
-										handleChange={this.handleChange}
-									/>
-								</Col>
-							</Row>
-							<br></br>
-							<Row>
-								<Col xs={16} lg={6}>
-									<span style={{ marginRight: '15px' }}>Detalhes:</span>
-									<Input
-										placeholder='Detail'
-										type='text'
-										name='detail'
-										size='middle'
-										value={this.state.detail}
-										onChange={this.handleChange}
-										style={{ maxWidth: 300 }}
-									/>
-								</Col>
-							</Row>
-						</>
-					)}
-					<br />
+										const [year, month] = dateString.split('-')
+										this.setState(
+											(state) => ({
+												...state,
+												filters: {
+													...state.filters,
+													year: parseInt(year, 10),
+													month: parseInt(month, 10),
+												},
+											}),
+											() => this.processExtractData()
+										)
+									}}
+									format='YYYY-MM'
+									placeholder='Selecione o mês e ano'
+									value={
+										this.state.filters.year && this.state.filters.month
+											? moment(
+													`${this.state.filters.year}-${this.state.filters.month}`,
+													'YYYY-MM'
+											  )
+											: null
+									}
+									inputReadOnly
+								/>
+							</Col>
+							<Col xs={11} lg={3}>
+								<span style={{ marginRight: '30px' }}>Banco:</span>
+								<SelectBank
+									handleChange={this.handleChange}
+									bankId={this.state.filters.bankId}
+									banks={this.state.banks}
+								/>
+							</Col>
+						</Row>
+						<Row style={{ marginTop: '8px', marginBottom: '20px' }}>
+							<Col xs={12} lg={3}>
+								<span style={{ marginRight: '15px' }}>Título:</span>
+								<SelectDescription
+									lastDescriptions={this.state.descriptions}
+									currentDescription={this.state.filters.description}
+									handleChange={this.handleChange}
+									maxWidth={160}
+								/>
+							</Col>
+							<Col xs={12} lg={3}>
+								<span style={{ marginRight: '15px' }}>Detalhes:</span>
+								<Input
+									placeholder='Detail'
+									type='text'
+									name='detail'
+									size='middle'
+									value={this.state.detail}
+									onChange={this.handleChange}
+									style={{ maxWidth: 160 }}
+								/>
+							</Col>
+						</Row>
+					</>
 					<div>
 						<Title level={4}>
 							Transações
