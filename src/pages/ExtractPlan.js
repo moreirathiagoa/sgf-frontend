@@ -119,16 +119,6 @@ class ExtractPlan extends React.Component {
 					state.data.bankType = event.target.value
 					break
 
-				case 'year':
-					state.year = event.target.value
-					state.checked = []
-					break
-
-				case 'month':
-					state.month = event.target.value
-					state.checked = []
-					break
-
 				case 'bankId':
 					state.bankId = event.target.value
 					state.checked = []
