@@ -1,20 +1,7 @@
 import React from 'react'
-import moment from 'moment'
-
 import '../App.css'
-
-import {
-	Input,
-	Checkbox,
-	Typography,
-	Row,
-	Col,
-	Card,
-	DatePicker,
-	Radio,
-	Popconfirm,
-} from 'antd'
-import { TitleFilter, SelectBank, SelectDescription } from '../components'
+import { Checkbox, Typography, Row, Col, Card, Radio, Popconfirm } from 'antd'
+import { TitleFilter, Filters } from '../components'
 import {
 	PlusCircleOutlined,
 	DeleteOutlined,
@@ -47,8 +34,8 @@ class ExtractAccount extends React.Component {
 			filters: {
 				year: actualYear,
 				month: actualMonth,
-				onlyFuture: true,
-				onlyPast: false,
+				onlyCompensated: true,
+				onlyNotCompensated: false,
 				bankId: null,
 				description: '',
 				detail: '',
@@ -56,7 +43,6 @@ class ExtractAccount extends React.Component {
 
 			banks: [],
 			descriptions: [],
-			filtro: true,
 			idToEdit: null,
 			menu: {
 				modalVisible: false,
@@ -102,10 +88,13 @@ class ExtractAccount extends React.Component {
 					this.setState((state) => {
 						let transactions = extractData.transactionList
 
-						if (state.filters.onlyPast) {
-							const today = new Date()
+						if (state.filters.onlyCompensated) {
 							transactions = transactions.filter(
-								(transaction) => new Date(transaction.effectedAt) < today
+								(transaction) => !transaction.isCompensated
+							)
+						} else if (state.filters.onlyNotCompensated) {
+							transactions = transactions.filter(
+								(transaction) => transaction.isCompensated
 							)
 						}
 
@@ -132,11 +121,6 @@ class ExtractAccount extends React.Component {
 	handleChange(event) {
 		this.setState((state) => {
 			switch (event.target.name) {
-				case 'filtro':
-					state.filtro = !state.filtro
-					state.checked = []
-					break
-
 				case 'clearFilter':
 					const now = new Date()
 					state.transactions = state.allTransactions
@@ -144,8 +128,8 @@ class ExtractAccount extends React.Component {
 					state.filters.month = now.getMonth() + 1
 					state.filters.bankId = null
 					state.filters.description = ''
+					state.filters.detail = '' // Adicionado para limpar o campo "detail"
 					state.checked = []
-					this.processExtractData()
 					break
 
 				case 'name':
@@ -163,45 +147,52 @@ class ExtractAccount extends React.Component {
 				case 'year':
 					state.filters.year = event.target.value
 					state.checked = []
-					this.processExtractData()
 					break
 
 				case 'month':
 					state.filters.month = event.target.value
 					state.checked = []
-					this.processExtractData()
 					break
 
-				case 'timeFilter':
-					state.filters.onlyFuture = event.target.value === 'future'
-					state.filters.onlyPast = event.target.value === 'past'
+				case 'date': // Adicionado para tratar o filtro de data diretamente
+					state.filters.year = event.target.value.year
+					state.filters.month = event.target.value.month
 					state.checked = []
-					this.processExtractData()
+					break
+
+				case 'clearDate': // Adicionado para limpar o filtro de data
+					const nowDate = new Date()
+					state.filters.year = nowDate.getFullYear()
+					state.filters.month = nowDate.getMonth() + 1
+					state.checked = []
+					break
+
+				case 'compensationFilter':
+					state.filters.onlyCompensated =
+						event.target.value === 'notCompensated'
+					state.filters.onlyNotCompensated = event.target.value === 'past'
+					state.checked = []
 					break
 
 				case 'bankId':
 					state.filters.bankId = event.target.value
 					state.checked = []
-					this.processExtractData()
 					break
 
 				case 'description':
 					state.filters.description = event.target.value
 					state.checked = []
-					this.processExtractData()
 					break
 
 				case 'descriptionList':
 					if (event?.target?.value?.length > 0) {
 						state.descriptions = event.target.value
-						this.processExtractData()
 					}
 					break
 
 				case 'detail':
 					state.filters.detail = event.target.value
 					state.checked = []
-					this.processExtractData()
 					break
 
 				case 'checkbox':
@@ -216,7 +207,7 @@ class ExtractAccount extends React.Component {
 				default:
 			}
 			return state
-		})
+		}, this.processExtractData) // Certifique-se de chamar `processExtractData` após atualizar o estado
 	}
 
 	removeChecked(id) {
@@ -346,134 +337,80 @@ class ExtractAccount extends React.Component {
 		return (
 			<div>
 				<div>
-					<TitleFilter
-						handleChange={this.handleChange}
-						isFiltered={this.state.filtro}
-					/>
-					{this.state.filtro && (
-						<>
-							<Row>
-								<Col xs={10}  lg={3}>
-									<span style={{ marginRight: '40px' }}>Data:</span>
-									<DatePicker
-										size='middle'
-										picker='month'
-										style={{ width: 100 }}
-										onChange={(date, dateString) => {
-											if (!date) {
-												const now = new Date()
-												this.setState(
-													(state) => ({
-														...state,
-														filters: {
-															...state.filters,
-															year: now.getFullYear(),
-															month: now.getMonth() + 1,
-														},
-													}),
-													() => this.processExtractData()
-												)
-												return
-											}
-											const [year, month] = dateString.split('-')
-											this.setState(
-												(state) => ({
-													...state,
-													filters: {
-														...state.filters,
-														year: parseInt(year, 10),
-														month: parseInt(month, 10),
-													},
-												}),
-												() => this.processExtractData()
-											)
-										}}
-										format='YYYY-MM'
-										placeholder='Selecione o mês e ano'
-										value={
-											this.state.filters.year && this.state.filters.month
-												? moment(
-														`${this.state.filters.year}-${this.state.filters.month}`,
-														'YYYY-MM'
-												  )
-												: null
-										}
-										inputReadOnly
-									/>
-								</Col>
-								<Col xs={13}  lg={4}>
-									<span style={{ marginRight: '15px' }}>Tipo:</span>
+					<TitleFilter handleChange={this.handleChange} />
+					<>
+							<Row style={{ marginBottom: '10px' }}> {/* Adicionado marginBottom para espaçamento */}
+								<Col xs={20} lg={4}>
 									<Radio.Group
 										size='middle'
-										name='timeFilter'
+										name='compensationFilter'
 										value={
-											this.state.filters.onlyFuture
-												? 'future'
-												: this.state.filters.onlyPast
+											this.state.filters.onlyCompensated
+												? 'notCompensated'
+												: this.state.filters.onlyNotCompensated
 												? 'past'
 												: 'all'
 										}
 										onChange={(e) =>
 											this.handleChange({
-												target: { name: 'timeFilter', value: e.target.value },
+												target: {
+													name: 'compensationFilter',
+													value: e.target.value,
+												},
 											})
 										}
 									>
 										<Radio.Button
+											value='notCompensated'
+											style={{
+												marginRight: '5px',
+												padding: '0 7px',
+												backgroundColor: this.state.filters.onlyCompensated
+													? '#e6f7ff'
+													: 'transparent',
+											}}
+										>
+											Pendentes
+										</Radio.Button>
+										<Radio.Button
 											value='all'
-											style={{ marginRight: '5px', padding: '0 7px' }}
+											style={{
+												marginRight: '5px',
+												padding: '0 7px',
+												backgroundColor:
+													!this.state.filters.onlyCompensated &&
+													!this.state.filters.onlyNotCompensated
+														? '#e6f7ff'
+														: 'transparent',
+											}}
 										>
 											Todos
 										</Radio.Button>
 										<Radio.Button
-											value='future'
-											style={{ marginRight: '5px', padding: '0 7px' }}
+											value='past'
+											style={{
+												padding: '0 7px',
+												backgroundColor: this.state.filters.onlyNotCompensated
+													? '#e6f7ff'
+													: 'transparent',
+											}}
 										>
-											Futuro
-										</Radio.Button>
-										<Radio.Button value='past' style={{ padding: '0 7px' }}>
-											Concluído
+											Compensados
 										</Radio.Button>
 									</Radio.Group>
 								</Col>
 							</Row>
-							<br />
-							<Row>
-								<Col xs={11} lg={3}>
-									<span style={{ marginRight: '30px' }}>Banco:</span>
-									<SelectBank
-										handleChange={this.handleChange}
-										bankId={this.state.filters.bankId}
-										banks={this.state.banks}
-									/>
-								</Col>
-								<Col xs={12} lg={4}>
-									<span style={{ marginRight: '5px' }}>Título:</span>
-									<SelectDescription
-										lastDescriptions={this.state.descriptions}
-										currentDescription={this.state.filters.description}
-										handleChange={this.handleChange}
-									/>
-								</Col>
-							</Row>
-							<br></br>
-							<Row>
-								<Col xs={16} lg={6}>
-									<span style={{ marginRight: '15px' }}>Detalhes:</span>
-									<Input
-										placeholder='Detail'
-										type='text'
-										name='detail'
-										size='middle'
-										value={this.state.detail}
-										onChange={this.handleChange}
-										style={{ maxWidth: 300 }}
-									/>
-								</Col>
-							</Row>
-						</>
-					)}
-					<br />
+							<Filters
+								handleChange={this.handleChange}
+								year={this.state.filters.year}
+								month={this.state.filters.month}
+								bankId={this.state.filters.bankId}
+								banks={this.state.banks}
+								descriptions={this.state.descriptions}
+								description={this.state.filters.description}
+								detail={this.state.filters.detail}
+							/>
+					</>
 					<div>
 						<Title level={4}>
 							Transações

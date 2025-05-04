@@ -1,18 +1,7 @@
 import React from 'react'
-
 import '../App.css'
-
-import {
-	Input,
-	Typography,
-	Row,
-	Col,
-	Card,
-	Checkbox,
-	DatePicker,
-	Popconfirm,
-} from 'antd'
-import { TitleFilter, SelectBank, SelectDescription } from '../components'
+import { Typography, Row, Col, Card, Checkbox, Popconfirm } from 'antd'
+import { TitleFilter, Filters } from '../components'
 import {
 	PlusCircleOutlined,
 	CheckOutlined,
@@ -21,10 +10,8 @@ import {
 } from '@ant-design/icons'
 import { getExtractData, removeTransaction, planToPrincipal } from '../api'
 import { openNotification, formatDateToUser, prepareValue } from '../utils'
-import moment from 'moment'
 
 const { Title } = Typography
-
 const descriptionsList = new Set()
 const now = new Date()
 const nextMonthDate = new Date(now.setMonth(new Date().getMonth() + 1))
@@ -47,7 +34,6 @@ class ExtractPlan extends React.Component {
 			detail: '',
 			banks: [],
 			descriptions: [],
-			filtro: true,
 			idToEdit: null,
 			menu: {
 				modalVisible: false,
@@ -111,17 +97,13 @@ class ExtractPlan extends React.Component {
 	handleChange(event) {
 		this.setState((state) => {
 			switch (event.target.name) {
-				case 'filtro':
-					state.filtro = !state.filtro
-					state.checked = []
-					break
-
 				case 'clearFilter':
 					state.transactions = state.allTransactions
 					state.year = 'Selecione'
 					state.month = 'Selecione'
 					state.bankId = null
 					state.description = ''
+					state.detail = ''
 					state.checked = []
 					this.filterList()
 					break
@@ -182,6 +164,21 @@ class ExtractPlan extends React.Component {
 					} else {
 						state.checked.push(id)
 					}
+					break
+
+				case 'date':
+					state.year = event.target.value.year
+					state.month = event.target.value.month
+					state.checked = []
+					this.filterList()
+					break
+
+				case 'clearDate':
+					const now = new Date()
+					state.year = now.getFullYear()
+					state.month = now.getMonth() + 1
+					state.checked = []
+					this.filterList()
 					break
 
 				default:
@@ -386,92 +383,17 @@ class ExtractPlan extends React.Component {
 		return (
 			<div>
 				<div>
-					<TitleFilter
+					<TitleFilter handleChange={this.handleChange} />
+					<Filters
 						handleChange={this.handleChange}
-						isFiltered={this.state.filtro}
+						year={this.state.year}
+						month={this.state.month}
+						bankId={this.state.bankId}
+						banks={this.state.banks}
+						descriptions={this.state.descriptions}
+						description={this.state.description}
+						detail={this.state.detail}
 					/>
-					{this.state.filtro && (
-						<>
-							<Row>
-								<Col xs={10} lg={3}>
-									<span style={{ marginRight: '40px' }}>Data:</span>
-									<DatePicker
-										picker='month'
-										size='middle'
-										onChange={(date, dateString) => {
-											if (!date) {
-												const now = new Date()
-												this.setState(
-													(state) => ({
-														...state,
-														year: now.getFullYear(),
-														month: now.getMonth() + 1,
-													}),
-													() => this.filterList()
-												)
-												return
-											}
-											const [year, month] = dateString.split('-')
-											this.setState(
-												(state) => ({
-													...state,
-													year: parseInt(year, 10),
-													month: parseInt(month, 10),
-												}),
-												() => this.filterList()
-											)
-										}}
-										format='YYYY-MM'
-										placeholder='Selecione o mês e ano'
-										value={
-											this.state.year && this.state.month
-												? moment(
-														`${this.state.year}-${this.state.month}`,
-														'YYYY-MM'
-												  )
-												: null
-										}
-										inputReadOnly
-									/>
-								</Col>
-							</Row>
-							<br />
-							<Row>
-								<Col xs={11} lg={3}>
-									<span style={{ marginRight: '30px' }}>Banco:</span>
-									<SelectBank
-										handleChange={this.handleChange}
-										bankId={this.state.bankId}
-										banks={this.state.banks}
-									/>
-								</Col>
-								<Col xs={12} lg={3}>
-									<span style={{ marginRight: '14px' }}>Título:</span>
-									<SelectDescription
-										lastDescriptions={this.state.descriptions}
-										currentDescription={this.state.description}
-										handleChange={this.handleChange}
-									/>
-								</Col>
-							</Row>
-							<br></br>
-							<Row>
-								<Col xs={16} lg={5}>
-									<span style={{ marginRight: '15px' }}>Detalhes:</span>
-									<Input
-										placeholder='Detail'
-										type='text'
-										name='detail'
-										size='middle'
-										value={this.state.detail}
-										onChange={this.handleChange}
-										style={{ width: 250 }}
-									/>
-								</Col>
-							</Row>
-						</>
-					)}
-					<br />
 					<div>
 						<Title level={4}>
 							Transações

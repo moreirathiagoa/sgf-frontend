@@ -269,6 +269,7 @@ class Transaction extends React.Component {
 						lastDescriptions={lastDescriptions}
 						currentDescription={data.description}
 						handleChange={this.handleChange}
+						maxWidth={220}
 					/>
 				</ResponsiveFormItem>
 
