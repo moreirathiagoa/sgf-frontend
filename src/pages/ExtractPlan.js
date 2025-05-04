@@ -99,13 +99,12 @@ class ExtractPlan extends React.Component {
 			switch (event.target.name) {
 				case 'clearFilter':
 					state.transactions = state.allTransactions
-					state.year = 'Selecione'
-					state.month = 'Selecione'
+					state.year = null
+					state.month = null
 					state.bankId = null
 					state.description = ''
 					state.detail = ''
 					state.checked = []
-					this.filterList()
 					break
 
 				case 'name':
@@ -120,28 +119,14 @@ class ExtractPlan extends React.Component {
 					state.data.bankType = event.target.value
 					break
 
-				case 'year':
-					state.year = event.target.value
-					state.checked = []
-					this.filterList()
-					break
-
-				case 'month':
-					state.month = event.target.value
-					state.checked = []
-					this.filterList()
-					break
-
 				case 'bankId':
 					state.bankId = event.target.value
 					state.checked = []
-					this.filterList()
 					break
 
 				case 'description':
 					state.description = event.target.value
 					state.checked = []
-					this.filterList()
 					break
 
 				case 'descriptionList':
@@ -154,7 +139,6 @@ class ExtractPlan extends React.Component {
 				case 'detail':
 					state.detail = event.target.value
 					state.checked = []
-					this.filterList()
 					break
 
 				case 'checkbox':
@@ -170,7 +154,6 @@ class ExtractPlan extends React.Component {
 					state.year = event.target.value.year
 					state.month = event.target.value.month
 					state.checked = []
-					this.filterList()
 					break
 
 				case 'clearDate':
@@ -178,13 +161,12 @@ class ExtractPlan extends React.Component {
 					state.year = now.getFullYear()
 					state.month = now.getMonth() + 1
 					state.checked = []
-					this.filterList()
 					break
 
 				default:
 			}
 			return state
-		})
+		}, this.filterList)
 	}
 
 	removeChecked(id) {
@@ -267,20 +249,20 @@ class ExtractPlan extends React.Component {
 						}
 					}
 
-					if (this.state.year.toString() !== 'Selecione') {
+					if (this.state.year !== null) {
 						let now = new Date(transaction.effectedAt)
 						const ano = now.getFullYear()
 
-						if (ano.toString() !== this.state.year.toString()) {
+						if (ano !== parseInt(this.state.year, 10)) {
 							toReturn = false
 						}
 					}
 
-					if (this.state.month.toString() !== 'Selecione') {
+					if (this.state.month !== null) {
 						let now = new Date(transaction.effectedAt)
 						const mes = now.getMonth() + 1
 
-						if (mes.toString() !== this.state.month.toString()) {
+						if (mes !== parseInt(this.state.month, 10)) {
 							toReturn = false
 						}
 					}

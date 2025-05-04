@@ -50,6 +50,7 @@ class ExtractAccount extends React.Component {
 			},
 		}
 		this.handleChange = this.handleChange.bind(this)
+		this.handleFilter = this.handleFilter.bind(this)
 		this.submitForm = this.submitForm.bind(this)
 		this.processExtractData = this.processExtractData.bind(this)
 		this.deleteTransactionChecked = this.deleteTransactionChecked.bind(this)
@@ -118,7 +119,7 @@ class ExtractAccount extends React.Component {
 			})
 	}
 
-	handleChange(event) {
+	handleFilter(event) {
 		this.setState((state) => {
 			switch (event.target.name) {
 				case 'clearFilter':
@@ -128,39 +129,17 @@ class ExtractAccount extends React.Component {
 					state.filters.month = now.getMonth() + 1
 					state.filters.bankId = null
 					state.filters.description = ''
-					state.filters.detail = '' // Adicionado para limpar o campo "detail"
+					state.filters.detail = ''
 					state.checked = []
 					break
 
-				case 'name':
-					state.name = event.target.value
-					break
-
-				case 'isActive':
-					state.filters.data.isActive = !state.filters.data.isActive
-					break
-
-				case 'bankType':
-					state.filters.data.bankType = event.target.value
-					break
-
-				case 'year':
-					state.filters.year = event.target.value
-					state.checked = []
-					break
-
-				case 'month':
-					state.filters.month = event.target.value
-					state.checked = []
-					break
-
-				case 'date': // Adicionado para tratar o filtro de data diretamente
+				case 'date':
 					state.filters.year = event.target.value.year
 					state.filters.month = event.target.value.month
 					state.checked = []
 					break
 
-				case 'clearDate': // Adicionado para limpar o filtro de data
+				case 'clearDate':
 					const nowDate = new Date()
 					state.filters.year = nowDate.getFullYear()
 					state.filters.month = nowDate.getMonth() + 1
@@ -184,21 +163,26 @@ class ExtractAccount extends React.Component {
 					state.checked = []
 					break
 
-				case 'descriptionList':
-					if (event?.target?.value?.length > 0) {
-						state.descriptions = event.target.value
-					}
-					break
-
 				case 'detail':
 					state.filters.detail = event.target.value
 					state.checked = []
 					break
 
+				default:
+			}
+			return state
+		}, this.processExtractData)
+	}
+
+	handleChange(event) {
+		this.setState((state) => {
+			switch (event.target.name) {
 				case 'checkbox':
 					const id = event.target.value
 					if (this.isChecked(id)) {
-						this.removeChecked(id)
+						state.checked = state.checked.filter((element) => {
+							return element !== id
+						})
 					} else {
 						state.checked.push(id)
 					}
@@ -206,16 +190,6 @@ class ExtractAccount extends React.Component {
 
 				default:
 			}
-			return state
-		}, this.processExtractData) // Certifique-se de chamar `processExtractData` após atualizar o estado
-	}
-
-	removeChecked(id) {
-		this.setState((state) => {
-			state.checked = state.checked.filter((element) => {
-				return element !== id
-			})
-
 			return state
 		})
 	}
@@ -337,79 +311,80 @@ class ExtractAccount extends React.Component {
 		return (
 			<div>
 				<div>
-					<TitleFilter handleChange={this.handleChange} />
+					<TitleFilter handleChange={this.handleFilter} />
 					<>
-							<Row style={{ marginBottom: '10px' }}> {/* Adicionado marginBottom para espaçamento */}
-								<Col xs={20} lg={4}>
-									<Radio.Group
-										size='middle'
-										name='compensationFilter'
-										value={
-											this.state.filters.onlyCompensated
-												? 'notCompensated'
-												: this.state.filters.onlyNotCompensated
-												? 'past'
-												: 'all'
-										}
-										onChange={(e) =>
-											this.handleChange({
-												target: {
-													name: 'compensationFilter',
-													value: e.target.value,
-												},
-											})
-										}
+						<Row style={{ marginBottom: '10px' }}>
+							{' '}
+							<Col xs={20} lg={4}>
+								<Radio.Group
+									size='middle'
+									name='compensationFilter'
+									value={
+										this.state.filters.onlyCompensated
+											? 'notCompensated'
+											: this.state.filters.onlyNotCompensated
+											? 'past'
+											: 'all'
+									}
+									onChange={(e) =>
+										this.handleFilter({
+											target: {
+												name: 'compensationFilter',
+												value: e.target.value,
+											},
+										})
+									}
+								>
+									<Radio.Button
+										value='notCompensated'
+										style={{
+											marginRight: '5px',
+											padding: '0 7px',
+											backgroundColor: this.state.filters.onlyCompensated
+												? '#e6f7ff'
+												: 'transparent',
+										}}
 									>
-										<Radio.Button
-											value='notCompensated'
-											style={{
-												marginRight: '5px',
-												padding: '0 7px',
-												backgroundColor: this.state.filters.onlyCompensated
+										Pendentes
+									</Radio.Button>
+									<Radio.Button
+										value='all'
+										style={{
+											marginRight: '5px',
+											padding: '0 7px',
+											backgroundColor:
+												!this.state.filters.onlyCompensated &&
+												!this.state.filters.onlyNotCompensated
 													? '#e6f7ff'
 													: 'transparent',
-											}}
-										>
-											Pendentes
-										</Radio.Button>
-										<Radio.Button
-											value='all'
-											style={{
-												marginRight: '5px',
-												padding: '0 7px',
-												backgroundColor:
-													!this.state.filters.onlyCompensated &&
-													!this.state.filters.onlyNotCompensated
-														? '#e6f7ff'
-														: 'transparent',
-											}}
-										>
-											Todos
-										</Radio.Button>
-										<Radio.Button
-											value='past'
-											style={{
-												padding: '0 7px',
-												backgroundColor: this.state.filters.onlyNotCompensated
-													? '#e6f7ff'
-													: 'transparent',
-											}}
-										>
-											Compensados
-										</Radio.Button>
-									</Radio.Group>
-								</Col>
-							</Row>
-							<Filters
-								handleChange={this.handleChange}
-								year={this.state.filters.year}
-								month={this.state.filters.month}
-								bankId={this.state.filters.bankId}
-								banks={this.state.banks}
-								descriptions={this.state.descriptions}
-								description={this.state.filters.description}
-								detail={this.state.filters.detail}
-							/>
+										}}
+									>
+										Todos
+									</Radio.Button>
+									<Radio.Button
+										value='past'
+										style={{
+											padding: '0 7px',
+											backgroundColor: this.state.filters.onlyNotCompensated
+												? '#e6f7ff'
+												: 'transparent',
+										}}
+									>
+										Compensados
+									</Radio.Button>
+								</Radio.Group>
+							</Col>
+						</Row>
+						<Filters
+							handleChange={this.handleFilter}
+							year={this.state.filters.year}
+							month={this.state.filters.month}
+							bankId={this.state.filters.bankId}
+							banks={this.state.banks}
+							descriptions={this.state.descriptions}
+							description={this.state.filters.description}
+							detail={this.state.filters.detail}
+						/>
 					</>
 					<div>
 						<Title level={4}>
