@@ -128,7 +128,7 @@ class ExtractAccount extends React.Component {
 					state.filters.month = now.getMonth() + 1
 					state.filters.bankId = null
 					state.filters.description = ''
-					state.filters.detail = '' // Adicionado para limpar o campo "detail"
+					state.filters.detail = ''
 					state.checked = []
 					break
 
