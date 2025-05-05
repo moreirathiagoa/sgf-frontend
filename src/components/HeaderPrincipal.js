@@ -34,7 +34,9 @@ class HeaderPrincipal extends React.Component {
 				{this.props.titulo && (
 					<>
 						<Link to='/saldos'>
-							<span style={{ paddingLeft: '10px', color: '#ccc', fontSize: '12px' }}>
+							<span
+								style={{ paddingLeft: '10px', color: '#ccc', fontSize: '12px' }}
+							>
 								{'Home >'}
 							</span>
 						</Link>

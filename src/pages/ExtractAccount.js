@@ -1,13 +1,14 @@
 import React from 'react'
 import '../App.css'
-import { Checkbox, Typography, Row, Col, Card, Radio, Popconfirm } from 'antd'
-import { TitleFilter, Filters } from '../components'
+import { Typography } from 'antd'
 import {
-	PlusCircleOutlined,
-	DeleteOutlined,
-	EditOutlined,
-	CheckCircleOutlined,
-} from '@ant-design/icons'
+	TitleFilter,
+	ExtractFilters,
+	TransactionCard,
+	CreateTransactionButton,
+	DeleteTransactionButton,
+	SelectAllCheckbox,
+} from '../components'
 import {
 	getExtractData,
 	removeTransaction,
@@ -15,9 +16,13 @@ import {
 	getTransaction,
 } from '../api'
 import { openNotification, formatDateToUser, prepareValue } from '../utils'
+import {
+	isChecked,
+	deleteTransactionChecked,
+	removeTransactionById,
+} from '../utils/extractUtils'
 
 const { Title } = Typography
-
 const descriptionsList = new Set()
 class ExtractAccount extends React.Component {
 	constructor(props) {
@@ -50,11 +55,11 @@ class ExtractAccount extends React.Component {
 			},
 		}
 		this.handleChange = this.handleChange.bind(this)
-		this.submitForm = this.submitForm.bind(this)
+		this.handleFilter = this.handleFilter.bind(this)
 		this.processExtractData = this.processExtractData.bind(this)
-		this.deleteTransactionChecked = this.deleteTransactionChecked.bind(this)
-		this.isChecked = this.isChecked.bind(this)
-		this.remover = this.remover.bind(this)
+		this.handleDeleteTransactionChecked =
+			this.handleDeleteTransactionChecked.bind(this)
+		this.handleRemoveTransaction = this.handleRemoveTransaction.bind(this)
 		this.compensateTransaction = this.compensateTransaction.bind(this)
 	}
 
@@ -118,7 +123,7 @@ class ExtractAccount extends React.Component {
 			})
 	}
 
-	handleChange(event) {
+	handleFilter(event) {
 		this.setState((state) => {
 			switch (event.target.name) {
 				case 'clearFilter':
@@ -128,39 +133,17 @@ class ExtractAccount extends React.Component {
 					state.filters.month = now.getMonth() + 1
 					state.filters.bankId = null
 					state.filters.description = ''
-					state.filters.detail = '' // Adicionado para limpar o campo "detail"
+					state.filters.detail = ''
 					state.checked = []
 					break
 
-				case 'name':
-					state.name = event.target.value
-					break
-
-				case 'isActive':
-					state.filters.data.isActive = !state.filters.data.isActive
-					break
-
-				case 'bankType':
-					state.filters.data.bankType = event.target.value
-					break
-
-				case 'year':
-					state.filters.year = event.target.value
-					state.checked = []
-					break
-
-				case 'month':
-					state.filters.month = event.target.value
-					state.checked = []
-					break
-
-				case 'date': // Adicionado para tratar o filtro de data diretamente
+				case 'date':
 					state.filters.year = event.target.value.year
 					state.filters.month = event.target.value.month
 					state.checked = []
 					break
 
-				case 'clearDate': // Adicionado para limpar o filtro de data
+				case 'clearDate':
 					const nowDate = new Date()
 					state.filters.year = nowDate.getFullYear()
 					state.filters.month = nowDate.getMonth() + 1
@@ -184,21 +167,24 @@ class ExtractAccount extends React.Component {
 					state.checked = []
 					break
 
-				case 'descriptionList':
-					if (event?.target?.value?.length > 0) {
-						state.descriptions = event.target.value
-					}
-					break
-
 				case 'detail':
 					state.filters.detail = event.target.value
 					state.checked = []
 					break
 
+				default:
+			}
+			return state
+		}, this.processExtractData)
+	}
+
+	handleChange(event) {
+		this.setState((state) => {
+			switch (event.target.name) {
 				case 'checkbox':
 					const id = event.target.value
-					if (this.isChecked(id)) {
-						this.removeChecked(id)
+					if (isChecked(id, state.checked)) {
+						state.checked = state.checked.filter((element) => element !== id)
 					} else {
 						state.checked.push(id)
 					}
@@ -207,87 +193,26 @@ class ExtractAccount extends React.Component {
 				default:
 			}
 			return state
-		}, this.processExtractData) // Certifique-se de chamar `processExtractData` após atualizar o estado
-	}
-
-	removeChecked(id) {
-		this.setState((state) => {
-			state.checked = state.checked.filter((element) => {
-				return element !== id
-			})
-
-			return state
 		})
 	}
 
-	isChecked(id) {
-		if (this.state.checked.includes(id)) {
-			return true
-		} else {
-			return false
-		}
+	handleDeleteTransactionChecked() {
+		deleteTransactionChecked(
+			this.state.checked,
+			removeTransaction,
+			this.processExtractData,
+			openNotification,
+			this.props.loading
+		)
 	}
 
-	deleteTransactionChecked() {
-		this.props.loading(true)
-
-		const checked = this.state.checked
-
-		for (let i = 0; i < checked.length; i++) {
-			removeTransaction(checked[i])
-				.then((res) => {
-					if (res.data.code === 202) {
-						openNotification(
-							'success',
-							'Transação removida',
-							'Transação removida com sucesso.'
-						)
-						//TODO: chamar essa função apenas ao finalizar o loop
-						this.processExtractData()
-					} else {
-						openNotification(
-							'error',
-							'Transação não removida',
-							`A Transação não pode ser removida. ${res?.data?.message}`
-						)
-					}
-				})
-				.catch((err) => {
-					openNotification(
-						'error',
-						'Transação não removida',
-						'Erro interno. Tente novamente mais tarde.'
-					)
-				})
-		}
-		this.setState({ checked: [] })
-	}
-
-	remover(id) {
-		return removeTransaction(id)
-			.then((res) => {
-				if (res.data.code === 202) {
-					openNotification(
-						'success',
-						'Transação removida',
-						'Transação removida com sucesso.'
-					)
-					this.processExtractData()
-				} else {
-					openNotification(
-						'error',
-						'Transação não removida',
-						`A Transação não pode ser removida. ${res?.data?.message}`
-					)
-				}
-			})
-			.catch((err) => {
-				openNotification(
-					'error',
-					'Transação não removida',
-					'Erro interno. Tente novamente mais tarde.'
-				)
-			})
+	handleRemoveTransaction(id) {
+		removeTransactionById(
+			id,
+			removeTransaction,
+			this.processExtractData,
+			openNotification
+		)
 	}
 
 	compensateTransaction(transactionId) {
@@ -331,137 +256,56 @@ class ExtractAccount extends React.Component {
 			})
 	}
 
-	submitForm(e) {}
-
 	render() {
 		return (
 			<div>
 				<div>
-					<TitleFilter handleChange={this.handleChange} />
-					<>
-							<Row style={{ marginBottom: '10px' }}> {/* Adicionado marginBottom para espaçamento */}
-								<Col xs={20} lg={4}>
-									<Radio.Group
-										size='middle'
-										name='compensationFilter'
-										value={
-											this.state.filters.onlyCompensated
-												? 'notCompensated'
-												: this.state.filters.onlyNotCompensated
-												? 'past'
-												: 'all'
-										}
-										onChange={(e) =>
-											this.handleChange({
-												target: {
-													name: 'compensationFilter',
-													value: e.target.value,
-												},
-											})
-										}
-									>
-										<Radio.Button
-											value='notCompensated'
-											style={{
-												marginRight: '5px',
-												padding: '0 7px',
-												backgroundColor: this.state.filters.onlyCompensated
-													? '#e6f7ff'
-													: 'transparent',
-											}}
-										>
-											Pendentes
-										</Radio.Button>
-										<Radio.Button
-											value='all'
-											style={{
-												marginRight: '5px',
-												padding: '0 7px',
-												backgroundColor:
-													!this.state.filters.onlyCompensated &&
-													!this.state.filters.onlyNotCompensated
-														? '#e6f7ff'
-														: 'transparent',
-											}}
-										>
-											Todos
-										</Radio.Button>
-										<Radio.Button
-											value='past'
-											style={{
-												padding: '0 7px',
-												backgroundColor: this.state.filters.onlyNotCompensated
-													? '#e6f7ff'
-													: 'transparent',
-											}}
-										>
-											Compensados
-										</Radio.Button>
-									</Radio.Group>
-								</Col>
-							</Row>
-							<Filters
-								handleChange={this.handleChange}
-								year={this.state.filters.year}
-								month={this.state.filters.month}
-								bankId={this.state.filters.bankId}
-								banks={this.state.banks}
-								descriptions={this.state.descriptions}
-								description={this.state.filters.description}
-								detail={this.state.filters.detail}
-							/>
-					</>
+					<TitleFilter handleChange={this.handleFilter} />
+					<ExtractFilters
+						handleChange={this.handleFilter}
+						year={this.state.filters.year}
+						month={this.state.filters.month}
+						bankId={this.state.filters.bankId}
+						banks={this.state.banks}
+						descriptions={this.state.descriptions}
+						description={this.state.filters.description}
+						detail={this.state.filters.detail}
+						showCompensationFilter={true}
+						compensationFilterValue={
+							this.state.filters.onlyCompensated
+								? 'notCompensated'
+								: this.state.filters.onlyNotCompensated
+								? 'past'
+								: 'all'
+						}
+						onCompensationFilterChange={(e) =>
+							this.handleFilter({
+								target: {
+									name: 'compensationFilter',
+									value: e.target.value,
+								},
+							})
+						}
+					/>
 					<div>
 						<Title level={4}>
 							Transações
-							<PlusCircleOutlined
-								style={{
-									marginLeft: '15px',
-									marginRight: '15px',
-									cursor: 'pointer',
-								}}
+							<CreateTransactionButton
 								onClick={() => {
 									this.props.showModal({ transactionType: 'contaCorrente' })
 								}}
+								tooltip='Adicionar nova transação'
 							/>
-							<Popconfirm
-								title='Deseja realmente apagar as transações selecionadas?'
-								onConfirm={() => {
-									this.deleteTransactionChecked()
-								}}
-								okText='Sim'
-								cancelText='Não'
+							<DeleteTransactionButton
+								onConfirm={this.handleDeleteTransactionChecked}
 								disabled={this.state.checked.length === 0}
-							>
-								<DeleteOutlined
-									style={{
-										marginRight: '15px',
-										cursor:
-											this.state.checked.length > 0 ? 'pointer' : 'not-allowed',
-										color:
-											this.state.checked.length > 0 ? 'inherit' : '#d9d9d9',
-									}}
-								/>
-							</Popconfirm>
-							<Checkbox
-								checked={
-									this.state.checked.length ===
-										this.state.transactions.length &&
-									this.state.transactions.length > 0
+							/>
+							<SelectAllCheckbox
+								transactions={this.state.transactions}
+								checkedIds={this.state.checked}
+								onSelectionChange={(checkedIds) =>
+									this.setState({ checked: checkedIds })
 								}
-								indeterminate={
-									this.state.checked.length > 0 &&
-									this.state.checked.length < this.state.transactions.length
-								}
-								onChange={(e) => {
-									if (e.target.checked) {
-										this.setState({
-											checked: this.state.transactions.map((t) => t._id),
-										})
-									} else {
-										this.setState({ checked: [] })
-									}
-								}}
 							/>
 						</Title>
 					</div>
@@ -472,101 +316,23 @@ class ExtractAccount extends React.Component {
 							element.isCompensated
 						)
 
-						const title = (
-							<>
-								<span
-									style={{
-										paddingRight: '10px',
-									}}
-								>
-									<Checkbox
-										checked={this.isChecked(element._id)}
-										onChange={() => {
-											this.handleChange({
-												target: { name: 'checkbox', value: element._id },
-											})
-										}}
-									/>
-								</span>
-								<span>{element.description || 'Transação Genérica'}</span>
-								<span
-									style={{
-										float: 'right',
-										display: 'flex',
-										gap: '15px',
-										fontSize: '17px',
-									}}
-								>
-									<EditOutlined
-										style={{ cursor: 'pointer', color: '#006400' }}
-										onClick={() => {
-											this.props.showModal({
-												transactionType: 'contaCorrente',
-												transactionId: element._id,
-											})
-										}}
-									/>
-									<Popconfirm
-										title='Deseja realmente apagar essa Transação?'
-										onConfirm={() => {
-											this.remover(element._id).then(() => {
-												this.processExtractData()
-											})
-										}}
-										okText='Sim'
-										cancelText='Não'
-									>
-										<DeleteOutlined
-											style={{ cursor: 'pointer', color: 'red' }}
-										/>
-									</Popconfirm>
-									{!element.isCompensated && (
-										<Popconfirm
-											title='Deseja realmente compensar essa Transação?'
-											onConfirm={() => this.compensateTransaction(element._id)}
-											okText='Sim'
-											cancelText='Não'
-										>
-											<CheckCircleOutlined
-												style={{ cursor: 'pointer', color: '#006400' }}
-											/>
-										</Popconfirm>
-									)}
-								</span>
-							</>
-						)
-
 						return (
-							<Card
-								size='small'
-								title={title}
-								style={{ maxWidth: 560, marginBottom: '5px' }}
-								key={element._id}
-							>
-								<Row>
-									<Col span={12} title={formatDateToUser(element.createdAt)}>
-										Efetivação: {formatDateToUser(element.effectedAt)}
-									</Col>
-									<Col span={12} style={{ textAlign: 'right' }}>
-										Valor:{' '}
-										<span
-											style={{
-												color: transactionValue.color,
-											}}
-										>
-											{transactionValue.value}
-										</span>
-									</Col>
-								</Row>
-								<Row>
-									<Col span={24} title={element.bankId?.name}>
-										Banco: {element.bankName}
-									</Col>
-								</Row>
-								<Row>
-									<Col span={24}>Detalhes: {element.detail}</Col>
-								</Row>
-							</Card>
+							<TransactionCard
+								transaction={element}
+								transactionValue={transactionValue}
+								isChecked={(id) => isChecked(id, this.state.checked)}
+								handleChange={this.handleChange}
+								handleRemoveTransaction={this.handleRemoveTransaction}
+								handleEditTransaction={(id) =>
+									this.props.showModal({
+										transactionType: 'contaCorrente',
+										transactionId: id,
+									})
+								}
+								handleCompensateTransaction={(id) =>
+									this.compensateTransaction(id)
+								}
+							/>
 						)
 					})}
 				</div>
