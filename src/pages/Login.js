@@ -73,7 +73,6 @@ class Login extends React.Component {
 							)
 							localStorage.setItem('token', res.data.data.token)
 							if (res.data.data.defaultDescription) {
-								console.log('entrei!!')
 								localStorage.setItem(
 									'defaultDescription',
 									res.data.data.defaultDescription

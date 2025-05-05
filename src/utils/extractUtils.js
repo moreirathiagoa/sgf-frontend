@@ -5,8 +5,7 @@
  * @returns {boolean} - Retorna true se o ID estiver na lista, caso contrário false.
  */
 export function isChecked(id, checked) {
-	console.log("isChecked", id, checked);
-	return checked.includes(id);
+	return checked.includes(id)
 }
 
 /**
@@ -24,15 +23,20 @@ export function deleteTransactionChecked(
 	openNotification,
 	setLoading
 ) {
-	setLoading(true);
+	setLoading(true)
 
 	const promises = checked.map((id) =>
-		removeTransactionById(id, removeTransaction, processExtractData, openNotification)
-	);
+		removeTransactionById(
+			id,
+			removeTransaction,
+			processExtractData,
+			openNotification
+		)
+	)
 
 	Promise.all(promises).finally(() => {
-		setLoading(false);
-	});
+		setLoading(false)
+	})
 }
 
 /**
@@ -56,14 +60,14 @@ export function removeTransactionById(
 					'success',
 					'Transação removida',
 					'Transação removida com sucesso.'
-				);
-				processExtractData();
+				)
+				processExtractData()
 			} else {
 				openNotification(
 					'error',
 					'Transação não removida',
 					`A Transação não pode ser removida. ${res?.data?.message}`
-				);
+				)
 			}
 		})
 		.catch(() => {
@@ -71,6 +75,6 @@ export function removeTransactionById(
 				'error',
 				'Transação não removida',
 				'Erro interno. Tente novamente mais tarde.'
-			);
-		});
+			)
+		})
 }
